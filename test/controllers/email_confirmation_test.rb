@@ -12,27 +12,25 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
     get magic_login_path(token_record.token)
   end
 
-  test "creating a letter while logged out generates and sends verification email" do
+  test "creating a letter while logged out creates letter and sends stamped confirmation email" do
     assert_difference -> { Letter.count } => 1 do
-      post letters_url, params: {
-        letter_form: {
-          email: "stranger@timeecho.com",
-          title: "Anonymous Capsule",
-          content: "I will be confirmed by this email verification flow when writing a time capsule letter.",
-          deliver_at: Date.current + 1.year,
-          happiness_level: "5",
-          anxiety_level: "5",
-          motivation_level: "5"
+      assert_enqueued_emails 1 do
+        post letters_url, params: {
+          letter_form: {
+            email: "stranger@timeecho.com",
+            title: "Anonymous Capsule",
+            content: "I will be confirmed by this email verification flow when writing a time capsule letter.",
+            deliver_at: Date.current + 1.year,
+            happiness_level: "5",
+            anxiety_level: "5",
+            motivation_level: "5"
+          }
         }
-      }
+      end
     end
 
     assert_redirected_to success_letters_url
-
-    record = VerifiedEmail.find_by(email: "stranger@timeecho.com")
-    assert_not_nil record
-    assert_not record.verified?
-    assert record.token_valid?
+    assert_equal "stranger@timeecho.com", Letter.last.email
   end
 
   test "magic link login activates/confirms the account" do

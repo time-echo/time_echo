@@ -16,7 +16,6 @@ class LettersTaskTest < ActiveSupport::TestCase
       status: "pending"
     )
     pending_letter.save!(validate: false)
-    VerifiedEmail.verify!(pending_letter.email)
 
     Rake::Task["letters:deliver"].reenable
     Rake::Task["letters:deliver"].invoke

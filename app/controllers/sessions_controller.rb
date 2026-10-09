@@ -26,8 +26,6 @@ class SessionsController < ApplicationController
       pref = UserPreference.find_or_create_by!(email: email)
       pref.update!(confirmed_at: Time.current) unless pref.confirmed_at.present?
 
-      VerifiedEmail.verify!(email)
-
       Analytics::TrackEventService.call("user_logged_in", { email: email })
 
       return_to = session.delete(:return_to)

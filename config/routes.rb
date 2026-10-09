@@ -9,7 +9,6 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy", as: :logout
 
   get "check_email", to: "check_emails#show", as: :check_email
-  get "email_verifications/:token", to: "email_verifications#show", as: :verify_email
 
   get "letters/success", to: "letter_successes#show", as: :success_letters
 

@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14-alpine
+    image: postgres:17-alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -60,64 +60,64 @@ services:
       - "8025:8025"
       - "1025:1025"
 
-  glitchtip-db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: glitchtip
-    volumes:
-      - glitchtip_postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+  # glitchtip-db:
+  #   image: postgres:14-alpine
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: glitchtip
+  #   volumes:
+  #     - glitchtip_postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 5
 
-  glitchtip-redis:
-    image: redis:7-alpine
+  # glitchtip-redis:
+  #   image: redis:7-alpine
 
-  glitchtip-web:
-    image: glitchtip/glitchtip:latest
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@glitchtip-db:5432/glitchtip
-      REDIS_URL: redis://glitchtip-redis:6379/0
-      SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
-      GLITCHTIP_DOMAIN: http://localhost:8000
-      DEFAULT_FROM_EMAIL: glitchtip@example.com
-      EMAIL_URL: smtp://mailpit:1025
-      ENABLE_USER_REGISTRATION: "True"
-      ENABLE_ORGANIZATION_CREATION: "True"
-      RUN_MIGRATIONS: "1"
-    depends_on:
-      glitchtip-db:
-        condition: service_healthy
-      glitchtip-redis:
-        condition: service_started
-      mailpit:
-        condition: service_started
+  # glitchtip-web:
+  #   image: glitchtip/glitchtip:latest
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:postgres@glitchtip-db:5432/glitchtip
+  #     REDIS_URL: redis://glitchtip-redis:6379/0
+  #     SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
+  #     GLITCHTIP_DOMAIN: http://localhost:8000
+  #     DEFAULT_FROM_EMAIL: glitchtip@example.com
+  #     EMAIL_URL: smtp://mailpit:1025
+  #     ENABLE_USER_REGISTRATION: "True"
+  #     ENABLE_ORGANIZATION_CREATION: "True"
+  #     RUN_MIGRATIONS: "1"
+  #   depends_on:
+  #     glitchtip-db:
+  #       condition: service_healthy
+  #     glitchtip-redis:
+  #       condition: service_started
+  #     mailpit:
+  #       condition: service_started
 
-  glitchtip-worker:
-    image: glitchtip/glitchtip:latest
-    command: ./bin/run-celery-with-beat.sh
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@glitchtip-db:5432/glitchtip
-      REDIS_URL: redis://glitchtip-redis:6379/0
-      SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
-      GLITCHTIP_DOMAIN: http://localhost:8000
-      DEFAULT_FROM_EMAIL: glitchtip@example.com
-      EMAIL_URL: smtp://mailpit:1025
-      ENABLE_USER_REGISTRATION: "True"
-      ENABLE_ORGANIZATION_CREATION: "True"
-    depends_on:
-      glitchtip-db:
-        condition: service_healthy
-      glitchtip-redis:
-        condition: service_started
+  # glitchtip-worker:
+  #   image: glitchtip/glitchtip:latest
+  #   command: ./bin/run-celery-with-beat.sh
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:postgres@glitchtip-db:5432/glitchtip
+  #     REDIS_URL: redis://glitchtip-redis:6379/0
+  #     SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
+  #     GLITCHTIP_DOMAIN: http://localhost:8000
+  #     DEFAULT_FROM_EMAIL: glitchtip@example.com
+  #     EMAIL_URL: smtp://mailpit:1025
+  #     ENABLE_USER_REGISTRATION: "True"
+  #     ENABLE_ORGANIZATION_CREATION: "True"
+  #   depends_on:
+  #     glitchtip-db:
+  #       condition: service_healthy
+  #     glitchtip-redis:
+  #       condition: service_started
 
 volumes:
   postgres_data:
   bundle_cache:
-  glitchtip_postgres_data:
+  # glitchtip_postgres_data:

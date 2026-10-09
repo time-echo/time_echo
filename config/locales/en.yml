@@ -252,8 +252,6 @@ en:
     unauthorized_view: You are not authorized to view this letter.
     unauthorized_modify: You are not authorized to modify this letter.
     reality_updated: Reality updated! Reflect on how your life has evolved.
-    email_verified: Your email has been verified successfully. Welcome to your digital vault!
-    invalid_or_expired_verification_token: This verification link is invalid or has expired.
     letter_deleted: The letter has been permanently deleted.
     letter_archived: The letter has been archived and will not be delivered.
     letter_restored: The letter has been restored to your active vault.
@@ -443,10 +441,6 @@ en:
     success_opening: Scheduled opening
     success_next_title: What happens next?
     success_next_desc:
-      We have sent a verification email to %{email}. Once verified,
-      your capsule will be permanently scheduled. On that special day, it will arrive
-      back in your inbox.
-    success_next_desc_verified:
       We have sent a confirmation email to %{email}.
       On that special day, it will arrive back in your inbox.
     success_btn_dashboard: Go to Your Vault Dashboard
@@ -881,20 +875,6 @@ en:
       expiry_help:
         This link will expire in 15 minutes. If you did not request this
         change, you can safely ignore this email.
-    verify_email:
-      badge: Email Verification
-      subject: Verify your email address for TimeEcho
-      header: Verify your email address
-      greeting: Hello,
-      body:
-        Thank you for writing a capsule on TimeEcho. To ensure the delivery of your
-        future letter and safeguard your vault, please verify your email address
-        by clicking the button below.
-      btn: Verify Email Address
-      expiry_help:
-        This verification link will expire in 48 hours. If you did not write a letter
-        on TimeEcho, you can safely ignore this email.
-      footer_subtitle: Nostalgic & hopeful journaling to your future self.
     stamped_confirmation:
       badge: Capsule Sealed
       subject: "Letter Confirmed & Sealed: %{title}"

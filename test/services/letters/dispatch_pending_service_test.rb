@@ -15,10 +15,6 @@ class Letters::DispatchPendingServiceTest < ActiveJob::TestCase
   end
 
   test "queues due pending letters and enqueues deliver letter jobs" do
-    VerifiedEmail.create!(email: "due1@example.com", verified_at: Time.current)
-    VerifiedEmail.create!(email: "due2@example.com", verified_at: Time.current)
-    VerifiedEmail.create!(email: "future@example.com", verified_at: Time.current)
-
     due_letter1 = build_letter(email: "due1@example.com")
     due_letter2 = build_letter(email: "due2@example.com")
     future_letter = build_letter(scheduled_at: 1.month.from_now, email: "future@example.com")
@@ -48,16 +44,6 @@ class Letters::DispatchPendingServiceTest < ActiveJob::TestCase
     build_letter(status: "queued", queued_at: 10.minutes.ago)
     build_letter(status: "delivered", delivered_at: 1.day.ago)
     build_letter(status: "failed")
-
-    assert_enqueued_jobs 0 do
-      queued_count = Letters::DispatchPendingService.call
-      assert_equal 0, queued_count
-    end
-  end
-
-  test "does not queue pending letters for unverified emails" do
-    build_letter(email: "unverified@example.com")
-    VerifiedEmail.create!(email: "unverified@example.com", verified_at: nil)
 
     assert_enqueued_jobs 0 do
       queued_count = Letters::DispatchPendingService.call

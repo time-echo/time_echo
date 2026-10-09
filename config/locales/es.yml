@@ -254,8 +254,6 @@ es:
     reality_updated:
       "¡Realidad actualizada! Reflexiona sobre cómo ha evolucionado
       tu vida."
-    email_verified: Tu correo electrónico ha sido verificado correctamente. ¡Bienvenido a tu baúl digital!
-    invalid_or_expired_verification_token: Este enlace de verificación no es válido o ha caducado.
     letter_deleted: La carta ha sido eliminada permanentemente.
     letter_archived: La carta ha sido archivada y no será enviada.
     letter_restored: La carta ha sido restaurada a tu baúl activo.
@@ -574,10 +572,6 @@ es:
     success_opening: Apertura programada
     success_next_title: "¿Qué pasa después?"
     success_next_desc:
-      Hemos enviado un correo de verificación a %{email}. Una vez
-      verificado, tu cápsula se programará permanentemente. En ese día tan especial,
-      llegará de vuelta a tu correo.
-    success_next_desc_verified:
       Hemos enviado un correo de confirmación a %{email}.
       En ese día especial, llegará de nuevo a tu bandeja de entrada.
     success_btn_dashboard: Ir a mi Panel de Control
@@ -895,20 +889,6 @@ es:
       expiry_help:
         Este enlace caducará en 15 minutos. Si no solicitaste este cambio,
         puedes ignorar este correo de forma segura.
-    verify_email:
-      badge: Verificación de Correo
-      subject: Verifica tu dirección de correo electrónico para TimeEcho
-      header: Verifica tu correo electrónico
-      greeting: Hola,
-      body:
-        Gracias por escribir una cápsula en TimeEcho. Para garantizar la entrega de tu
-        carta futura y salvaguardar tu baúl, por favor verifica tu dirección de correo
-        haciendo clic en el botón de abajo.
-      btn: Verificar Correo Electrónico
-      expiry_help:
-        Este enlace de verificación caducará en 48 horas. Si no escribiste una carta
-        en TimeEcho, puedes ignorar este correo con total tranquilidad.
-      footer_subtitle: Diario nostálgico y esperanzador para tu yo del futuro.
     stamped_confirmation:
       badge: Cápsula Sellada
       subject: "Carta Confirmada y Sellada: %{title}"
