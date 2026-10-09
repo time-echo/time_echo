@@ -16,10 +16,6 @@ class LetterSuccessesController < ApplicationController
   def next_steps_text
     return "" unless @email
 
-    if VerifiedEmail.verified?(@email)
-      t("letters.success_next_desc_verified", email: @email)
-    else
-      t("letters.success_next_desc", email: @email)
-    end
+    t("letters.success_next_desc", email: @email)
   end
 end

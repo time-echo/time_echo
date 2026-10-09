@@ -14,7 +14,6 @@ class Letters::DeliverLetterJobTest < ActiveJob::TestCase
       queued_at: 1.minute.ago
     }.merge(overrides))
     letter.save!(validate: false)
-    VerifiedEmail.verify!(letter.email)
     letter
   end
 

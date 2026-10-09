@@ -16,9 +16,7 @@ class Letters::CreateServiceTest < ActiveSupport::TestCase
     }
   end
 
-  test "creates a letter and sends stamped confirmation email when email is verified" do
-    VerifiedEmail.create!(email: "author@example.com", verified_at: Time.current)
-
+  test "creates a letter and sends stamped confirmation email" do
     assert_enqueued_emails 1 do
       result = Letters::CreateService.call(
         params: @valid_params,
@@ -29,25 +27,7 @@ class Letters::CreateServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "creates a letter and sends verification email when email is not verified" do
-    assert_enqueued_emails 1 do
-      result = Letters::CreateService.call(
-        params: @valid_params,
-        current_user_email: nil
-      )
-      assert result.success?
-      assert_equal "author@example.com", result.letter.email
-    end
-
-    record = VerifiedEmail.find_by(email: "author@example.com")
-    assert_not_nil record
-    assert_not record.verified?
-    assert record.token_valid?
-  end
-
-  test "creates a letter for signed-in user and sends stamped confirmation when already verified" do
-    VerifiedEmail.create!(email: "signed_in@example.com", verified_at: Time.current)
-
+  test "creates a letter for signed-in user and sends stamped confirmation" do
     assert_enqueued_emails 1 do
       result = Letters::CreateService.call(
         params: @valid_params,

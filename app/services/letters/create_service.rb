@@ -28,12 +28,7 @@ module Letters
           }
         )
 
-        if VerifiedEmail.verified?(form.letter.email)
-          LetterMailer.stamped_confirmation(form.letter).deliver_later
-        else
-          verified_record = VerifiedEmail.generate_token_for(form.letter.email)
-          VerificationMailer.verify_email(form.letter.email, verified_record.token).deliver_later
-        end
+        LetterMailer.stamped_confirmation(form.letter).deliver_later
         Result.new(success: true, letter: form.letter, form: form)
       else
         Result.new(success: false, errors: form.errors, form: form)

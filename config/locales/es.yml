@@ -254,8 +254,6 @@ es:
     reality_updated:
       "¡Realidad actualizada! Reflexiona sobre cómo ha evolucionado
       tu vida."
-    email_verified: Tu correo electrónico ha sido verificado correctamente. ¡Bienvenido a tu baúl digital!
-    invalid_or_expired_verification_token: Este enlace de verificación no es válido o ha caducado.
     letter_deleted: La carta ha sido eliminada permanentemente.
     letter_archived: La carta ha sido archivada y no será enviada.
     letter_restored: La carta ha sido restaurada a tu baúl activo.
@@ -574,10 +572,6 @@ es:
     success_opening: Apertura programada
     success_next_title: "¿Qué pasa después?"
     success_next_desc:
-      Hemos enviado un correo de verificación a %{email}. Una vez
-      verificado, tu cápsula se programará permanentemente. En ese día tan especial,
-      llegará de vuelta a tu correo.
-    success_next_desc_verified:
       Hemos enviado un correo de confirmación a %{email}.
       En ese día especial, llegará de nuevo a tu bandeja de entrada.
     success_btn_dashboard: Ir a mi Panel de Control
@@ -855,23 +849,26 @@ es:
       access_token_badge: Clave de Acceso Oficial
       email_update_badge: Solicitud de Actualización
       docket_prefix: Expediente
+      postal_address: Calle Mayor 12, Planta 3, 28013 Madrid, España
     magic_link:
-      subject: Tu enlace mágico de inicio de sesión para TimeEcho
+      subject: Tu enlace de acceso a TimeEcho
+      preheader: Usa este enlace directo para ingresar a tu baúl personal de cartas.
       header: Inicia sesión en tu cápsula del tiempo digital
       greeting: Hola,
       body:
-        Haz clic en el botón de abajo para iniciar sesión en tu panel de TimeEcho
+        Haz clic en el botón de abajo para ingresar a tu panel de TimeEcho
         y ver tus cartas o escribirle a tu yo del futuro.
       btn: Iniciar sesión en TimeEcho
       body_text:
-        "Haz clic en el enlace de abajo o cópialo y pégalo en tu navegador
-        para iniciar sesión en tu panel de TimeEcho:"
+        "Abre el enlace de abajo o cópialo en tu navegador
+        para acceder a tu panel de TimeEcho:"
       expiry_help:
-        Este enlace caducará en 15 minutos. Si no solicitaste este correo
-        electrónico, puedes ignorarlo de forma segura.
+        Este enlace caducará en 15 minutos. Si no solicitaste este acceso,
+        puedes ignorar este correo de forma segura.
       footer_subtitle: Diario nostálgico y esperanzador para tu yo del futuro.
     future_letter:
-      subject: Un mensaje de tu yo del pasado (Enviado el %{date})
+      subject: Tu carta del pasado ya está lista
+      preheader: Escribiste este mensaje para hoy. Ábrelo y revive lo que pensabas.
       header: Un mensaje de tu yo del pasado
       written_on: Escrita el %{date}
       open_btn: Abrir mi carta
@@ -895,23 +892,10 @@ es:
       expiry_help:
         Este enlace caducará en 15 minutos. Si no solicitaste este cambio,
         puedes ignorar este correo de forma segura.
-    verify_email:
-      badge: Verificación de Correo
-      subject: Verifica tu dirección de correo electrónico para TimeEcho
-      header: Verifica tu correo electrónico
-      greeting: Hola,
-      body:
-        Gracias por escribir una cápsula en TimeEcho. Para garantizar la entrega de tu
-        carta futura y salvaguardar tu baúl, por favor verifica tu dirección de correo
-        haciendo clic en el botón de abajo.
-      btn: Verificar Correo Electrónico
-      expiry_help:
-        Este enlace de verificación caducará en 48 horas. Si no escribiste una carta
-        en TimeEcho, puedes ignorar este correo con total tranquilidad.
-      footer_subtitle: Diario nostálgico y esperanzador para tu yo del futuro.
     stamped_confirmation:
       badge: Cápsula Sellada
-      subject: "Carta Confirmada y Sellada: %{title}"
+      subject: "Carta confirmada: %{title}"
+      preheader: Guardamos tu cápsula bajo llave. Llegará a tu correo en la fecha elegida.
       header: Tu carta ha sido sellada y registrada
       body:
         Hemos registrado y sellado de manera segura tu cápsula del tiempo "%{title}". Ha quedado

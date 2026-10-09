@@ -56,18 +56,6 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     token_record.reload
     assert token_record.used?
     assert_not_nil token_record.used_at
-    assert VerifiedEmail.verified?("user@example.com")
-  end
-
-  test "should mark unverified email as verified on successful login" do
-    VerifiedEmail.create!(email: "unverified@example.com")
-    assert_not VerifiedEmail.verified?("unverified@example.com")
-
-    token_record = SessionToken.create!(email: "unverified@example.com")
-    get magic_login_path(token_record.token)
-
-    assert_redirected_to dashboard_path
-    assert VerifiedEmail.verified?("unverified@example.com")
   end
 
   test "should redirect to return_to after magic login when present" do

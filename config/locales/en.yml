@@ -252,8 +252,6 @@ en:
     unauthorized_view: You are not authorized to view this letter.
     unauthorized_modify: You are not authorized to modify this letter.
     reality_updated: Reality updated! Reflect on how your life has evolved.
-    email_verified: Your email has been verified successfully. Welcome to your digital vault!
-    invalid_or_expired_verification_token: This verification link is invalid or has expired.
     letter_deleted: The letter has been permanently deleted.
     letter_archived: The letter has been archived and will not be delivered.
     letter_restored: The letter has been restored to your active vault.
@@ -443,10 +441,6 @@ en:
     success_opening: Scheduled opening
     success_next_title: What happens next?
     success_next_desc:
-      We have sent a verification email to %{email}. Once verified,
-      your capsule will be permanently scheduled. On that special day, it will arrive
-      back in your inbox.
-    success_next_desc_verified:
       We have sent a confirmation email to %{email}.
       On that special day, it will arrive back in your inbox.
     success_btn_dashboard: Go to Your Vault Dashboard
@@ -841,8 +835,10 @@ en:
       access_token_badge: Official Access Key
       email_update_badge: Address Update Request
       docket_prefix: Docket
+      postal_address: Calle Mayor 12, 3rd Floor, 28013 Madrid, Spain
     magic_link:
-      subject: Your Magic Sign-In Link for TimeEcho
+      subject: Your Sign-In Link for TimeEcho
+      preheader: Use this secure link to access your personal letter vault.
       header: Sign in to your digital time capsule
       greeting: Hello,
       body:
@@ -850,14 +846,15 @@ en:
         letters or write to your future self.
       btn: Sign in to TimeEcho
       body_text:
-        "Click the link below or copy and paste it into your browser to log
+        "Open the link below or copy and paste it into your browser to log
         in to your TimeEcho dashboard:"
       expiry_help:
         This link will expire in 15 minutes. If you did not request this
         email, you can safely ignore it.
       footer_subtitle: Nostalgic & hopeful journaling to your future self.
     future_letter:
-      subject: A Message from Your Past Self (Sent %{date})
+      subject: Your letter from the past is ready
+      preheader: You wrote this message for today. Open it to revisit your thoughts.
       header: A Message from Your Past Self
       written_on: Written on %{date}
       open_btn: Open My Letter
@@ -881,23 +878,10 @@ en:
       expiry_help:
         This link will expire in 15 minutes. If you did not request this
         change, you can safely ignore this email.
-    verify_email:
-      badge: Email Verification
-      subject: Verify your email address for TimeEcho
-      header: Verify your email address
-      greeting: Hello,
-      body:
-        Thank you for writing a capsule on TimeEcho. To ensure the delivery of your
-        future letter and safeguard your vault, please verify your email address
-        by clicking the button below.
-      btn: Verify Email Address
-      expiry_help:
-        This verification link will expire in 48 hours. If you did not write a letter
-        on TimeEcho, you can safely ignore this email.
-      footer_subtitle: Nostalgic & hopeful journaling to your future self.
     stamped_confirmation:
       badge: Capsule Sealed
-      subject: "Letter Confirmed & Sealed: %{title}"
+      subject: "Confirmed & Sealed: %{title}"
+      preheader: Your capsule is locked and safely stored. It will arrive on the chosen date.
       header: Your Letter is Stamped and Sealed
       body:
         We have safely registered and sealed your time capsule "%{title}". It has been locked

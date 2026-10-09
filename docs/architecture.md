@@ -52,7 +52,6 @@ graph TD
         FMS[Analytics::FetchMetricsService]
         REUS[Settings::RequestEmailUpdateService]
         CEUS[Settings::ConfirmEmailUpdateService]
-        UPS2[Settings::UpdatePreferencesService]
         DAS[Settings::DestroyAccountService]
     end
 
@@ -63,7 +62,6 @@ graph TD
 
     subgraph Models [Active Record Models]
         Let[Letter]
-        Pref[UserPreference]
         Evt[AnalyticsEvent]
         Snap[EmotionalSnapshot]
         Pred[Prediction]
@@ -174,15 +172,6 @@ Below is the entity-relationship design showing the relational mapping, attribut
 
 ```mermaid
 erDiagram
-    UserPreference {
-        bigint id PK
-        string email UK
-        datetime confirmed_at
-        string unconfirmed_email
-        datetime created_at
-        datetime updated_at
-    }
-
     Letter {
         bigint id PK
         string email FK
@@ -254,10 +243,8 @@ erDiagram
         datetime updated_at
     }
 
-    UserPreference ||--o{ Letter : "owns"
     Letter ||--o| EmotionalSnapshot : "has one"
     Letter ||--o{ Prediction : "has many"
-    UserPreference ||--o{ SessionToken : "requests"
 ```
 
 > [!SECURITY]
@@ -300,9 +287,8 @@ If a user triggers "Eliminar mi baúl" in their settings, a direct PostgreSQL tr
 
 1. All foreign keys (`predictions`, `emotional_snapshots`) matching the user's `Letter` IDs.
 2. The `Letter` records themselves.
-3. The `UserPreference` records.
-4. Historical `AnalyticsEvent` records matching the user's email inside metadata.
-5. All active session contexts are immediately cleared.
+3. Historical `AnalyticsEvent` records matching the user's email inside metadata.
+4. All active session contexts are immediately cleared.
 
 ---
 
