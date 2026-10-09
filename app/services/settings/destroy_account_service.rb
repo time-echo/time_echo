@@ -1,12 +1,11 @@
 module Settings
   class DestroyAccountService
-    def self.call(email, user_preference)
-      new(email, user_preference).call
+    def self.call(email)
+      new(email).call
     end
 
-    def initialize(email, user_preference)
+    def initialize(email)
       @email = email
-      @user_preference = user_preference
     end
 
     def call
@@ -35,7 +34,6 @@ module Settings
         end
 
         letters.destroy_all
-        @user_preference.destroy!
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
       end
       true

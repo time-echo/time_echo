@@ -4,7 +4,6 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
   setup do
     @old_email = "original@timeecho.com"
     @new_email = "newaddress@timeecho.com"
-    @pref = UserPreference.find_or_create_by!(email: @old_email)
   end
 
   def sign_in(email)
@@ -33,75 +32,43 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
     assert_equal "stranger@timeecho.com", Letter.last.email
   end
 
-  test "magic link login activates/confirms the account" do
-    assert_nil @pref.confirmed_at
-
+  test "updating email in Settings does not change it immediately and dispatches mailer" do
     sign_in(@old_email)
 
-    @pref.reload
-    assert_not_nil @pref.confirmed_at
-  end
-
-  test "updating email in Settings does not change it immediately, sets unconfirmed_email and dispatches mailer" do
-    sign_in(@old_email)
-
-    patch settings_url, params: {
-      user_preference: {
+    assert_enqueued_emails 1 do
+      patch settings_url, params: {
         email: @new_email
       }
-    }
+    end
 
     assert_redirected_to settings_url
     follow_redirect!
     assert_match "Hemos enviado un correo de confirmación", response.body
-
-    @pref.reload
-    assert_equal @old_email, @pref.email
-    assert_equal @new_email, @pref.unconfirmed_email
-
-    # Verify a SessionToken was generated for new email address
-    token = SessionToken.find_by(email: @new_email)
-    assert_not_nil token
   end
 
   test "confirming email update via token completes the migration transaction" do
     sign_in(@old_email)
 
-    # Write a letter under the old email
-    letter = Letter.create!(
+    Letter.create!(
       email: @old_email,
       title: "My Legacy",
       content: "Nostalgic letter.",
       deliver_at: Date.current + 2.years
     )
 
-    # Initiate email update
-    patch settings_url, params: {
-      user_preference: {
-        email: @new_email
-      }
-    }
+    token = Rails.application.message_verifier(:email_update).generate(
+      { old_email: @old_email, new_email: @new_email },
+      expires_in: 15.minutes
+    )
 
-    token_record = SessionToken.find_by(email: @new_email)
-    assert_not_nil token_record
-
-    # Confirm the update by visiting the confirmation path
-    get confirm_email_update_settings_url(token: token_record.token)
+    get confirm_email_update_settings_url(token: token)
 
     assert_redirected_to settings_url
     follow_redirect!
     assert_match "Dirección de correo electrónico confirmada y actualizada", response.body
 
-    # Check database migration
-    @pref.reload
-    assert_equal @new_email, @pref.email
-    assert_nil @pref.unconfirmed_email
-
-    # Check letters migrated
     assert_equal 0, Letter.where(email: @old_email).count
     assert_equal 1, Letter.where(email: @new_email).count
-
-    # Session should be updated
     assert_equal @new_email, session[:current_user_email]
   end
 

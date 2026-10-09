@@ -11,23 +11,18 @@ module Settings
     end
 
     def call
-      token_record = SessionToken.active.find_by(token: @token)
-      return OpenStruct.new(success?: false) unless token_record
+      return OpenStruct.new(success?: false) if @token.blank?
 
-      new_email = token_record.email
-      pref = UserPreference.find_by(unconfirmed_email: new_email)
-      return OpenStruct.new(success?: false) unless pref
+      payload = Rails.application.message_verifier(:email_update).verified(@token)
+      return OpenStruct.new(success?: false) unless payload.is_a?(Hash)
 
-      old_email = pref.email
+      old_email = payload[:old_email] || payload["old_email"]
+      new_email = payload[:new_email] || payload["new_email"]
+
+      return OpenStruct.new(success?: false) if old_email.blank? || new_email.blank?
 
       ActiveRecord::Base.transaction do
-        token_record.use!
-
-        existing_pref = UserPreference.find_by(email: new_email)
         Letter.where(email: old_email).update_all(email: new_email)
-
-        existing_pref.destroy! if existing_pref
-        pref.update!(email: new_email, unconfirmed_email: nil)
       end
 
       Analytics::TrackEventService.call("email_update_confirmed", { old_email: old_email, new_email: new_email }) rescue nil

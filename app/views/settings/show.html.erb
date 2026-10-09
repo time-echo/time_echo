@@ -18,10 +18,12 @@
       </h2>
     </div>
 
-    <%= form_with model: @user_preference, url: settings_path, method: :patch, class: "space-y-6" do |f| %>
+    <%= form_with url: settings_path, method: :patch, class: "space-y-6" do |f| %>
       <div class="space-y-2">
         <%= f.label :email, t('settings.new_email_address'), class: "text-xs font-letter uppercase tracking-wider font-semibold text-base-content/70 block" %>
         <%= f.email_field :email,
+            name: "email",
+            id: "email",
             value: current_user_email,
             class: "w-full paper-sheet rounded-xs border border-[#D8D2C2] dark:border-[#2D3340] px-4 py-2.5 font-letter text-xs text-base-content placeholder:text-base-content/40 focus:border-[#8E2818] focus:outline-none transition-colors min-h-[44px]",
             placeholder: t('settings.email_placeholder'),

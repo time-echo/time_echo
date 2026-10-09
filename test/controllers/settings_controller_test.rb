@@ -33,48 +33,31 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     sign_in(@email)
 
     patch settings_url, params: {
-      user_preference: {
-        email: @email
-      }
+      email: @email
     }
 
     assert_redirected_to settings_url
     follow_redirect!
     assert_match "Ajustes guardados", response.body
-
-    # Verify database persistence
-    prefs = UserPreference.find_by(email: @email)
-    assert_not_nil prefs
-    assert_equal @email, prefs.email
   end
 
   test "should update settings via turbo_stream" do
     sign_in(@email)
 
     patch settings_url, as: :turbo_stream, params: {
-      user_preference: {
-        email: @email
-      }
+      email: @email
     }
 
     assert_response :success
     assert_match "Ajustes actualizados correctamente", response.body
-
-    # Verify persistence
-    prefs = UserPreference.find_by(email: @email)
-    assert_not_nil prefs
   end
 
-  test "should destroy account and delete all associated letters, preferences and clear session" do
+  test "should destroy account and delete all associated letters and clear session" do
     sign_in(@email)
 
-    # Confirm existences first
     assert_equal 1, Letter.where(email: @email).count
-    assert_nothing_raised do
-      UserPreference.find_or_create_by!(email: @email)
-    end
 
-    assert_difference -> { Letter.where(email: @email).count } => -1, -> { UserPreference.where(email: @email).count } => -1, -> { AuditLog.for_action("letter.deleted").count } => 1 do
+    assert_difference -> { Letter.where(email: @email).count } => -1, -> { AuditLog.for_action("letter.deleted").count } => 1 do
       delete settings_url
     end
 
@@ -85,11 +68,11 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
   test "should handle email update request in settings update" do
     sign_in(@email)
 
-    patch settings_url, params: {
-      user_preference: {
+    assert_enqueued_emails 1 do
+      patch settings_url, params: {
         email: "new_email@timeecho.com"
       }
-    }
+    end
 
     assert_redirected_to settings_url
   end
@@ -98,14 +81,14 @@ class SettingsControllerTest < ActionDispatch::IntegrationTest
     sign_in(@email)
 
     struct_fail = Struct.new(:success?, :error).new(false, "Invalid settings")
-    original_call = Settings::UpdatePreferencesService.method(:call)
-    Settings::UpdatePreferencesService.define_singleton_method(:call, ->(*) { struct_fail })
+    original_call = Settings::RequestEmailUpdateService.method(:call)
+    Settings::RequestEmailUpdateService.define_singleton_method(:call, ->(*) { struct_fail })
 
     patch settings_url, params: {
-      user_preference: { email: "invalid" }
+      email: "invalid"
     }
     assert_response :unprocessable_entity
   ensure
-    Settings::UpdatePreferencesService.define_singleton_method(:call, original_call.to_proc)
+    Settings::RequestEmailUpdateService.define_singleton_method(:call, original_call.to_proc)
   end
 end
