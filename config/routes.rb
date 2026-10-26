@@ -35,5 +35,11 @@ Rails.application.routes.draw do
   get "terms", to: "pages#terms", as: :terms
   get "about", to: "pages#about", as: :about
 
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      get "ping", to: proc { [ 200, { "Content-Type" => "application/json" }, [ { status: "ok", timestamp: Time.current.iso8601 }.to_json ] ] }
+    end
+  end
+
   mount GoodJob::Engine => "/good_job", constraints: ->(request) { request.session[:current_user_email].present? }
 end
