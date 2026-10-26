@@ -38,6 +38,14 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       get "ping", to: proc { [ 200, { "Content-Type" => "application/json" }, [ { status: "ok", timestamp: Time.current.iso8601 }.to_json ] ] }
+
+      resources :letters, only: [ :index, :show, :create, :destroy ] do
+        post "predictions", to: "letter_predictions#update"
+        scope module: :letters do
+          resource :archive, only: [ :create ]
+          resource :restore, only: [ :create ]
+        end
+      end
     end
   end
 
