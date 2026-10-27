@@ -59,6 +59,20 @@ class Api::V1::ResultHandlerTest < ActiveSupport::TestCase
     assert_equal 422, Rack::Utils.status_code(err.status)
   end
 
+  test "unwrap! raises Api::UnauthorizedError on :invalid_token" do
+    result = Struct.new(:success?, :error, :message).new(false, :invalid_token, nil)
+    err = assert_raises(Api::UnauthorizedError) { @handler.unwrap!(result) }
+    assert_equal "unauthorized", err.code
+    assert_equal 401, Rack::Utils.status_code(err.status)
+  end
+
+  test "unwrap! raises Api::RateLimitedError on :rate_limited" do
+    result = Struct.new(:success?, :error, :message).new(false, :rate_limited, nil)
+    err = assert_raises(Api::RateLimitedError) { @handler.unwrap!(result) }
+    assert_equal "rate_limited", err.code
+    assert_equal 429, Rack::Utils.status_code(err.status)
+  end
+
   test "unwrap! raises ActiveRecord::RecordInvalid when result letter has errors" do
     letter = Letter.new
     letter.validate

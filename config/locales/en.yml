@@ -246,6 +246,7 @@ en:
     locked: This action cannot be undone once sealed.
     login_required: Please sign in to access your digital capsule vault.
     welcome_back: Welcome back to your digital time capsule.
+    magic_link_sent: Magic link dispatched.
     invalid_link: This magic link is invalid or has expired.
     logged_out: You have successfully signed out.
     private_or_inaccessible: This letter is private or cannot be accessed.

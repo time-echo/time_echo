@@ -52,6 +52,16 @@ Rails.application.routes.draw do
           resource :restore, only: [ :create ]
         end
       end
+
+      resource :session, only: [ :destroy ] do
+        get :me
+      end
+      resources :sessions, only: [ :create, :show ], param: :token do
+        collection do
+          get :me
+        end
+      end
+      delete "sessions", to: "sessions#destroy"
     end
   end
 

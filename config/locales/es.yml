@@ -246,6 +246,7 @@ es:
     locked: Esta acción no se puede deshacer una vez sellada.
     login_required: Por favor, inicia sesión para acceder a tu baúl digital de cápsulas.
     welcome_back: Bienvenido de nuevo a tu cápsula del tiempo digital.
+    magic_link_sent: Enlace mágico enviado.
     invalid_link: Este enlace mágico no es válido o ha caducado.
     logged_out: Has cerrado correctamente la sesión de tu baúl.
     private_or_inaccessible: Esta carta es privada o no se puede acceder a ella.

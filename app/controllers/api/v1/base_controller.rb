@@ -9,7 +9,7 @@ module Api
       include Api::ResultHandler
       include Api::ErrorHandler
 
-      protect_from_forgery with: :null_session
+      protect_from_forgery with: :null_session, unless: -> { request.format.json? }
 
       before_action :set_locale
       before_action :set_current_attributes

@@ -33,6 +33,14 @@ module Api
         exception_class: Api::BusinessRuleError,
         code: "validation_failed",
         default_message: -> { I18n.t("letters.error_saving", default: "Validation failed") }
+      },
+      invalid_token: {
+        exception_class: Api::UnauthorizedError,
+        default_message: -> { I18n.t("flash.invalid_link", default: "Invalid or expired link") }
+      },
+      rate_limited: {
+        exception_class: Api::RateLimitedError,
+        default_message: -> { I18n.t("errors.messages.magic_link_rate_limit_exceeded", default: "Rate limit reached") }
       }
     }.freeze
 
