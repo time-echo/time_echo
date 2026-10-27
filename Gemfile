@@ -27,6 +27,9 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use the database-backed adapter for Active Job
 gem "good_job"
 
+# Cross-Origin Resource Sharing (CORS) for API requests
+gem "rack-cors"
+
 # Rate limiting against volumetric attacks and abuse [https://github.com/rack/rack-attack]
 gem "rack-attack"
 
