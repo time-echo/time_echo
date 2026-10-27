@@ -452,5 +452,115 @@ Turnkey container deployment configured in `config/deploy.yml`:
 - Leverages the multi-stage Docker build (`Dockerfile`) to create a minimal, hardened production image.
 - Supports rolling zero-downtime updates, asset volume management, and direct integration with managed PostgreSQL and Resend transactional email.
 
+---
+
+## 📡 9. REST API Architecture (v1)
+
+TimeEcho exposes a standardized RESTful JSON API under `/api/v1` primarily consumed by the mobile client (Expo / React Native). The API is built to guarantee an immutable response contract, strict separation of concerns, and centralized error handling from HTTP status 200 through 503.
+
+### 9.1 Single-Responsibility Pipeline
+
+Every API interaction adheres to a strict pipeline where each component has exactly one responsibility:
+
+| Component | Input | Output / Behavior | Restriction |
+|---|---|---|---|
+| **Service** (`app/services/`) | Raw parameters / domain models | `Result` object (`success?`, `letter`/`value`, `error`, `errors`, `message`) | Agnostic of HTTP transport and controllers |
+| **`ResultHandler#unwrap!`** (`app/controllers/concerns/api/result_handler.rb`) | `Result` | Unwrapped domain entity or raises domain exception | **Never renders** JSON or HTTP responses |
+| **Controller** (`app/controllers/api/v1/`) | Incoming HTTP request | Sets `@variables`, calls `unwrap!`, chooses 2xx status (`:created`, `render_no_content`) | Never catches errors, never renders raw error JSON, never assigns 4xx/5xx |
+| **`ErrorHandler`** (`app/controllers/concerns/api/error_handler.rb`) | Rescued controller exception | Renders `api/v1/shared/error.json.jbuilder` with HTTP status | Evaluated bottom-to-top by Rails (`StandardError` first) |
+| **`exceptions_app`** (`Api::V1::ExceptionsController#show`) | Unhandled router/middleware exception | Renders standardized JSON error payload | Handles 404/500/etc. occurring outside controller action dispatch |
+| **Jbuilder Views** (`app/views/api/v1/`) | `@variables` (assigned in controller) | Serializes data into camelCase JSON envelope | Formats output via deep formatting |
+
+### 9.2 API Base Controller Composition
+
+All API controllers inherit from `Api::V1::BaseController < ActionController::API`, which includes:
+- `Api::ApiResponse`: Provides `paginate(scope)` (Pagy, clamped between 1 and 100, default 20) and `render_no_content` (`head :no_content`).
+- `Api::ResultHandler`: Provides `unwrap!(result)` backed by `RESULT_ERRORS`.
+- `Api::ErrorHandler`: Provides centralized `rescue_from` handlers for all domain and framework exceptions.
+
+### 9.3 Unified Response Contract
+
+All endpoints adhere to one of three JSON envelopes with keys camelized in `camelCase` (`Jbuilder.key_format camelize: :lower` + `Jbuilder.deep_format_keys true`):
+
+#### 1. Single Resource Success (200 / 201)
+```json
+{
+  "data": {
+    "id": "1",
+    "docketNumber": "TE-00001",
+    "title": "Future Self Letter",
+    "scheduledAt": "2027-10-26T20:00:00Z",
+    "emotionalSnapshot": {
+      "happinessLevel": 8
+    },
+    "predictions": []
+  },
+  "meta": {}
+}
+```
+
+#### 2. Collection Success (200)
+```json
+{
+  "data": [
+    { "id": "1", "title": "First Letter" },
+    { "id": "2", "title": "Second Letter" }
+  ],
+  "meta": {
+    "page": 1,
+    "perPage": 20,
+    "total": 42,
+    "totalPages": 3
+  }
+}
+```
+
+#### 3. Error Response (4xx / 5xx)
+```json
+{
+  "error": {
+    "code": "validation_failed",
+    "message": "Title can't be blank",
+    "details": {
+      "title": ["can't be blank"]
+    },
+    "requestId": "9c1b3f6e-..."
+  }
+}
+```
+*Note: `details` is only rendered if populated. In production, 500 errors never expose internal exception messages or backtraces.*
+
+### 9.4 Complete HTTP Status & Error Mapping
+
+| Status | Origin | `error.code` | Handling Behavior |
+|---|---|---|---|
+| **200 OK** | `GET`, `PATCH`, `PUT` | — | Renders Jbuilder template |
+| **201 Created** | `POST` | — | `render :show, status: :created` |
+| **204 No Content** | `DELETE` | — | `render_no_content` |
+| **400 Bad Request** | `ActionController::ParameterMissing`, `ActionDispatch::Http::Parameters::ParseError` | `"bad_request"` | Parameter or malformed JSON syntax error |
+| **401 Unauthorized** | `Api::UnauthorizedError` (`authenticate_user!`) | `"unauthorized"` | **Strictly** for missing, invalid, or expired session tokens |
+| **403 Forbidden** | `Api::ForbiddenError`, `RESULT_ERRORS[:unauthorized]`, Pundit/CanCan | `"forbidden"` | **Permission denial**: authenticated user trying to access/modify a resource they do not own |
+| **404 Not Found** | `ActiveRecord::RecordNotFound`, `Api::NotFoundError`, Catch-all route | `"not_found"` | Missing record or unmatched API route |
+| **406 Not Acceptable** | `ActionController::UnknownFormat` | `"not_acceptable"` | Requested mime-type cannot be served |
+| **409 Conflict** | `ActiveRecord::RecordNotUnique`, `ActiveRecord::StaleObjectError` | `"conflict"` | Uniqueness violation or optimistic locking collision |
+| **422 Unprocessable** | `ActiveRecord::RecordInvalid`, `Api::BusinessRuleError` | `"validation_failed"` / specific code | Validation failure or business rule violation (`cannot_delete`, `cannot_restore`, `cannot_archive_delivered`) |
+| **429 Too Many Requests** | `Api::RateLimitedError`, `Rack::Attack` | `"rate_limited"` | Throttled response with `Retry-After` header |
+| **500 Internal Error** | `StandardError` | `"internal_error"` | Logged with `requestId` + backtrace, captured in Sentry; masked in production |
+| **503 Service Unavailable** | `Api::ServiceUnavailableError` | `"service_unavailable"` | Upstream failure, timeout, or external dependency disruption |
+
+### 9.5 Implemented v1 Endpoints & Resources
+
+| Method | Endpoint | Controller Action | Success Status | Unwrapped Service / Operation |
+|---|---|---|---|---|
+| `GET` | `/api/v1/letters` | `Api::V1::LettersController#index` | `200 OK` | Paginated scope via `UserTimelineQuery` |
+| `POST` | `/api/v1/letters` | `Api::V1::LettersController#create` | `201 Created` | `Letters::CreateService.call(...)` |
+| `GET` | `/api/v1/letters/:id` | `Api::V1::LettersController#show` | `200 OK` | `Letters::AccessService.call(...)` |
+| `PATCH/PUT` | `/api/v1/letters/:id` | `Api::V1::LettersController#update` | `200 OK` | `Letters::UpdateService.call(...)` |
+| `DELETE` | `/api/v1/letters/:id` | `Api::V1::LettersController#destroy` | `204 No Content` | `Letters::DeleteService.call(...)` |
+| `POST` | `/api/v1/letters/:letter_id/predictions` | `Api::V1::LetterPredictionsController#create` | `201 Created` | Letter lookup + nested prediction creation |
+| `POST` | `/api/v1/letters/:id/archive` | `Api::V1::Letters::ArchivesController#create` | `200 OK` | `Letters::ArchiveService.call(...)` |
+| `POST` | `/api/v1/letters/:id/restore` | `Api::V1::Letters::RestoresController#create` | `200 OK` | `Letters::RestoreService.call(...)` |
+| `*` | `/api/v1/*path` | `Api::V1::BaseController#route_not_found` | `404 Not Found` | Catch-all for undefined `/api/v1` routes |
+
 
 

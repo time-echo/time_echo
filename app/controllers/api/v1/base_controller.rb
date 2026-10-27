@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class BaseController < ActionController::API
       include ActionController::Cookies
       include ActionController::RequestForgeryProtection
+      include Api::ApiResponse
+      include Api::ResultHandler
+      include Api::ErrorHandler
 
       protect_from_forgery with: :null_session
 
       before_action :set_locale
       before_action :set_current_attributes
-
-      rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
-      rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable_entity
-      rescue_from ActionController::ParameterMissing, with: :render_bad_request
 
       def current_user_email
         @current_user_email ||= resolve_current_user_email
@@ -23,8 +24,12 @@ module Api
 
       def authenticate_user!
         unless user_signed_in?
-          render json: { error: "unauthorized", message: I18n.t("flash.login_required") }, status: :unauthorized
+          raise Api::UnauthorizedError, I18n.t("flash.login_required")
         end
+      end
+
+      def route_not_found
+        raise Api::NotFoundError, "No route matches [#{request.method}] #{request.path}"
       end
 
       private
@@ -65,22 +70,6 @@ module Api
       def set_current_attributes
         Current.ip_address = request.remote_ip
         Current.user_agent = request.user_agent
-      end
-
-      def render_not_found(exception)
-        render json: { error: "not_found", message: exception.message }, status: :not_found
-      end
-
-      def render_unprocessable_entity(exception)
-        render json: {
-          error: "unprocessable_entity",
-          message: exception.record.errors.full_messages.to_sentence,
-          details: exception.record.errors.as_json
-        }, status: :unprocessable_entity
-      end
-
-      def render_bad_request(exception)
-        render json: { error: "bad_request", message: exception.message }, status: :bad_request
       end
     end
   end

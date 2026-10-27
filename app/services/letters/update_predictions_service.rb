@@ -23,20 +23,37 @@ module Letters
       end
 
       Letter.transaction do
-        letter.update!(
+        update_attrs = {
           reveal_happiness: @params[:reveal_happiness],
           reveal_anxiety: @params[:reveal_anxiety],
           reveal_motivation: @params[:reveal_motivation]
-        )
+        }
+        if @params[:opened_at].present? || @params[:is_wax_broken].present?
+          update_attrs[:opened_at] = @params[:opened_at] || letter.opened_at || Time.current
+        end
+
+        letter.update!(update_attrs.compact)
 
         if @params[:predictions].present?
-          @params[:predictions].each do |pred_id, pred_params|
-            prediction = letter.predictions.find_by(id: pred_id)
-            if prediction
-              prediction.update!(
-                reality: pred_params[:reality],
-                matched: ActiveModel::Type::Boolean.new.cast(pred_params[:matched])
-              )
+          if @params[:predictions].is_a?(Array)
+            @params[:predictions].each do |pred_params|
+              prediction = letter.predictions.find_by(id: pred_params[:id])
+              if prediction
+                prediction.update!(
+                  reality: pred_params[:reality],
+                  matched: ActiveModel::Type::Boolean.new.cast(pred_params[:matched])
+                )
+              end
+            end
+          else
+            @params[:predictions].each do |pred_id, pred_params|
+              prediction = letter.predictions.find_by(id: pred_id)
+              if prediction
+                prediction.update!(
+                  reality: pred_params[:reality],
+                  matched: ActiveModel::Type::Boolean.new.cast(pred_params[:matched])
+                )
+              end
             end
           end
         end

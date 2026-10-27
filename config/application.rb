@@ -36,6 +36,9 @@ module TimeEcho
     # Rack middleware for rate-limiting requests and mitigating brute-force/DoS attacks
     config.middleware.use Rack::Attack
 
+    # Handle exceptions raised outside controller dispatch (middleware, router)
+    config.exceptions_app = ->(env) { Api::V1::ExceptionsController.action(:show).call(env) }
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

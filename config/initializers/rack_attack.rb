@@ -45,12 +45,28 @@ class Rack::Attack
     now = match_data[:epoch_time] || Time.now.to_i
     period = match_data[:period] || 60
     retry_after = (period - (now % period)).to_s
+    req_id = req.env["action_dispatch.request_id"] || req.env["HTTP_X_REQUEST_ID"]
 
-    headers = {
-      "Content-Type" => "text/plain; charset=utf-8",
-      "Retry-After" => retry_after
-    }
+    if req.path.start_with?("/api") || req.content_type.to_s.include?("json") || req.env["HTTP_ACCEPT"].to_s.include?("json")
+      headers = {
+        "Content-Type" => "application/json; charset=utf-8",
+        "Retry-After" => retry_after
+      }
+      body = {
+        error: {
+          code: "rate_limited",
+          message: "Too many requests. Please retry after #{retry_after} seconds.",
+          requestId: req_id
+        }
+      }.to_json
 
-    [ 429, headers, [ "Too Many Requests. Retry after #{retry_after} seconds.\n" ] ]
+      [ 429, headers, [ body ] ]
+    else
+      headers = {
+        "Content-Type" => "text/plain; charset=utf-8",
+        "Retry-After" => retry_after
+      }
+      [ 429, headers, [ "Too Many Requests. Retry after #{retry_after} seconds.\n" ] ]
+    end
   end
 end

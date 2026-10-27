@@ -35,6 +35,28 @@ class LetterForm
 
   attr_reader :letter
 
+  def initialize(attributes = {})
+    attrs = attributes ? attributes.to_h.with_indifferent_access : {}
+
+    if attrs[:emotional_snapshot_attributes].present?
+      snap = attrs.delete(:emotional_snapshot_attributes)
+      attrs[:happiness_level] ||= snap[:happiness_level]
+      attrs[:anxiety_level] ||= snap[:anxiety_level]
+      attrs[:motivation_level] ||= snap[:motivation_level]
+    end
+
+    if attrs[:predictions_attributes].present?
+      preds = attrs.delete(:predictions_attributes)
+      list = preds.is_a?(Hash) ? preds.values : Array(preds)
+      list.each do |p|
+        cat = p[:category].to_s
+        attrs["prediction_#{cat}"] ||= p[:prediction] if Prediction::CATEGORIES.include?(cat)
+      end
+    end
+
+    super(attrs)
+  end
+
   def deliver_at
     parsed_utc_scheduled_at
   end

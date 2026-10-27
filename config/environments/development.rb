@@ -12,6 +12,9 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  # Ensure API errors respond in API format instead of HTML error pages
+  config.debug_exception_response_format = :api
+
   # Enable server timing.
   config.server_timing = true
 
