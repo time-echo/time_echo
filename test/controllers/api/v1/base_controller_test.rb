@@ -17,6 +17,12 @@ module Api
         raise ActiveRecord::RecordNotFound, "Resource not found"
       end
 
+      def invalid_action
+        letter = Letter.new
+        letter.validate
+        raise ActiveRecord::RecordInvalid, letter
+      end
+
       def bad_request_action
         params.require(:required_param)
         render json: { ok: true }
@@ -26,24 +32,6 @@ module Api
 end
 
 class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
-  setup do
-    Rails.application.routes.draw do
-      namespace :api, defaults: { format: :json } do
-        namespace :v1 do
-          get "dummy/public", to: "dummy#public_action"
-          get "dummy/protected", to: "dummy#protected_action"
-          get "dummy/error", to: "dummy#error_action"
-          post "dummy/bad_request", to: "dummy#bad_request_action"
-          get "ping", to: proc { [ 200, { "Content-Type" => "application/json" }, [ { status: "ok" }.to_json ] ] }
-        end
-      end
-    end
-  end
-
-  teardown do
-    Rails.application.reload_routes!
-  end
-
   test "returns 401 unauthorized when unauthenticated user accesses protected endpoint" do
     get "/api/v1/dummy/protected"
 
@@ -97,6 +85,16 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     json = JSON.parse(response.body)
     assert_equal "not_found", json["error"]
+  end
+
+  test "renders 422 json when ActiveRecord::RecordInvalid is raised" do
+    get "/api/v1/dummy/invalid"
+
+    assert_response :unprocessable_entity
+    json = JSON.parse(response.body)
+    assert_equal "unprocessable_entity", json["error"]
+    assert json["message"].present?
+    assert json["details"].present?
   end
 
   test "renders 400 json when ActionController::ParameterMissing is raised" do
