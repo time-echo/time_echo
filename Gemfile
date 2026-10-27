@@ -80,3 +80,6 @@ group :test do
   gem "selenium-webdriver"
   gem "simplecov", require: false
 end
+
+gem "rswag-api", "~> 2.17"
+gem "rswag-ui", "~> 2.17"

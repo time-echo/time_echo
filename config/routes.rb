@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
+  get "livez", to: "api/v1/health#liveness", defaults: { format: :json }
+  get "readyz", to: "api/v1/health#show", defaults: { format: :json }
 
   root "pages#landing"
 
@@ -45,6 +47,9 @@ Rails.application.routes.draw do
         [ 200, { "Content-Type" => "application/json" }, [ payload ] ]
       }
 
+      get "health", to: "health#show"
+      get "health/liveness", to: "health#liveness"
+
       resources :letters, only: [ :index, :show, :create, :destroy ] do
         post "predictions", to: "letter_predictions#update"
         scope module: :letters do
@@ -84,6 +89,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  mount Rswag::Ui::Engine => "/api-docs"
+  mount Rswag::Api::Engine => "/api-docs"
 
   mount GoodJob::Engine => "/good_job", constraints: ->(request) { request.session[:current_user_email].present? }
 
