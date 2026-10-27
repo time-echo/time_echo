@@ -37,7 +37,13 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      get "ping", to: proc { [ 200, { "Content-Type" => "application/json" }, [ { status: "ok", timestamp: Time.current.iso8601 }.to_json ] ] }
+      get "ping", to: proc {
+        payload = {
+          data: { status: "ok", timestamp: Time.current.iso8601 },
+          meta: {}
+        }.to_json
+        [ 200, { "Content-Type" => "application/json" }, [ payload ] ]
+      }
 
       resources :letters, only: [ :index, :show, :create, :destroy ] do
         post "predictions", to: "letter_predictions#update"
@@ -56,10 +62,16 @@ Rails.application.routes.draw do
         get "dummy/protected", to: "dummy#protected_action"
         get "dummy/error", to: "dummy#error_action"
         get "dummy/invalid", to: "dummy#invalid_action"
+        get "dummy/conflict", to: "dummy#conflict_action"
+        get "dummy/forbidden", to: "dummy#forbidden_action"
+        get "dummy/server_error", to: "dummy#server_error_action"
         post "dummy/bad_request", to: "dummy#bad_request_action"
       end
     end
   end
 
   mount GoodJob::Engine => "/good_job", constraints: ->(request) { request.session[:current_user_email].present? }
+
+  # Catch-all route to return 404 JSON error contract for unmatched routes
+  match "*path", to: "api/v1/base#route_not_found", via: :all, defaults: { format: :json }
 end

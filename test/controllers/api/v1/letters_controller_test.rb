@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
@@ -29,83 +31,85 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
 
   test "GET /api/v1/letters returns 401 when unauthorized" do
     get "/api/v1/letters"
-    assert_response :unauthorized
+    assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
-  test "GET /api/v1/letters returns letters list for authenticated user" do
+  test "GET /api/v1/letters returns letters list with pagination envelope for authenticated user" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
-    assert_response :created
+    assert_resource_response(expected_status: :created)
 
     get "/api/v1/letters", headers: @auth_headers
-    assert_response :success
+    json = assert_collection_response(expected_status: :ok)
 
-    json = JSON.parse(response.body)
-    assert_kind_of Array, json
-    assert_equal 1, json.length
-    assert_equal "Future Self Letter", json.first["title"]
-    assert json.first["docket_number"].present?
-    assert json.first["emotional_snapshot"].present?
-    assert_equal 2, json.first["predictions"].length
+    assert_equal 1, json["data"].length
+    first_letter = json["data"].first
+    assert_equal "Future Self Letter", first_letter["title"]
+    assert first_letter["docketNumber"].present?
+    assert first_letter["emotionalSnapshot"].present?
+    assert_equal 2, first_letter["predictions"].length
+
+    assert_equal 1, json["meta"]["page"]
+    assert_equal 20, json["meta"]["perPage"]
+    assert_equal 1, json["meta"]["total"]
+    assert_equal 1, json["meta"]["totalPages"]
   end
 
-  test "POST /api/v1/letters creates letter with nested attributes" do
+  test "POST /api/v1/letters creates letter with nested attributes and returns resource envelope" do
     assert_difference -> { Letter.count } => 1, -> { EmotionalSnapshot.count } => 1, -> { Prediction.count } => 2 do
       post "/api/v1/letters", params: @create_payload, headers: @auth_headers
     end
 
-    assert_response :created
-    json = JSON.parse(response.body)
-    assert_equal "Future Self Letter", json["title"]
-    assert_equal @user_email, json["email"]
-    assert_equal 8, json["emotional_snapshot"]["happiness_level"]
-    assert_equal 2, json["predictions"].length
+    json = assert_resource_response(expected_status: :created)
+    letter_data = json["data"]
+    assert_equal "Future Self Letter", letter_data["title"]
+    assert_equal @user_email, letter_data["email"]
+    assert_equal 8, letter_data["emotionalSnapshot"]["happinessLevel"]
+    assert_equal 2, letter_data["predictions"].length
   end
 
-  test "POST /api/v1/letters returns 422 for invalid parameters" do
+  test "POST /api/v1/letters returns 422 for invalid parameters with details" do
     invalid_payload = { letter: { title: "", content: "Too short" } }
     post "/api/v1/letters", params: invalid_payload, headers: @auth_headers
 
-    assert_response :unprocessable_entity
-    json = JSON.parse(response.body)
-    assert_equal "unprocessable_entity", json["error"]
+    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    assert json["error"]["details"].present?
   end
 
-  test "GET /api/v1/letters/:id returns single letter" do
+  test "GET /api/v1/letters/:id returns single letter in resource envelope" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
-    letter_id = JSON.parse(response.body)["id"]
+    created = assert_resource_response(expected_status: :created)
+    letter_id = created["data"]["id"]
 
     get "/api/v1/letters/#{letter_id}", headers: @auth_headers
-    assert_response :success
-
-    json = JSON.parse(response.body)
-    assert_equal letter_id, json["id"]
-    assert_equal "Future Self Letter", json["title"]
+    json = assert_resource_response(expected_status: :ok)
+    assert_equal letter_id, json["data"]["id"]
+    assert_equal "Future Self Letter", json["data"]["title"]
   end
 
   test "POST /api/v1/letters/:id/archive and restore" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
-    letter_id = JSON.parse(response.body)["id"]
+    created = assert_resource_response(expected_status: :created)
+    letter_id = created["data"]["id"]
 
     post "/api/v1/letters/#{letter_id}/archive", headers: @auth_headers
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "archived", json["status"]
+    archived_json = assert_resource_response(expected_status: :ok)
+    assert_equal "archived", archived_json["data"]["status"]
 
     post "/api/v1/letters/#{letter_id}/restore", headers: @auth_headers
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "pending", json["status"]
+    restored_json = assert_resource_response(expected_status: :ok)
+    assert_equal "pending", restored_json["data"]["status"]
   end
 
   test "DELETE /api/v1/letters/:id only allows deleting archived letters" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
-    letter_id = JSON.parse(response.body)["id"]
+    created = assert_resource_response(expected_status: :created)
+    letter_id = created["data"]["id"]
 
     delete "/api/v1/letters/#{letter_id}", headers: @auth_headers
-    assert_response :unprocessable_entity
+    assert_error_response(expected_status: :unprocessable_entity, expected_code: "cannot_delete")
 
     post "/api/v1/letters/#{letter_id}/archive", headers: @auth_headers
-    assert_response :success
+    assert_resource_response(expected_status: :ok)
 
     delete "/api/v1/letters/#{letter_id}", headers: @auth_headers
     assert_response :no_content
@@ -115,9 +119,9 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
 
   test "POST /api/v1/letters/:id/predictions updates reality ledger" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
-    created_letter = JSON.parse(response.body)
-    letter_id = created_letter["id"]
-    prediction_id = created_letter["predictions"].first["id"]
+    created = assert_resource_response(expected_status: :created)
+    letter_id = created["data"]["id"]
+    prediction_id = created["data"]["predictions"].first["id"]
 
     letter = Letter.find(letter_id)
     letter.update_columns(status: "delivered", delivered_at: Time.current)
@@ -133,12 +137,12 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     }
 
     post "/api/v1/letters/#{letter_id}/predictions", params: update_payload, headers: @auth_headers
-    assert_response :success
+    json = assert_resource_response(expected_status: :ok)
 
-    json = JSON.parse(response.body)
-    assert_equal 9, json["reveal_happiness"]
-    assert_equal true, json["is_wax_broken"]
-    updated_pred = json["predictions"].find { |p| p["id"] == prediction_id }
+    letter_data = json["data"]
+    assert_equal 9, letter_data["revealHappiness"]
+    assert_equal true, letter_data["isWaxBroken"]
+    updated_pred = letter_data["predictions"].find { |p| p["id"] == prediction_id }
     assert_equal "Moved to Madrid in September", updated_pred["reality"]
     assert_equal true, updated_pred["matched"]
     assert_equal "fulfilled", updated_pred["outcome"]

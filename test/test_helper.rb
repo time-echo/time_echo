@@ -29,3 +29,9 @@ module ActiveSupport
     fixtures :all
   end
 end
+
+require_relative "support/api_response_assertions"
+
+class ActionDispatch::IntegrationTest
+  include ApiResponseAssertions
+end

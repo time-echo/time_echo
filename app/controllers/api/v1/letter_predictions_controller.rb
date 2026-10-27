@@ -1,28 +1,22 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class LetterPredictionsController < BaseController
       before_action :authenticate_user!
 
       def update
-        result = Letters::UpdatePredictionsService.call(
-          params[:letter_id],
-          prediction_params,
-          current_user_email
+        result = handle_service_result!(
+          Letters::UpdatePredictionsService.call(
+            params[:letter_id],
+            prediction_params,
+            current_user_email
+          ),
+          unauthorized: I18n.t("flash.unauthorized_modify")
         )
 
-        if result.success?
-          @letter = result.letter
-          render "api/v1/letters/show", status: :ok
-        else
-          case result.error
-          when :not_found
-            render json: { error: "not_found", message: I18n.t("flash.private_or_inaccessible") }, status: :not_found
-          when :unauthorized
-            render json: { error: "unauthorized", message: I18n.t("flash.unauthorized_modify") }, status: :unauthorized
-          else
-            render json: { error: "unprocessable_entity", message: result.message || I18n.t("letters.error_saving") }, status: :unprocessable_entity
-          end
-        end
+        @letter = result.letter
+        render "api/v1/letters/show", status: :ok
       end
 
       private

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 module Api
@@ -23,6 +25,18 @@ module Api
         raise ActiveRecord::RecordInvalid, letter
       end
 
+      def conflict_action
+        raise ActiveRecord::RecordNotUnique, "Duplicate record"
+      end
+
+      def forbidden_action
+        raise Api::ForbiddenError, "Access forbidden"
+      end
+
+      def server_error_action
+        raise "Unexpected standard error"
+      end
+
       def bad_request_action
         params.require(:required_param)
         render json: { ok: true }
@@ -35,9 +49,7 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
   test "returns 401 unauthorized when unauthenticated user accesses protected endpoint" do
     get "/api/v1/dummy/protected"
 
-    assert_response :unauthorized
-    json = JSON.parse(response.body)
-    assert_equal "unauthorized", json["error"]
+    assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
   test "authenticates user via session cookie" do
@@ -76,33 +88,26 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
 
     get "/api/v1/dummy/protected", headers: { "X-Session-Token" => token_record.token }
 
-    assert_response :unauthorized
+    assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
   test "renders 404 json when ActiveRecord::RecordNotFound is raised" do
     get "/api/v1/dummy/error"
 
-    assert_response :not_found
-    json = JSON.parse(response.body)
-    assert_equal "not_found", json["error"]
+    assert_error_response(expected_status: :not_found, expected_code: "not_found")
   end
 
   test "renders 422 json when ActiveRecord::RecordInvalid is raised" do
     get "/api/v1/dummy/invalid"
 
-    assert_response :unprocessable_entity
-    json = JSON.parse(response.body)
-    assert_equal "unprocessable_entity", json["error"]
-    assert json["message"].present?
-    assert json["details"].present?
+    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    assert json["error"]["details"].present?
   end
 
   test "renders 400 json when ActionController::ParameterMissing is raised" do
     post "/api/v1/dummy/bad_request", params: {}
 
-    assert_response :bad_request
-    json = JSON.parse(response.body)
-    assert_equal "bad_request", json["error"]
+    assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
   end
 
   test "detects locale from X-Locale header" do
