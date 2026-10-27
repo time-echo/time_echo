@@ -41,6 +41,10 @@ module Api
       rate_limited: {
         exception_class: Api::RateLimitedError,
         default_message: -> { I18n.t("errors.messages.magic_link_rate_limit_exceeded", default: "Rate limit reached") }
+      },
+      service_unavailable: {
+        exception_class: Api::ServiceUnavailableError,
+        default_message: -> { I18n.t("flash.service_unavailable", default: "Service temporarily unavailable. Please retry later.") }
       }
     }.freeze
 
@@ -76,10 +80,13 @@ module Api
       error_key = result.error
       config = RESULT_ERRORS[error_key]
       custom_message = result.message if result.respond_to?(:message) && result.message.present?
+      details = result.details if result.respond_to?(:details)
 
       if config
         message = custom_message || config[:default_message].call
-        if config[:code]
+        if config[:exception_class] == Api::ServiceUnavailableError
+          raise config[:exception_class].new(message, details: details)
+        elsif config[:code]
           raise config[:exception_class].new(message, code: config[:code])
         else
           raise config[:exception_class], message

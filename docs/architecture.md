@@ -552,6 +552,11 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 
 | Method | Endpoint | Controller Action | Success Status | Unwrapped Service / Operation |
 |---|---|---|---|---|
+| `GET` | `/livez`, `/api/v1/health/liveness` | `Api::V1::HealthController#liveness` | `200 OK` | Lightweight process liveness probe |
+| `GET` | `/readyz`, `/api/v1/health` | `Api::V1::HealthController#show` | `200 OK` | `Health::CheckService.call` (DB, migrations, GoodJob queue) |
+| `GET` | `/api/v1/ping` | Rack proc | `200 OK` | Timestamp & status diagnostic |
+| `GET` | `/api-docs` | `Rswag::Ui::Engine` | `200 OK` | Interactive Swagger UI API documentation |
+| `GET` | `/api-docs/v1/swagger.yaml` | `Rswag::Api::Engine` | `200 OK` | OpenAPI 3.0.3 specification document |
 | `GET` | `/api/v1/letters` | `Api::V1::LettersController#index` | `200 OK` | Paginated scope via `UserTimelineQuery` |
 | `POST` | `/api/v1/letters` | `Api::V1::LettersController#create` | `201 Created` | `Letters::CreateService.call(...)` |
 | `GET` | `/api/v1/letters/:id` | `Api::V1::LettersController#show` | `200 OK` | `Letters::AccessService.call(...)` |
@@ -565,6 +570,19 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 | `GET` | `/api/v1/sessions/me` | `Api::V1::SessionsController#me` | `200 OK` | Current authenticated user profile |
 | `DELETE` | `/api/v1/sessions` | `Api::V1::SessionsController#destroy` | `204 No Content` | `Auth::DestroySessionService.call(...)` |
 | `*` | `/api/v1/*path` | `Api::V1::BaseController#route_not_found` | `404 Not Found` | Catch-all for undefined `/api/v1` routes |
+
+### 9.6 OpenAPI & Health Probes Architecture
+
+- **Liveness Probe (`/livez` & `/api/v1/health/liveness`)**:
+  - Validates process responsiveness with zero external dependencies.
+  - Returns `200 OK` with `{ "data": { "status": "alive", "timestamp": "..." }, "meta": {} }`.
+- **Readiness / Healthcheck Probe (`/readyz` & `/api/v1/health`)**:
+  - Validates PostgreSQL database connectivity (`SELECT 1`), verifies that no migrations are pending (`ActiveRecord::Migration.check_all_pending!`), and checks background worker table availability (`GoodJob::Job.table_exists?`).
+  - Returns `200 OK` with latency diagnostics when healthy.
+  - Returns `503 Service Unavailable` with structured diagnostic error details if any critical dependency fails.
+- **Swagger Documentation Engine (`/api-docs`)**:
+  - Serves Swagger UI powered by `rswag-ui` and `rswag-api`.
+  - Comprehensive OpenAPI 3.0.3 specification maintained at `swagger/v1/swagger.yaml`.
 
 
 
