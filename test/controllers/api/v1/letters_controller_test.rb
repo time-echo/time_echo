@@ -54,6 +54,14 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, json["meta"]["totalPages"]
   end
 
+  test "GET /api/v1/letters?status=archived returns archived letters" do
+    get "/api/v1/letters?status=archived", headers: @auth_headers
+    json = assert_collection_response(expected_status: :ok)
+
+    assert_kind_of Array, json["data"]
+    assert_equal 0, json["data"].length
+  end
+
   test "POST /api/v1/letters creates letter with nested attributes and returns resource envelope" do
     assert_difference -> { Letter.count } => 1, -> { EmotionalSnapshot.count } => 1, -> { Prediction.count } => 2 do
       post "/api/v1/letters", params: @create_payload, headers: @auth_headers

@@ -10,12 +10,11 @@ class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
     assert_match(/required_param/i, json["error"]["message"])
   end
 
-  test "400 bad_request on malformed JSON payload (ParseError)" do
-    post "/api/v1/dummy/bad_request",
-         headers: { "Content-Type" => "application/json" },
-         env: { "RAW_POST_DATA" => "{\"invalid_json: true" }
+  test "400 bad_request on ActionDispatch::Http::Parameters::ParseError" do
+    get "/api/v1/dummy/parse_error"
 
-    assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
+    json = assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
+    assert_equal "Invalid or malformed request parameters", json["error"]["message"]
   end
 
   test "401 unauthorized when session token is missing or expired" do
@@ -132,5 +131,24 @@ class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
     parsed = JSON.parse(body.body)
     assert_equal "internal_error", parsed["error"]["code"]
     assert_equal "middleware-req-500", parsed["error"]["requestId"]
+  end
+
+  test "exceptions_app in production masks 500 error message" do
+    original_env = Rails.env
+    begin
+      Rails.env = "production"
+      env = Rack::MockRequest.env_for("/api/v1/middleware_failure", {
+        "action_dispatch.exception" => StandardError.new("Middleware crashed"),
+        "action_dispatch.request_id" => "middleware-req-500-prod"
+      })
+      status, _headers, body = Api::V1::ExceptionsController.action(:show).call(env)
+
+      assert_equal 500, status
+      parsed = JSON.parse(body.body)
+      assert_equal "Internal server error", parsed["error"]["message"]
+      assert_equal "internal_error", parsed["error"]["code"]
+    ensure
+      Rails.env = original_env
+    end
   end
 end

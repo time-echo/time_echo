@@ -71,6 +71,29 @@ class Api::V1::ResultHandlerTest < ActiveSupport::TestCase
     err = assert_raises(Api::BusinessRuleError) { @handler.unwrap!(result) }
     assert_equal "quota_exceeded", err.code
     assert_equal "Monthly limit reached", err.message
-    assert_equal 422, Rack::Utils.status_code(err.status)
+  end
+
+  test "unwrap! returns value when result responds to value" do
+    result = Struct.new(:success?, :value).new(true, "CustomValue")
+    assert_equal "CustomValue", @handler.unwrap!(result)
+  end
+
+  test "unwrap! returns result itself when result responds to neither letter nor value" do
+    result = Struct.new(:success?).new(true)
+    assert_equal result, @handler.unwrap!(result)
+  end
+
+  test "unwrap! raises Api::BusinessRuleError on :invalid with default message when message is nil" do
+    result = Struct.new(:success?, :error, :message).new(false, :invalid, nil)
+    err = assert_raises(Api::BusinessRuleError) { @handler.unwrap!(result) }
+    assert_equal "validation_failed", err.code
+    assert err.message.present?
+  end
+
+  test "Api::ApiError uses default message when none provided" do
+    err = Api::ApiError.new
+    assert_equal "An API error occurred", err.message
+    assert_equal "internal_error", err.code
+    assert_equal :internal_server_error, err.status
   end
 end

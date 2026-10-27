@@ -3,6 +3,18 @@
 module Api
   module V1
     class ExceptionsController < ActionController::API
+      STATUS_CODES = {
+        400 => "bad_request",
+        401 => "unauthorized",
+        403 => "forbidden",
+        404 => "not_found",
+        406 => "not_acceptable",
+        409 => "conflict",
+        422 => "validation_failed",
+        429 => "rate_limited",
+        503 => "service_unavailable"
+      }.freeze
+
       def show
         exception = request.env["action_dispatch.exception"]
         wrapper = ActionDispatch::ExceptionWrapper.new(request.env, exception)
@@ -29,18 +41,7 @@ module Api
       private
 
       def error_code_for_status(status_code)
-        case status_code
-        when 400 then "bad_request"
-        when 401 then "unauthorized"
-        when 403 then "forbidden"
-        when 404 then "not_found"
-        when 406 then "not_acceptable"
-        when 409 then "conflict"
-        when 422 then "validation_failed"
-        when 429 then "rate_limited"
-        when 503 then "service_unavailable"
-        else "internal_error"
-        end
+        STATUS_CODES.fetch(status_code, "internal_error")
       end
     end
   end

@@ -69,6 +69,7 @@ Rails.application.routes.draw do
         get "dummy/rate_limited", to: "dummy#rate_limited_action"
         get "dummy/service_unavailable", to: "dummy#service_unavailable_action"
         get "dummy/server_error", to: "dummy#server_error_action"
+        get "dummy/parse_error", to: "dummy#parse_error_action"
         post "dummy/bad_request", to: "dummy#bad_request_action"
       end
     end

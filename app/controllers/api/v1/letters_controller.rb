@@ -9,24 +9,24 @@ module Api
         scope = if params[:status] == "archived" || params[:archived] == "true"
           Letter.archived.for_email(current_user_email)
         else
-          UserTimelineQuery.call(current_user_email)
+          ::UserTimelineQuery.call(current_user_email)
         end
 
         scope = scope.includes(:emotional_snapshot, :predictions)
         @letters = paginate(scope)
 
-        Analytics::TrackEventService.call("dashboard_viewed", { email: current_user_email })
+        ::Analytics::TrackEventService.call("dashboard_viewed", { email: current_user_email })
       end
 
       def show
         @letter = unwrap!(
-          Letters::AccessService.call(params[:id], current_user_email, include_archived: true)
+          ::Letters::AccessService.call(params[:id], current_user_email, include_archived: true)
         )
       end
 
       def create
         @letter = unwrap!(
-          Letters::CreateService.call(
+          ::Letters::CreateService.call(
             params: letter_params,
             current_user_email: current_user_email
           )
@@ -35,7 +35,7 @@ module Api
       end
 
       def destroy
-        unwrap!(Letters::DestroyService.call(params[:id], current_user_email))
+        unwrap!(::Letters::DestroyService.call(params[:id], current_user_email))
         render_no_content
       end
 

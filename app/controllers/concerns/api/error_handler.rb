@@ -5,11 +5,11 @@ module Api
     extend ActiveSupport::Concern
 
     included do
-      # Evaluated bottom-to-top by Rails. StandardError declared first so specific handlers take precedence.
+      # Evaluated bottom-to-top by Rails. StandardError and base ApiError declared first so specific handlers take precedence.
       rescue_from StandardError, with: :handle_standard_error
+      rescue_from Api::ApiError, with: :handle_api_error
       rescue_from Api::ServiceUnavailableError, with: :handle_service_unavailable
       rescue_from Api::RateLimitedError, with: :handle_rate_limited
-      rescue_from Api::ApiError, with: :handle_api_error
       rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
       rescue_from Api::NotFoundError, with: :handle_not_found
       rescue_from ActionController::UnknownFormat, with: :handle_unknown_format
@@ -20,14 +20,6 @@ module Api
       rescue_from Api::UnauthorizedError, with: :handle_unauthorized
       rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_bad_request
       rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
-
-      if defined?(Pundit::NotAuthorizedError)
-        rescue_from Pundit::NotAuthorizedError, with: :handle_forbidden
-      end
-
-      if defined?(CanCan::AccessDenied)
-        rescue_from CanCan::AccessDenied, with: :handle_forbidden
-      end
     end
 
     private

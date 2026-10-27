@@ -7,7 +7,7 @@ module Api
 
       def update
         @letter = unwrap!(
-          Letters::UpdatePredictionsService.call(
+          ::Letters::UpdatePredictionsService.call(
             params[:letter_id],
             prediction_params,
             current_user_email

@@ -53,6 +53,10 @@ module Api
         raise "Unexpected standard error"
       end
 
+      def parse_error_action
+        raise ActionDispatch::Http::Parameters::ParseError.new("Malformed JSON")
+      end
+
       def bad_request_action
         params.require(:required_param)
         render json: { ok: true }
