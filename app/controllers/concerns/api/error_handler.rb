@@ -5,12 +5,18 @@ module Api
     extend ActiveSupport::Concern
 
     included do
-      # Evaluated bottom-to-top by Rails. StandardError is registered first so more specific handlers take precedence.
+      # Evaluated bottom-to-top by Rails. StandardError declared first so specific handlers take precedence.
       rescue_from StandardError, with: :handle_standard_error
+      rescue_from ServiceUnavailableError, with: :handle_service_unavailable
+      rescue_from RateLimitedError, with: :handle_rate_limited
       rescue_from ApiError, with: :handle_api_error
       rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
+      rescue_from ActionController::UnknownFormat, with: :handle_unknown_format
+      rescue_from ActiveRecord::RecordNotUnique, with: :handle_conflict
+      rescue_from ActiveRecord::StaleObjectError, with: :handle_conflict
       rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
-      rescue_from ActiveRecord::RecordNotUnique, with: :handle_record_not_unique
+      rescue_from ForbiddenError, with: :handle_forbidden
+      rescue_from UnauthorizedError, with: :handle_unauthorized
       rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_bad_request
       rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
 
@@ -23,43 +29,7 @@ module Api
       end
     end
 
-    def handle_service_result!(result, message_fallbacks = {})
-      return result if result.success?
-
-      handle_service_error!(result, message_fallbacks)
-    end
-
-    def handle_service_error!(result, message_fallbacks = {})
-      error_key = result.error
-      message = service_error_message(result) || message_fallbacks[error_key]
-
-      case error_key
-      when :not_found
-        raise Api::NotFoundError, message || I18n.t("flash.private_or_inaccessible")
-      when :unauthorized
-        raise Api::UnauthorizedError, message || I18n.t("flash.unauthorized_action")
-      else
-        if result.respond_to?(:letter) && result.letter&.errors&.any?
-          raise ActiveRecord::RecordInvalid, result.letter
-        elsif result.respond_to?(:errors) && result.errors.present?
-          raise Api::BusinessRuleError.new(
-            result.errors.full_messages.to_sentence,
-            code: "validation_failed",
-            details: result.errors.to_hash
-          )
-        else
-          code = (error_key || "business_rule_violation").to_s
-          fallback_msg = I18n.t("flash.#{code}", default: code.humanize)
-          raise Api::BusinessRuleError.new(message || fallback_msg, code: code)
-        end
-      end
-    end
-
     private
-
-    def service_error_message(result)
-      result.message if result.respond_to?(:message) && result.message.present?
-    end
 
     def handle_standard_error(exception)
       log_exception(exception)
@@ -75,6 +45,24 @@ module Api
         status: :internal_server_error,
         code: "internal_error",
         message: message
+      )
+    end
+
+    def handle_service_unavailable(exception)
+      render_error(
+        status: :service_unavailable,
+        code: "service_unavailable",
+        message: exception.message,
+        details: exception.details
+      )
+    end
+
+    def handle_rate_limited(exception)
+      render_error(
+        status: :too_many_requests,
+        code: "rate_limited",
+        message: exception.message,
+        details: exception.details
       )
     end
 
@@ -95,6 +83,28 @@ module Api
       )
     end
 
+    def handle_unknown_format(exception)
+      render_error(
+        status: :not_acceptable,
+        code: "not_acceptable",
+        message: exception.message
+      )
+    end
+
+    def handle_conflict(exception)
+      message = if exception.is_a?(ActiveRecord::StaleObjectError)
+        "Record was modified by another request. Please reload and retry."
+      else
+        "A record with these details already exists or violates a uniqueness constraint"
+      end
+
+      render_error(
+        status: :conflict,
+        code: "conflict",
+        message: message
+      )
+    end
+
     def handle_record_invalid(exception)
       render_error(
         status: :unprocessable_entity,
@@ -104,11 +114,21 @@ module Api
       )
     end
 
-    def handle_record_not_unique(exception)
+    def handle_unauthorized(exception)
       render_error(
-        status: :conflict,
-        code: "conflict",
-        message: "A record with these details already exists or violates a uniqueness constraint"
+        status: :unauthorized,
+        code: "unauthorized",
+        message: exception.message,
+        details: exception.details
+      )
+    end
+
+    def handle_forbidden(exception)
+      render_error(
+        status: :forbidden,
+        code: "forbidden",
+        message: exception.message,
+        details: exception.details
       )
     end
 
@@ -124,14 +144,6 @@ module Api
       render_error(
         status: :bad_request,
         code: "bad_request",
-        message: exception.message
-      )
-    end
-
-    def handle_forbidden(exception)
-      render_error(
-        status: :forbidden,
-        code: "forbidden",
         message: exception.message
       )
     end

@@ -3,6 +3,7 @@
 module ApiResponseAssertions
   def assert_resource_response(expected_status: :ok)
     assert_response expected_status
+    assert_equal "application/json", response.media_type
     body = JSON.parse(response.body)
 
     assert body.key?("data"), "Expected response body to contain 'data' key"
@@ -14,6 +15,7 @@ module ApiResponseAssertions
 
   def assert_collection_response(expected_status: :ok)
     assert_response expected_status
+    assert_equal "application/json", response.media_type
     body = JSON.parse(response.body)
 
     assert body.key?("data"), "Expected response body to contain 'data' key"
@@ -31,6 +33,7 @@ module ApiResponseAssertions
 
   def assert_error_response(expected_status:, expected_code:)
     assert_response expected_status
+    assert_equal "application/json", response.media_type
     body = JSON.parse(response.body)
 
     assert body.key?("error"), "Expected response body to contain 'error' key"

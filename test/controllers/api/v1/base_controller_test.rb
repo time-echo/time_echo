@@ -29,8 +29,24 @@ module Api
         raise ActiveRecord::RecordNotUnique, "Duplicate record"
       end
 
+      def stale_object_action
+        raise ActiveRecord::StaleObjectError.new(Letter.new, :update)
+      end
+
       def forbidden_action
         raise Api::ForbiddenError, "Access forbidden"
+      end
+
+      def unknown_format_action
+        raise ActionController::UnknownFormat, "ActionController::UnknownFormat"
+      end
+
+      def rate_limited_action
+        raise Api::RateLimitedError, "Rate limit reached"
+      end
+
+      def service_unavailable_action
+        raise Api::ServiceUnavailableError, "Upstream service timeout"
       end
 
       def server_error_action

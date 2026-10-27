@@ -6,16 +6,13 @@ module Api
       before_action :authenticate_user!
 
       def update
-        result = handle_service_result!(
+        @letter = unwrap!(
           Letters::UpdatePredictionsService.call(
             params[:letter_id],
             prediction_params,
             current_user_email
-          ),
-          unauthorized: I18n.t("flash.unauthorized_modify")
+          )
         )
-
-        @letter = result.letter
         render "api/v1/letters/show", status: :ok
       end
 

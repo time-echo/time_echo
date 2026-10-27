@@ -13,33 +13,30 @@ module Api
         end
 
         scope = scope.includes(:emotional_snapshot, :predictions)
-        @pagy, @letters = pagy(scope, limit: per_page)
+        @letters = paginate(scope)
 
         Analytics::TrackEventService.call("dashboard_viewed", { email: current_user_email })
       end
 
       def show
-        result = handle_service_result!(
-          Letters::AccessService.call(params[:id], current_user_email, include_archived: true),
-          unauthorized: I18n.t("flash.unauthorized_view")
+        @letter = unwrap!(
+          Letters::AccessService.call(params[:id], current_user_email, include_archived: true)
         )
-        @letter = result.letter
       end
 
       def create
-        result = handle_service_result!(
+        @letter = unwrap!(
           Letters::CreateService.call(
             params: letter_params,
             current_user_email: current_user_email
           )
         )
-        @letter = result.letter
         render :show, status: :created
       end
 
       def destroy
-        handle_service_result!(Letters::DestroyService.call(params[:id], current_user_email))
-        head :no_content
+        unwrap!(Letters::DestroyService.call(params[:id], current_user_email))
+        render_no_content
       end
 
       private

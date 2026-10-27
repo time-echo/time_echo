@@ -5,8 +5,9 @@ module Api
     class BaseController < ActionController::API
       include ActionController::Cookies
       include ActionController::RequestForgeryProtection
+      include Api::ApiResponse
+      include Api::ResultHandler
       include Api::ErrorHandler
-      include Pagy::Backend
 
       protect_from_forgery with: :null_session
 
@@ -32,12 +33,6 @@ module Api
       end
 
       private
-
-      def per_page
-        raw = params[:per_page] || params[:perPage]
-        limit = raw.to_i
-        limit.positive? ? limit.clamp(1, 100) : 20
-      end
 
       def resolve_current_user_email
         if session[:current_user_email].present?

@@ -63,7 +63,11 @@ Rails.application.routes.draw do
         get "dummy/error", to: "dummy#error_action"
         get "dummy/invalid", to: "dummy#invalid_action"
         get "dummy/conflict", to: "dummy#conflict_action"
+        get "dummy/stale_object", to: "dummy#stale_object_action"
         get "dummy/forbidden", to: "dummy#forbidden_action"
+        get "dummy/unknown_format", to: "dummy#unknown_format_action"
+        get "dummy/rate_limited", to: "dummy#rate_limited_action"
+        get "dummy/service_unavailable", to: "dummy#service_unavailable_action"
         get "dummy/server_error", to: "dummy#server_error_action"
         post "dummy/bad_request", to: "dummy#bad_request_action"
       end
