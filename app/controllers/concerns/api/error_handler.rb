@@ -7,16 +7,17 @@ module Api
     included do
       # Evaluated bottom-to-top by Rails. StandardError declared first so specific handlers take precedence.
       rescue_from StandardError, with: :handle_standard_error
-      rescue_from ServiceUnavailableError, with: :handle_service_unavailable
-      rescue_from RateLimitedError, with: :handle_rate_limited
-      rescue_from ApiError, with: :handle_api_error
+      rescue_from Api::ServiceUnavailableError, with: :handle_service_unavailable
+      rescue_from Api::RateLimitedError, with: :handle_rate_limited
+      rescue_from Api::ApiError, with: :handle_api_error
       rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
+      rescue_from Api::NotFoundError, with: :handle_not_found
       rescue_from ActionController::UnknownFormat, with: :handle_unknown_format
       rescue_from ActiveRecord::RecordNotUnique, with: :handle_conflict
       rescue_from ActiveRecord::StaleObjectError, with: :handle_conflict
       rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
-      rescue_from ForbiddenError, with: :handle_forbidden
-      rescue_from UnauthorizedError, with: :handle_unauthorized
+      rescue_from Api::ForbiddenError, with: :handle_forbidden
+      rescue_from Api::UnauthorizedError, with: :handle_unauthorized
       rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_bad_request
       rescue_from ActionController::ParameterMissing, with: :handle_parameter_missing
 
