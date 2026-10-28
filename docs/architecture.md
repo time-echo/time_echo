@@ -565,7 +565,7 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 | `POST` | `/api/v1/letters/:letter_id/predictions` | `Api::V1::LetterPredictionsController#create` | `201 Created` | Letter lookup + nested prediction creation |
 | `POST` | `/api/v1/letters/:id/archive` | `Api::V1::Letters::ArchivesController#create` | `200 OK` | `Letters::ArchiveService.call(...)` |
 | `POST` | `/api/v1/letters/:id/restore` | `Api::V1::Letters::RestoresController#create` | `200 OK` | `Letters::RestoreService.call(...)` |
-| `POST` | `/api/v1/sessions` | `Api::V1::SessionsController#create` | `201 Created` | `Auth::RequestMagicLinkService.call(...)` |
+| `POST` | `/api/v1/sessions` | `Api::V1::SessionsController#create` | `201 Created` | `Auth::RequestMagicLinkService.call(...)` (revokes active session tokens & issues fresh magic link) |
 | `GET` | `/api/v1/sessions/:token` | `Api::V1::SessionsController#show` | `200 OK` | `Auth::AuthenticateTokenService.call(...)` |
 | `GET` | `/api/v1/sessions/me` | `Api::V1::SessionsController#me` | `200 OK` | Current authenticated user profile |
 | `DELETE` | `/api/v1/sessions` | `Api::V1::SessionsController#destroy` | `204 No Content` | `Auth::DestroySessionService.call(...)` |

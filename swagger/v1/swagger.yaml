@@ -101,7 +101,7 @@ paths:
   /sessions:
     post:
       summary: Request magic link
-      description: Generates a secure, single-use token and dispatches an authentication magic link to the provided email.
+      description: Invalidates any existing active session tokens for the provided email, generates a secure, single-use token, and dispatches a fresh authentication magic link.
       tags:
         - Auth & Sessions
       requestBody:

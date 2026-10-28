@@ -21,9 +21,13 @@ module Auth
       end
 
       email = token_record.email
-      token_record.use!
+      api_session_token = nil
 
-      api_session_token = SessionToken.create!(email: email)
+      SessionToken.transaction do
+        token_record.use!
+        SessionToken.revoke_active_for(email)
+        api_session_token = SessionToken.create!(email: email)
+      end
 
       Analytics::TrackEventService.call("user_logged_in", { email: email })
 

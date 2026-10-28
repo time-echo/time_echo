@@ -28,6 +28,23 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_not token_record.expired?
   end
 
+  test "should revoke previous active session tokens when requesting a magic link" do
+    old_token = SessionToken.create!(email: "user@example.com")
+    assert SessionToken.active.exists?(id: old_token.id)
+
+    post login_path, params: { magic_link_form: { email: "user@example.com" } }
+    assert_redirected_to check_email_path(email: "user@example.com")
+
+    old_token.reload
+    assert old_token.used?
+    assert_not SessionToken.active.exists?(id: old_token.id)
+
+    # Verify old token cannot be used to authenticate
+    get magic_login_path(old_token.token)
+    assert_redirected_to login_path
+    assert_nil session[:current_user_email]
+  end
+
   test "should render new when magic link submission fails" do
     post login_path, params: { magic_link_form: { email: "invalid-email" } }
     assert_response :unprocessable_entity

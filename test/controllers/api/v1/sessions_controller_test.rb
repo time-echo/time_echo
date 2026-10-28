@@ -22,6 +22,38 @@ class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_not token_record.used?
   end
 
+  test "POST /api/v1/sessions revokes previous active session tokens and issues fresh magic link token" do
+    old_active_token = SessionToken.create!(email: @user_email)
+    other_user_token = SessionToken.create!(email: "other_user@example.com")
+    assert SessionToken.active.exists?(id: old_active_token.id)
+    assert SessionToken.active.exists?(id: other_user_token.id)
+
+    assert_emails 1 do
+      post "/api/v1/sessions", params: { email: @user_email }, as: :json
+    end
+
+    assert_resource_response(expected_status: :created)
+
+    old_active_token.reload
+    assert old_active_token.used?, "Old session token must be revoked (marked as used)"
+    assert_not SessionToken.active.exists?(id: old_active_token.id)
+
+    # Verify requests with the old revoked token now fail with 401 Unauthorized
+    get "/api/v1/sessions/me", headers: { "Authorization" => "Bearer #{old_active_token.token}" }, as: :json
+    assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
+
+    # Verify other user's active token is untouched
+    other_user_token.reload
+    assert_not other_user_token.used?
+    assert SessionToken.active.exists?(id: other_user_token.id)
+
+    # Verify new token is distinct and active
+    new_token = SessionToken.last
+    assert_not_equal old_active_token.token, new_token.token
+    assert SessionToken.active.exists?(id: new_token.id)
+    assert_not new_token.used?
+  end
+
   test "POST /api/v1/sessions accepts nested session payload" do
     assert_emails 1 do
       post "/api/v1/sessions", params: { session: { email: @user_email } }, as: :json
