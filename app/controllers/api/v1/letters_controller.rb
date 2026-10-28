@@ -35,11 +35,7 @@ module Api
       end
 
       def destroy
-        letter = Letter.find_by(id: params[:id])
-        if letter.nil? || letter.email != current_user_email
-          raise Api::NotFoundError, I18n.t("flash.private_or_inaccessible", default: "Resource not found")
-        end
-
+        find_owned_letter!(params[:id])
         unwrap!(::Letters::DestroyService.call(params[:id], current_user_email))
         render_no_content
       end

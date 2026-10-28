@@ -6,11 +6,7 @@ module Api
       before_action :authenticate_user!
 
       def update
-        letter = Letter.find_by(id: params[:letter_id])
-        if letter.nil? || letter.email != current_user_email
-          raise Api::NotFoundError, I18n.t("flash.private_or_inaccessible", default: "Resource not found")
-        end
-
+        find_owned_letter!(params[:letter_id])
         @letter = unwrap!(
           ::Letters::UpdatePredictionsService.call(
             params[:letter_id],
