@@ -32,6 +32,13 @@ module Api
         raise Api::NotFoundError, "No route matches [#{request.method}] #{request.path}"
       end
 
+      def find_owned_letter!(id = params[:letter_id] || params[:id])
+        letter = Letter.find_by(id: id)
+        raise Api::NotFoundError if letter.nil? || letter.email != current_user_email
+
+        letter
+      end
+
       private
 
       def resolve_current_user_email

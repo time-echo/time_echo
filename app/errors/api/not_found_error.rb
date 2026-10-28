@@ -3,7 +3,8 @@
 module Api
   class NotFoundError < ApiError
     def initialize(message = nil, details: nil)
-      super(message || "Resource not found", status: :not_found, code: "not_found", details: details)
+      message ||= I18n.t("flash.private_or_inaccessible", default: "Resource not found")
+      super(message, status: :not_found, code: "not_found", details: details)
     end
   end
 end

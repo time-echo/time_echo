@@ -94,14 +94,43 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Future Self Letter", json["data"]["title"]
   end
 
-  test "GET /api/v1/letters/:id returns 403 forbidden when user does not own the letter" do
+  test "GET /api/v1/letters/:id returns 401 when unauthorized" do
+    post "/api/v1/letters", params: @create_payload, headers: @auth_headers
+    created = assert_resource_response(expected_status: :created)
+    letter_id = created["data"]["id"]
+
+    get "/api/v1/letters/#{letter_id}"
+    assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
+  end
+
+  test "GET /api/v1/letters/:id returns 404 not_found when user does not own the letter" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
     letter_id = JSON.parse(response.body)["data"]["id"]
 
     other_token = SessionToken.create!(email: "other_user@example.com")
     get "/api/v1/letters/#{letter_id}", headers: { "X-Session-Token" => other_token.token }
 
-    assert_error_response(expected_status: :forbidden, expected_code: "forbidden")
+    assert_error_response(expected_status: :not_found, expected_code: "not_found")
+  end
+
+  test "DELETE /api/v1/letters/:id returns 404 not_found when letter does not belong to user" do
+    post "/api/v1/letters", params: @create_payload, headers: @auth_headers
+    letter_id = JSON.parse(response.body)["data"]["id"]
+
+    other_token = SessionToken.create!(email: "other_user@example.com")
+    delete "/api/v1/letters/#{letter_id}", headers: { "X-Session-Token" => other_token.token }
+
+    assert_error_response(expected_status: :not_found, expected_code: "not_found")
+  end
+
+  test "POST /api/v1/letters/:id/archive returns 404 not_found when letter does not belong to user" do
+    post "/api/v1/letters", params: @create_payload, headers: @auth_headers
+    letter_id = JSON.parse(response.body)["data"]["id"]
+
+    other_token = SessionToken.create!(email: "other_user@example.com")
+    post "/api/v1/letters/#{letter_id}/archive", headers: { "X-Session-Token" => other_token.token }
+
+    assert_error_response(expected_status: :not_found, expected_code: "not_found")
   end
 
   test "GET /api/v1/letters/:id returns 404 not_found when letter does not exist" do

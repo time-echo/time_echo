@@ -4,6 +4,9 @@ class Rack::Attack
   # Use memory store or Rails.cache for tracking limits
   Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
+  # Disable rate limiting in development environment
+  Rack::Attack.enabled = false if Rails.env.development?
+
   ### Safelists ###
   # Always allow localhost requests in development or test if desired, but whitelist health checks everywhere
   safelist("allow-health-check") do |req|

@@ -3,7 +3,7 @@
 module Api
   module V1
     class LettersController < BaseController
-      before_action :authenticate_user!, only: [ :index, :destroy ]
+      before_action :authenticate_user!, only: [ :index, :show, :destroy ]
 
       def index
         scope = if params[:status] == "archived" || params[:archived] == "true"
@@ -35,6 +35,7 @@ module Api
       end
 
       def destroy
+        find_owned_letter!(params[:id])
         unwrap!(::Letters::DestroyService.call(params[:id], current_user_email))
         render_no_content
       end

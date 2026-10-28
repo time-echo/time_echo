@@ -150,9 +150,9 @@ TimeEcho exposes a standardized RESTful API under `app/controllers/api/v1/` foll
 - **`unwrap!(result)`**: Returns the entity on `result.success?`. When `result.failure?`, raises the exception mapped in `RESULT_ERRORS` or falls back to `Api::BusinessRuleError` (`code: result.error.to_s`).
 - **Never Renders**: `ResultHandler` must **never** call `render`.
 
-### C. Permissions (403) vs Authentication (401) Rule
-- **401 Unauthorized**: Strictly reserved for missing, invalid, or expired authentication tokens (`authenticate_user!`).
-- **403 Forbidden**: Mandatory when an authenticated user attempts to access, modify, or delete a resource they do not own (`RESULT_ERRORS[:unauthorized]` ➔ `Api::ForbiddenError`). Never return 401 for permission denials.
+### C. Authentication (401) vs Resource Not Found (404) Rule
+- **401 Unauthorized**: Returned for missing, invalid, or expired authentication tokens (`authenticate_user!`) and unauthenticated operations (`RESULT_ERRORS[:unauthorized]` ➔ `Api::UnauthorizedError`).
+- **404 Not Found**: Returned when an authenticated user attempts to access, modify, or delete a resource they do not own or that does not exist (`Api::NotFoundError`). Never return 403 or 401 for unowned resources to prevent resource existence leakage.
 
 ### D. Response Contract & Key Formatting
 - **Keys in `camelCase`**: Guaranteed globally via `config/initializers/jbuilder.rb` (`camelize: :lower` and `deep_format_keys true`).
