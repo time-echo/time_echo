@@ -7,6 +7,11 @@ module Api
         before_action :authenticate_user!
 
         def create
+          letter = Letter.find_by(id: params[:letter_id])
+          if letter.nil? || letter.email != current_user_email
+            raise Api::NotFoundError, I18n.t("flash.private_or_inaccessible", default: "Resource not found")
+          end
+
           @letter = unwrap!(
             ::Letters::ArchiveService.call(params[:letter_id], current_user_email)
           )

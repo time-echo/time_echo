@@ -10,7 +10,10 @@ module Api
         default_message: -> { I18n.t("flash.private_or_inaccessible", default: "Resource not found") }
       },
       unauthorized: {
-        # Permission denied on resource -> 403 Forbidden
+        exception_class: Api::UnauthorizedError,
+        default_message: -> { I18n.t("flash.unauthorized_action", default: "You are not authorized to perform this action") }
+      },
+      forbidden: {
         exception_class: Api::ForbiddenError,
         default_message: -> { I18n.t("flash.unauthorized_action", default: "You are not authorized to perform this action") }
       },

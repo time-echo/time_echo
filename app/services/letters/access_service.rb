@@ -19,7 +19,7 @@ module Letters
 
       policy = LetterPolicy.new(@current_user_email, letter)
       unless policy.show?
-        return Result.new(success: false, error: :unauthorized)
+        return Result.new(success: false, error: :not_found)
       end
 
       countdown = letter.pending?

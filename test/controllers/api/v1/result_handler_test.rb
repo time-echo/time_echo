@@ -23,8 +23,15 @@ class Api::V1::ResultHandlerTest < ActiveSupport::TestCase
     assert_equal 404, Rack::Utils.status_code(err.status)
   end
 
-  test "unwrap! raises Api::ForbiddenError on :unauthorized (403 forbidden)" do
+  test "unwrap! raises Api::UnauthorizedError on :unauthorized (401 unauthorized)" do
     result = Struct.new(:success?, :error, :message).new(false, :unauthorized, nil)
+    err = assert_raises(Api::UnauthorizedError) { @handler.unwrap!(result) }
+    assert_equal "unauthorized", err.code
+    assert_equal 401, Rack::Utils.status_code(err.status)
+  end
+
+  test "unwrap! raises Api::ForbiddenError on :forbidden (403 forbidden)" do
+    result = Struct.new(:success?, :error, :message).new(false, :forbidden, nil)
     err = assert_raises(Api::ForbiddenError) { @handler.unwrap!(result) }
     assert_equal "forbidden", err.code
     assert_equal 403, Rack::Utils.status_code(err.status)

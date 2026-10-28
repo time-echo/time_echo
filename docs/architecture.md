@@ -538,9 +538,9 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 | **201 Created** | `POST` | — | `render :show, status: :created` |
 | **204 No Content** | `DELETE` | — | `render_no_content` |
 | **400 Bad Request** | `ActionController::ParameterMissing`, `ActionDispatch::Http::Parameters::ParseError` | `"bad_request"` | Parameter or malformed JSON syntax error |
-| **401 Unauthorized** | `Api::UnauthorizedError` (`authenticate_user!`) | `"unauthorized"` | **Strictly** for missing, invalid, or expired session tokens |
-| **403 Forbidden** | `Api::ForbiddenError`, `RESULT_ERRORS[:unauthorized]`, Pundit/CanCan | `"forbidden"` | **Permission denial**: authenticated user trying to access/modify a resource they do not own |
-| **404 Not Found** | `ActiveRecord::RecordNotFound`, `Api::NotFoundError`, Catch-all route | `"not_found"` | Missing record or unmatched API route |
+| **401 Unauthorized** | `Api::UnauthorizedError`, `authenticate_user!`, `RESULT_ERRORS[:unauthorized]` | `"unauthorized"` | Missing, invalid, or expired session token, or unauthenticated action |
+| **403 Forbidden** | `Api::ForbiddenError`, `RESULT_ERRORS[:forbidden]` | `"forbidden"` | Forbidden action or administrative access denial |
+| **404 Not Found** | `ActiveRecord::RecordNotFound`, `Api::NotFoundError`, Catch-all route | `"not_found"` | Missing record, resource not owned by user, or unmatched API route |
 | **406 Not Acceptable** | `ActionController::UnknownFormat` | `"not_acceptable"` | Requested mime-type cannot be served |
 | **409 Conflict** | `ActiveRecord::RecordNotUnique`, `ActiveRecord::StaleObjectError` | `"conflict"` | Uniqueness violation or optimistic locking collision |
 | **422 Unprocessable** | `ActiveRecord::RecordInvalid`, `Api::BusinessRuleError` | `"validation_failed"` / specific code | Validation failure or business rule violation (`cannot_delete`, `cannot_restore`, `cannot_archive_delivered`) |
