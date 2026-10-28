@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require_relative "base_controller_test"
 
 class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
   test "400 bad_request on ActionController::ParameterMissing" do
