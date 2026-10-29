@@ -9,7 +9,6 @@ module Api
           session[:current_user_email] = @account_data[:email]
           render "api/v1/accounts/update", status: :ok
         end
-        alias_method :create, :show
       end
     end
   end
