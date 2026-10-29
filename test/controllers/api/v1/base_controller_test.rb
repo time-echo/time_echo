@@ -2,72 +2,9 @@
 
 require "test_helper"
 
-module Api
-  module V1
-    class DummyController < BaseController
-      before_action :authenticate_user!, only: [ :protected_action ]
-
-      def public_action
-        render json: { user: current_user_email, locale: I18n.locale }
-      end
-
-      def protected_action
-        render json: { status: "authenticated", email: current_user_email }
-      end
-
-      def error_action
-        raise ActiveRecord::RecordNotFound, "Resource not found"
-      end
-
-      def invalid_action
-        letter = Letter.new
-        letter.validate
-        raise ActiveRecord::RecordInvalid, letter
-      end
-
-      def conflict_action
-        raise ActiveRecord::RecordNotUnique, "Duplicate record"
-      end
-
-      def stale_object_action
-        raise ActiveRecord::StaleObjectError.new(Letter.new, :update)
-      end
-
-      def forbidden_action
-        raise Api::ForbiddenError, "Access forbidden"
-      end
-
-      def unknown_format_action
-        raise ActionController::UnknownFormat, "ActionController::UnknownFormat"
-      end
-
-      def rate_limited_action
-        raise Api::RateLimitedError, "Rate limit reached"
-      end
-
-      def service_unavailable_action
-        raise Api::ServiceUnavailableError, "Upstream service timeout"
-      end
-
-      def server_error_action
-        raise "Unexpected standard error"
-      end
-
-      def parse_error_action
-        raise ActionDispatch::Http::Parameters::ParseError.new("Malformed JSON")
-      end
-
-      def bad_request_action
-        params.require(:required_param)
-        render json: { ok: true }
-      end
-    end
-  end
-end
-
 class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
   test "returns 401 unauthorized when unauthenticated user accesses protected endpoint" do
-    get "/api/v1/dummy/protected"
+    get "/api/v1/sessions/me"
 
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
@@ -76,66 +13,64 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     token_record = SessionToken.create!(email: "session_user@example.com")
     get magic_login_path(token_record.token)
 
-    get "/api/v1/dummy/protected"
+    get "/api/v1/sessions/me"
 
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "session_user@example.com", json["email"]
+    json = assert_resource_response(expected_status: :ok)
+    assert_equal "session_user@example.com", json["data"]["email"]
   end
 
   test "authenticates user via X-Session-Token header" do
     token_record = SessionToken.create!(email: "header_user@example.com")
 
-    get "/api/v1/dummy/protected", headers: { "X-Session-Token" => token_record.token }
+    get "/api/v1/sessions/me", headers: { "X-Session-Token" => token_record.token }
 
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "header_user@example.com", json["email"]
+    json = assert_resource_response(expected_status: :ok)
+    assert_equal "header_user@example.com", json["data"]["email"]
   end
 
   test "authenticates user via Authorization Bearer token" do
     token_record = SessionToken.create!(email: "bearer_user@example.com")
 
-    get "/api/v1/dummy/protected", headers: { "Authorization" => "Bearer #{token_record.token}" }
+    get "/api/v1/sessions/me", headers: { "Authorization" => "Bearer #{token_record.token}" }
 
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "bearer_user@example.com", json["email"]
+    json = assert_resource_response(expected_status: :ok)
+    assert_equal "bearer_user@example.com", json["data"]["email"]
   end
 
   test "rejects expired or used session token" do
     token_record = SessionToken.create!(email: "expired@example.com", expires_at: 1.minute.ago)
 
-    get "/api/v1/dummy/protected", headers: { "X-Session-Token" => token_record.token }
+    get "/api/v1/sessions/me", headers: { "X-Session-Token" => token_record.token }
 
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
-  test "renders 404 json when ActiveRecord::RecordNotFound is raised" do
-    get "/api/v1/dummy/error"
+  test "renders 404 json when resource is not found" do
+    token_record = SessionToken.create!(email: "notfound_user@example.com")
+
+    get "/api/v1/letters/999999", headers: { "Authorization" => "Bearer #{token_record.token}" }
 
     assert_error_response(expected_status: :not_found, expected_code: "not_found")
   end
 
-  test "renders 422 json when ActiveRecord::RecordInvalid is raised" do
-    get "/api/v1/dummy/invalid"
+  test "renders 422 json when validation fails" do
+    post "/api/v1/sessions", params: { email: "invalid-email" }, as: :json
 
     json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
     assert json["error"]["details"].present?
   end
 
   test "renders 400 json when ActionController::ParameterMissing is raised" do
-    post "/api/v1/dummy/bad_request", params: {}
+    post "/api/v1/sessions", params: {}
 
     assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
   end
 
   test "detects locale from X-Locale header" do
-    get "/api/v1/dummy/public", headers: { "X-Locale" => "es" }
+    get "/api/v1/sessions/me", headers: { "X-Locale" => "en" }
 
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal "es", json["locale"]
+    json = assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
+    assert_equal I18n.t("flash.login_required", locale: :en), json["error"]["message"]
   end
 
   test "allows CORS preflight requests from localhost:3000 with credentials" do

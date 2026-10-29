@@ -1,39 +1,52 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require_relative "base_controller_test"
 
 class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
+  def with_health_service_raising(exception)
+    original_call = Health::CheckService.method(:call)
+    Health::CheckService.define_singleton_method(:call) { raise exception }
+    yield
+  ensure
+    Health::CheckService.define_singleton_method(:call, original_call.to_proc)
+  end
+
   test "400 bad_request on ActionController::ParameterMissing" do
-    post "/api/v1/dummy/bad_request", params: {}
+    post "/api/v1/sessions", params: {}
 
     json = assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
-    assert_match(/required_param/i, json["error"]["message"])
+    assert_match(/email/i, json["error"]["message"])
   end
 
   test "400 bad_request on ActionDispatch::Http::Parameters::ParseError" do
-    get "/api/v1/dummy/parse_error"
+    with_health_service_raising(ActionDispatch::Http::Parameters::ParseError.new("Malformed JSON")) do
+      get "/api/v1/health"
 
-    json = assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
-    assert_equal "Invalid or malformed request parameters", json["error"]["message"]
+      json = assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
+      assert_equal "Invalid or malformed request parameters", json["error"]["message"]
+    end
   end
 
   test "401 unauthorized when session token is missing or expired" do
-    get "/api/v1/dummy/protected"
+    get "/api/v1/sessions/me"
 
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
   test "403 forbidden on Api::ForbiddenError" do
-    get "/api/v1/dummy/forbidden"
+    with_health_service_raising(Api::ForbiddenError.new("Access forbidden")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :forbidden, expected_code: "forbidden")
+      assert_error_response(expected_status: :forbidden, expected_code: "forbidden")
+    end
   end
 
   test "404 not_found on ActiveRecord::RecordNotFound" do
-    get "/api/v1/dummy/error"
+    with_health_service_raising(ActiveRecord::RecordNotFound.new("Resource not found")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :not_found, expected_code: "not_found")
+      assert_error_response(expected_status: :not_found, expected_code: "not_found")
+    end
   end
 
   test "404 not_found on catch-all route for unknown API path" do
@@ -43,36 +56,48 @@ class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
   end
 
   test "406 not_acceptable on ActionController::UnknownFormat" do
-    get "/api/v1/dummy/unknown_format"
+    with_health_service_raising(ActionController::UnknownFormat.new("ActionController::UnknownFormat")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :not_acceptable, expected_code: "not_acceptable")
+      assert_error_response(expected_status: :not_acceptable, expected_code: "not_acceptable")
+    end
   end
 
   test "409 conflict on ActiveRecord::RecordNotUnique" do
-    get "/api/v1/dummy/conflict"
+    with_health_service_raising(ActiveRecord::RecordNotUnique.new("Duplicate record")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :conflict, expected_code: "conflict")
+      assert_error_response(expected_status: :conflict, expected_code: "conflict")
+    end
   end
 
   test "409 conflict on ActiveRecord::StaleObjectError" do
-    get "/api/v1/dummy/stale_object"
+    with_health_service_raising(ActiveRecord::StaleObjectError.new(Letter.new, :update)) do
+      get "/api/v1/health"
 
-    json = assert_error_response(expected_status: :conflict, expected_code: "conflict")
-    assert_match(/modified by another request/i, json["error"]["message"])
+      json = assert_error_response(expected_status: :conflict, expected_code: "conflict")
+      assert_match(/modified by another request/i, json["error"]["message"])
+    end
   end
 
   test "422 validation_failed on ActiveRecord::RecordInvalid with details" do
-    get "/api/v1/dummy/invalid"
+    letter = Letter.new
+    letter.validate
+    with_health_service_raising(ActiveRecord::RecordInvalid.new(letter)) do
+      get "/api/v1/health"
 
-    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
-    assert json["error"].key?("details")
-    assert_kind_of Hash, json["error"]["details"]
+      json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+      assert json["error"].key?("details")
+      assert_kind_of Hash, json["error"]["details"]
+    end
   end
 
   test "429 rate_limited on Api::RateLimitedError" do
-    get "/api/v1/dummy/rate_limited"
+    with_health_service_raising(Api::RateLimitedError.new("Rate limit reached")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :too_many_requests, expected_code: "rate_limited")
+      assert_error_response(expected_status: :too_many_requests, expected_code: "rate_limited")
+    end
   end
 
   test "429 rate_limited via Rack::Attack throttled_responder" do
@@ -93,31 +118,37 @@ class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
   end
 
   test "500 internal_error in development exposes exception message" do
-    get "/api/v1/dummy/server_error"
+    with_health_service_raising(RuntimeError.new("Unexpected standard error")) do
+      get "/api/v1/health"
 
-    json = assert_error_response(expected_status: :internal_server_error, expected_code: "internal_error")
-    assert_equal "Unexpected standard error", json["error"]["message"]
+      json = assert_error_response(expected_status: :internal_server_error, expected_code: "internal_error")
+      assert_equal "Unexpected standard error", json["error"]["message"]
+    end
   end
 
   test "500 internal_error in production masks internal message and backtrace" do
     original_env = Rails.env
     begin
       Rails.env = "production"
-      get "/api/v1/dummy/server_error"
+      with_health_service_raising(RuntimeError.new("Unexpected standard error")) do
+        get "/api/v1/health"
 
-      json = assert_error_response(expected_status: :internal_server_error, expected_code: "internal_error")
-      assert_equal "Internal server error", json["error"]["message"]
-      assert_nil json["error"]["backtrace"]
-      refute_includes response.body, "Unexpected standard error"
+        json = assert_error_response(expected_status: :internal_server_error, expected_code: "internal_error")
+        assert_equal "Internal server error", json["error"]["message"]
+        assert_nil json["error"]["backtrace"]
+        refute_includes response.body, "Unexpected standard error"
+      end
     ensure
       Rails.env = original_env
     end
   end
 
   test "503 service_unavailable on Api::ServiceUnavailableError" do
-    get "/api/v1/dummy/service_unavailable"
+    with_health_service_raising(Api::ServiceUnavailableError.new("Upstream service timeout")) do
+      get "/api/v1/health"
 
-    assert_error_response(expected_status: :service_unavailable, expected_code: "service_unavailable")
+      assert_error_response(expected_status: :service_unavailable, expected_code: "service_unavailable")
+    end
   end
 
   test "exceptions_app formats exceptions outside controller dispatch with error contract" do
