@@ -16,9 +16,6 @@ class VerificationMailer < ApplicationMailer
   private
 
   def confirm_email_update_url(token:)
-    Rails.application.routes.url_helpers.api_v1_account_email_confirmation_url(
-      token: token,
-      host: ENV.fetch("APP_HOST") { "localhost:3000" }
-    )
+    "#{app_base_url}/settings/confirm_email?token=#{CGI.escape(token.to_s)}"
   end
 end

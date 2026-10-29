@@ -70,20 +70,6 @@ class Api::V1::AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, Letter.where(email: new_email).count
   end
 
-  test "POST /api/v1/account/confirm_email confirms email migration" do
-    new_email = "confirmed_post@example.com"
-    token = Rails.application.message_verifier(:email_update).generate(
-      { old_email: @email, new_email: new_email },
-      expires_in: 15.minutes
-    )
-
-    post "/api/v1/account/confirm_email", params: { token: token }, as: :json
-
-    json = assert_resource_response(expected_status: :ok)
-    assert_equal new_email, json["data"]["email"]
-    assert_equal 1, Letter.where(email: new_email).count
-  end
-
   test "GET /api/v1/account/confirm_email returns 401 when token is invalid" do
     get "/api/v1/account/confirm_email", params: { token: "invalid-token" }
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")

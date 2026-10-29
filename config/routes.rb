@@ -38,7 +38,7 @@ Rails.application.routes.draw do
 
       resource :account, only: [ :update, :destroy ] do
         scope module: :accounts do
-          resource :email_confirmation, only: [ :show, :create ], path: "confirm_email", defaults: { format: :json }
+          resource :email_confirmation, only: [ :show ], path: "confirm_email", defaults: { format: :json }
         end
       end
     end
