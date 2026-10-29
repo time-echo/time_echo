@@ -80,6 +80,14 @@ class Api::V1::ResultHandlerTest < ActiveSupport::TestCase
     assert_equal 429, Rack::Utils.status_code(err.status)
   end
 
+  test "unwrap! raises Api::ServiceUnavailableError on :service_unavailable with default message" do
+    result = Struct.new(:success?, :error, :message, :details).new(false, :service_unavailable, nil, { db: "down" })
+    err = assert_raises(Api::ServiceUnavailableError) { @handler.unwrap!(result) }
+    assert_equal "service_unavailable", err.code
+    assert_equal 503, Rack::Utils.status_code(err.status)
+    assert_equal({ db: "down" }, err.details)
+  end
+
   test "unwrap! raises ActiveRecord::RecordInvalid when result letter has errors" do
     letter = Letter.new
     letter.validate

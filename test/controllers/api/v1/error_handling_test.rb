@@ -86,7 +86,7 @@ class Api::V1::ErrorHandlingTest < ActionDispatch::IntegrationTest
     with_health_service_raising(ActiveRecord::RecordInvalid.new(letter)) do
       get "/api/v1/health"
 
-      json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+      json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
       assert json["error"].key?("details")
       assert_kind_of Hash, json["error"]["details"]
     end

@@ -69,7 +69,7 @@ class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
 
   test "POST /api/v1/sessions returns 422 validation_failed when email is invalid" do
     post "/api/v1/sessions", params: { email: "not-an-email" }, as: :json
-    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
     assert json["error"]["details"].present?
   end
 

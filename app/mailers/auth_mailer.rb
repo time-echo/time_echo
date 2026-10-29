@@ -15,6 +15,6 @@ class AuthMailer < ApplicationMailer
   private
 
   def magic_login_url(token:)
-    Rails.application.routes.url_helpers.magic_login_url(token: token, host: ENV.fetch("APP_HOST") { "localhost:3000" })
+    "#{app_base_url}/login/#{token}"
   end
 end

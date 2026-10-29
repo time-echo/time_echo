@@ -11,7 +11,8 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
 
   test "authenticates user via session cookie" do
     token_record = SessionToken.create!(email: "session_user@example.com")
-    get magic_login_path(token_record.token)
+    get "/api/v1/sessions/#{token_record.token}", as: :json
+    assert_response :ok
 
     get "/api/v1/sessions/me"
 
@@ -56,7 +57,7 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
   test "renders 422 json when validation fails" do
     post "/api/v1/sessions", params: { email: "invalid-email" }, as: :json
 
-    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
     assert json["error"]["details"].present?
   end
 
@@ -73,6 +74,13 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     assert_equal I18n.t("flash.login_required", locale: :en), json["error"]["message"]
   end
 
+  test "detects locale from HTTP_ACCEPT_LANGUAGE header when X-Locale is absent" do
+    get "/api/v1/sessions/me", headers: { "Accept-Language" => "en-US,en;q=0.9" }
+
+    json = assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
+    assert_equal I18n.t("flash.login_required", locale: :en), json["error"]["message"]
+  end
+
   test "allows CORS preflight requests from localhost:3000 with credentials" do
     options "/api/v1/ping", headers: {
       "Origin" => "http://localhost:3000",
@@ -82,5 +90,13 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "http://localhost:3000", response.headers["Access-Control-Allow-Origin"]
     assert_equal "true", response.headers["Access-Control-Allow-Credentials"]
+  end
+
+  test "GET /api/v1/ping returns ok status and timestamp" do
+    get "/api/v1/ping", as: :json
+
+    json = assert_resource_response(expected_status: :ok)
+    assert_equal "ok", json["data"]["status"]
+    assert json["data"]["timestamp"].present?
   end
 end

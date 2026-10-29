@@ -57,10 +57,6 @@ class LetterForm
     super(attrs)
   end
 
-  def deliver_at
-    parsed_utc_scheduled_at
-  end
-
   def deliver_at=(val)
     self.scheduled_at = val
   end

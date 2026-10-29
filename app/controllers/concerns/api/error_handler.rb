@@ -100,7 +100,7 @@ module Api
 
     def handle_record_invalid(exception)
       render_error(
-        status: :unprocessable_entity,
+        status: :unprocessable_content,
         code: "validation_failed",
         message: exception.record.errors.full_messages.to_sentence,
         details: exception.record.errors.to_hash
@@ -125,7 +125,7 @@ module Api
       )
     end
 
-    def handle_bad_request(exception)
+    def handle_bad_request(_exception)
       render_error(
         status: :bad_request,
         code: "bad_request",
