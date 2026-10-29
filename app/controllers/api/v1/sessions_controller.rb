@@ -36,8 +36,6 @@ module Api
           params[:email]
         elsif params[:session].present?
           params.require(:session).require(:email)
-        elsif params[:magic_link_form].present?
-          params.require(:magic_link_form).require(:email)
         else
           params.require(:email)
         end

@@ -20,14 +20,19 @@ class Api::V1::AccountsControllerTest < ActionDispatch::IntegrationTest
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 
+  test "PATCH /api/v1/account returns 400 when email parameter is missing" do
+    patch "/api/v1/account", params: {}, headers: @auth_headers, as: :json
+    assert_error_response(expected_status: :bad_request, expected_code: "bad_request")
+  end
+
   test "PATCH /api/v1/account returns 422 when email is unchanged" do
     patch "/api/v1/account", params: { email: @email }, headers: @auth_headers, as: :json
-    assert_error_response(expected_status: :unprocessable_entity, expected_code: "same_email")
+    assert_error_response(expected_status: :unprocessable_content, expected_code: "same_email")
   end
 
   test "PATCH /api/v1/account returns 422 when email is invalid" do
     patch "/api/v1/account", params: { email: "invalid-email" }, headers: @auth_headers, as: :json
-    assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
   end
 
   test "PATCH /api/v1/account dispatches confirmation email when new email is provided" do
@@ -57,7 +62,7 @@ class Api::V1::AccountsControllerTest < ActionDispatch::IntegrationTest
       expires_in: 15.minutes
     )
 
-    get "/api/v1/account/confirm_email", params: { token: token }, as: :json
+    get "/api/v1/account/confirm_email", params: { token: token }
 
     json = assert_resource_response(expected_status: :ok)
     assert_equal new_email, json["data"]["email"]
@@ -80,7 +85,7 @@ class Api::V1::AccountsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET /api/v1/account/confirm_email returns 401 when token is invalid" do
-    get "/api/v1/account/confirm_email", params: { token: "invalid-token" }, as: :json
+    get "/api/v1/account/confirm_email", params: { token: "invalid-token" }
     assert_error_response(expected_status: :unauthorized, expected_code: "unauthorized")
   end
 

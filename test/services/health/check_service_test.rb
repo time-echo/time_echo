@@ -16,22 +16,22 @@ module Health
       assert_equal "ok", result.value.dig(:services, :jobs, :status)
     end
 
-    test "returns failure when database check raises error" do
-      service = Health::CheckService.new
-      with_stub(service, :check_database, [ "unhealthy", nil, "PG::ConnectionBad: connection refused" ]) do
-        result = service.call
+    test "returns failure when database execute raises StandardError" do
+      conn = ActiveRecord::Base.connection
+      with_stub(conn, :execute, ->(*) { raise StandardError, "PG::ConnectionBad: connection refused" }) do
+        result = Health::CheckService.call
 
         assert_not result.success?
         assert_equal :service_unavailable, result.error
         assert_includes result.message, "database"
         assert_equal "unhealthy", result.details.dig(:database, :status)
+        assert_includes result.details.dig(:database, :error), "connection refused"
       end
     end
 
-    test "returns failure when migrations check reports pending migrations" do
-      service = Health::CheckService.new
-      with_stub(service, :check_migrations, [ "pending_migrations", "Pending migrations exist" ]) do
-        result = service.call
+    test "returns failure when migrations check raises PendingMigrationError" do
+      with_stub(ActiveRecord::Migration, :check_all_pending!, -> { raise ActiveRecord::PendingMigrationError.new("Pending migrations exist") }) do
+        result = Health::CheckService.call
 
         assert_not result.success?
         assert_equal :service_unavailable, result.error
@@ -40,15 +40,40 @@ module Health
       end
     end
 
+    test "returns failure when migrations check raises StandardError" do
+      with_stub(ActiveRecord::Migration, :check_all_pending!, -> { raise StandardError, "Migration check failed" }) do
+        result = Health::CheckService.call
+
+        assert_not result.success?
+        assert_equal :service_unavailable, result.error
+        assert_includes result.message, "migrations"
+        assert_equal "unhealthy", result.details.dig(:migrations, :status)
+      end
+    end
+
     test "returns failure when background jobs table is missing" do
-      service = Health::CheckService.new
-      with_stub(service, :check_jobs, [ "unhealthy", "GoodJob table does not exist" ]) do
-        result = service.call
+      conn = ActiveRecord::Base.connection
+      with_stub(conn, :table_exists?, false) do
+        result = Health::CheckService.call
 
         assert_not result.success?
         assert_equal :service_unavailable, result.error
         assert_includes result.message, "jobs"
         assert_equal "unhealthy", result.details.dig(:jobs, :status)
+        assert_equal "GoodJob table does not exist", result.details.dig(:jobs, :error)
+      end
+    end
+
+    test "returns failure when background jobs check raises StandardError" do
+      conn = ActiveRecord::Base.connection
+      with_stub(conn, :table_exists?, ->(*) { raise StandardError, "Table check error" }) do
+        result = Health::CheckService.call
+
+        assert_not result.success?
+        assert_equal :service_unavailable, result.error
+        assert_includes result.message, "jobs"
+        assert_equal "unhealthy", result.details.dig(:jobs, :status)
+        assert_equal "Table check error", result.details.dig(:jobs, :error)
       end
     end
 

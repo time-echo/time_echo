@@ -79,7 +79,7 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     invalid_payload = { letter: { title: "", content: "Too short" } }
     post "/api/v1/letters", params: invalid_payload, headers: @auth_headers
 
-    json = assert_error_response(expected_status: :unprocessable_entity, expected_code: "validation_failed")
+    json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
     assert json["error"]["details"].present?
   end
 
@@ -158,7 +158,7 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     letter_id = created["data"]["id"]
 
     delete "/api/v1/letters/#{letter_id}", headers: @auth_headers
-    assert_error_response(expected_status: :unprocessable_entity, expected_code: "cannot_delete")
+    assert_error_response(expected_status: :unprocessable_content, expected_code: "cannot_delete")
 
     post "/api/v1/letters/#{letter_id}/archive", headers: @auth_headers
     assert_resource_response(expected_status: :ok)

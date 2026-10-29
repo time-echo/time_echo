@@ -7,7 +7,7 @@
 
 <%= t('mailers.future_letter.view_full_prompt') %>
 <%= t('mailers.future_letter.open_btn') %>:
-<%= Rails.application.routes.url_helpers.letter_url(@letter.signed_id, host: ENV.fetch('APP_HOST') { 'localhost:3000' }) %>
+<%= @letter_url %>
 
 --
 <%= t('mailers.future_letter.footer_text') %>
