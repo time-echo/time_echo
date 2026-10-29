@@ -16,6 +16,6 @@ class VerificationMailer < ApplicationMailer
   private
 
   def confirm_email_update_url(token:)
-    Rails.application.routes.url_helpers.account_email_confirmation_url(token: token, host: ENV.fetch("APP_HOST") { "localhost:3000" })
+    Rails.application.routes.url_helpers.confirm_email_update_settings_url(token: token, host: ENV.fetch("APP_HOST") { "localhost:3000" })
   end
 end

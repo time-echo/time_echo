@@ -32,16 +32,16 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
     assert_equal "stranger@timeecho.com", Letter.last.email
   end
 
-  test "updating email in Account does not change it immediately and dispatches mailer" do
+  test "updating email in Settings does not change it immediately and dispatches mailer" do
     sign_in(@old_email)
 
     assert_enqueued_emails 1 do
-      patch account_url, params: {
+      patch settings_url, params: {
         email: @new_email
       }
     end
 
-    assert_redirected_to account_url
+    assert_redirected_to settings_url
     follow_redirect!
     assert_match "Hemos enviado un correo de confirmación", response.body
   end
@@ -61,9 +61,9 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
       expires_in: 15.minutes
     )
 
-    get account_email_confirmation_url(token: token)
+    get confirm_email_update_settings_url(token: token)
 
-    assert_redirected_to account_url
+    assert_redirected_to settings_url
     follow_redirect!
     assert_match "Dirección de correo electrónico confirmada y actualizada", response.body
 
@@ -75,9 +75,9 @@ class EmailConfirmationTest < ActionDispatch::IntegrationTest
   test "invalid token for email update displays error" do
     sign_in(@old_email)
 
-    get account_email_confirmation_url(token: "invalid-token-123")
+    get confirm_email_update_settings_url(token: "invalid-token-123")
 
-    assert_redirected_to account_url
+    assert_redirected_to settings_url
     follow_redirect!
     assert_match "El enlace de confirmación no es válido o ha caducado", response.body
   end

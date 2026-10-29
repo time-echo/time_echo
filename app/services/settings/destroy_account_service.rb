@@ -1,6 +1,6 @@
-# frozen_string_literal: true
+require "ostruct"
 
-module Accounts
+module Settings
   class DestroyAccountService
     def self.call(email)
       new(email).call
@@ -40,17 +40,7 @@ module Accounts
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
       end
 
-      Result.new(success: true)
-    end
-
-    class Result
-      def initialize(success:)
-        @success = success
-      end
-
-      def success?
-        @success
-      end
+      OpenStruct.new(success?: true)
     end
   end
 end

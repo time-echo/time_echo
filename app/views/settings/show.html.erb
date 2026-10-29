@@ -1,0 +1,63 @@
+<div class="max-w-2xl mx-auto space-y-8 font-ui pb-16 animate-fade-in text-base-content">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-[#D8D2C2] dark:border-[#2D3340] pb-6">
+    <div class="space-y-1">
+      <h1 class="font-serif-editorial text-3xl font-semibold text-base-content tracking-tight">
+        <%= t('settings.title') %>
+      </h1>
+      <p class="text-xs font-letter text-base-content/60 tracking-wider">
+        <%= t('settings.subtitle') %>
+      </p>
+    </div>
+  </div>
+
+  <div class="paper-sheet rounded-xs border border-[#D8D2C2] dark:border-[#2D3340] p-6 sm:p-8 space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D8D2C2] dark:border-[#2D3340] pb-3.5">
+      <h2 class="font-serif-editorial text-xl font-semibold text-base-content flex items-center gap-2">
+        <%= tabler_icon("mail", size: 18, class: "text-[#2C485E] dark:text-[#77A3C4]") %>
+        <span><%= t('settings.change_email') %></span>
+      </h2>
+    </div>
+
+    <%= form_with url: settings_path, method: :patch, class: "space-y-6" do |f| %>
+      <div class="space-y-2">
+        <%= f.label :email, t('settings.new_email_address'), class: "text-xs font-letter uppercase tracking-wider font-semibold text-base-content/70 block" %>
+        <%= f.email_field :email,
+            name: "email",
+            id: "email",
+            value: current_user_email,
+            class: "w-full paper-sheet rounded-xs border border-[#D8D2C2] dark:border-[#2D3340] px-4 py-2.5 font-letter text-xs text-base-content placeholder:text-base-content/40 focus:border-[#8E2818] focus:outline-none transition-colors min-h-[44px]",
+            placeholder: t('settings.email_placeholder'),
+            required: true %>
+        <p class="text-[11px] font-letter text-base-content/50 leading-relaxed">
+          <%= t('settings.email_change_note') %>
+        </p>
+      </div>
+
+      <%= f.submit t('settings.update_email'),
+          class: "btn bg-[#8E2818] hover:bg-[#6A1E12] text-[#FAF9F5] w-full rounded-xs py-3 px-8 text-xs font-semibold tracking-widest uppercase shadow-xs border-none cursor-pointer font-letter min-h-[44px]" %>
+    <% end %>
+  </div>
+
+  <div class="archival-folder rounded-xs border border-error/30 p-6 sm:p-8 space-y-6">
+    <div class="flex items-center gap-2 border-b border-error/20 pb-3 text-error">
+      <%= tabler_icon("alert-triangle", size: 18) %>
+      <h2 class="font-serif-editorial text-xl font-semibold text-error"><%= t('settings.danger_zone') %></h2>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div class="space-y-1">
+        <h4 class="text-xs font-letter font-semibold uppercase tracking-wider text-error"><%= t('settings.delete_account_permanently') %></h4>
+        <p class="text-xs font-letter text-base-content/60 leading-relaxed max-w-lg">
+          <%= t('settings.delete_account_desc') %>
+        </p>
+      </div>
+
+      <%= button_to settings_path,
+          method: :delete,
+          class: "btn btn-outline border-error/40 text-error hover:bg-error/10 hover:border-error rounded-xs cursor-pointer shrink-0 font-letter text-xs font-semibold uppercase tracking-wider transition-colors min-h-[44px] px-5 whitespace-nowrap",
+          data: { turbo_confirm: t('settings.delete_confirm') } do %>
+        <%= t('settings.delete_my_vault') %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -6,12 +6,12 @@ module Api
       before_action :authenticate_user!
 
       def update
-        @account_data = unwrap!(::Accounts::RequestEmailUpdateService.call(email_param, current_user_email))
+        @account_data = unwrap!(::Settings::RequestEmailUpdateService.call(email_param, current_user_email))
         render :update, status: :ok
       end
 
       def destroy
-        unwrap!(::Accounts::DestroyAccountService.call(current_user_email))
+        unwrap!(::Settings::DestroyAccountService.call(current_user_email))
         session.delete(:current_user_email)
         render_no_content
       end

@@ -16,13 +16,13 @@ graph TD
 
     subgraph Controllers [RESTful Controller Layer]
         LC[LettersController]
-        SC[AccountsController]
+        SC[SettingsController]
         SessC[SessionsController]
         AC[AnalyticsController]
         LPC[LetterPredictionsController]
         LSC[LetterSuccessesController]
         CEC[CheckEmailsController]
-        SEC[Accounts::EmailConfirmationsController]
+        SEC[Settings::EmailConfirmationsController]
         LocC[LocalesController]
         PC[PagesController]
     end
@@ -50,9 +50,9 @@ graph TD
         MLS[Auth::MagicLinkService]
         TES[Analytics::TrackEventService]
         FMS[Analytics::FetchMetricsService]
-        REUS[Accounts::RequestEmailUpdateService]
-        CEUS[Accounts::ConfirmEmailUpdateService]
-        DAS[Accounts::DestroyAccountService]
+        REUS[Settings::RequestEmailUpdateService]
+        CEUS[Settings::ConfirmEmailUpdateService]
+        DAS[Settings::DestroyAccountService]
     end
 
     subgraph Queries [Query Objects Layer]
@@ -88,7 +88,7 @@ graph TD
 ### Key Structural Layers:
 
 1. **Model-View-Controller (MVC) & RESTful Controller Design**:
-   - **Controllers**: Extremely thin layers strictly focused on the seven standard RESTful actions (`index`, `show`, `new`, `create`, `update`, `destroy`). Any custom collection or member flows are extracted into dedicated, single-responsibility controllers (e.g., `LocalesController` for session-persisted locale selection, `LetterPredictionsController` to update reality states, `Accounts::EmailConfirmationsController` to process confirmation links, `PagesController` for landing and static info pages).
+   - **Controllers**: Extremely thin layers strictly focused on the seven standard RESTful actions (`index`, `show`, `new`, `create`, `update`, `destroy`). Any custom collection or member flows are extracted into dedicated, single-responsibility controllers (e.g., `LocalesController` for session-persisted locale selection, `LetterPredictionsController` to update reality states, `Settings::EmailConfirmationsController` to process confirmation links, `PagesController` for landing and static info pages).
    - **Views**: Rendered in English/Spanish (using Rails i18n localization). Powered by Tailwind CSS v4 and DaisyUI v5, using semantic component layout rules.
    - **Models**: Encapsulate basic relationships, validations, and scopes. Heavy business actions are offloaded to Services.
 
@@ -112,10 +112,10 @@ graph TD
    - **`Auth::MagicLinkService`**: Generates, signs, sends, and authenticates cryptographically secure passwordless tokens.
    - **`Analytics::TrackEventService`**: Logs granular user actions to `analytics_events` for retrospection.
    - **`Analytics::FetchMetricsService`**: Aggregates retrospective dashboard metrics (capsule counts, emotional baselines, prediction match ratios).
-   - **`Accounts::RequestEmailUpdateService`**: Dispatches email address update confirmation magic links.
-   - **`Accounts::ConfirmEmailUpdateService`**: Atomically updates user email address across preferences, letters, and events.
+   - **`Settings::RequestEmailUpdateService`**: Dispatches email address update confirmation magic links.
+   - **`Settings::ConfirmEmailUpdateService`**: Atomically updates user email address across preferences, letters, and events.
    - **`Settings::UpdatePreferencesService`**: Updates user appearance mode, theme, reflection style, and notification preferences.
-   - **`Accounts::DestroyAccountService`**: Atomically purges all user records ("Danger Zone" account deletion).
+   - **`Settings::DestroyAccountService`**: Atomically purges all user records ("Danger Zone" account deletion).
 
 5. **Query Objects Layer (`app/queries/`)**:
    - Isolate complex ActiveRecord operations from controllers and models to maintain clean separation of concerns.
@@ -258,7 +258,7 @@ To guarantee absolute transactional integrity and prevent orphaned rows or secur
 
 ### Email Update Transaction
 
-When a user updates their email inside `AccountsController#update`, all associated entities must migrate in tandem to prevent locking out the user from their historical capsules.
+When a user updates their email inside `SettingsController#update`, all associated entities must migrate in tandem to prevent locking out the user from their historical capsules.
 
 ```mermaid
 flowchart TD
@@ -283,7 +283,7 @@ flowchart TD
 
 ### Complete Account Deletion ("Danger Zone" Wipeout)
 
-If a user triggers "Eliminar mi baúl" in their settings, a direct PostgreSQL transactional block (`Accounts::DestroyAccountService`) triggers. This wipes out:
+If a user triggers "Eliminar mi baúl" in their settings, a direct PostgreSQL transactional block (`Settings::DestroyAccountService`) triggers. This wipes out:
 
 1. All foreign keys (`predictions`, `emotional_snapshots`) matching the user's `Letter` IDs.
 2. The `Letter` records themselves.

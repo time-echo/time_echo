@@ -27,11 +27,11 @@ Rails.application.routes.draw do
 
   get "analytics", to: "analytics#index", as: :analytics
 
-  resource :account, only: [ :show, :update, :destroy ] do
-    scope module: :accounts do
-      resource :email_confirmation, only: [ :show ], path: "confirm_email"
-    end
-  end
+  get "settings", to: "settings#show", as: :settings
+  patch "settings", to: "settings#update"
+  delete "settings", to: "settings#destroy"
+
+  get "settings/confirm_email", to: "settings/email_confirmations#show", as: :confirm_email_update_settings
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms", to: "pages#terms", as: :terms

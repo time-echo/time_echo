@@ -1,6 +1,6 @@
-# frozen_string_literal: true
+require "ostruct"
 
-module Accounts
+module Settings
   class RequestEmailUpdateService
     def self.call(new_email, old_email)
       new(new_email, old_email).call
@@ -14,12 +14,12 @@ module Accounts
     def call
       unless valid_email?
         msg = I18n.t("settings.invalid_email", default: "Por favor introduce un correo electrónico válido.")
-        return Result.new(success: false, error: :invalid, message: msg)
+        return OpenStruct.new(success?: false, code: :invalid, error: msg, message: msg)
       end
 
       if @new_email == @old_email
         msg = I18n.t("settings.same_email", default: "El nuevo correo no puede ser igual al actual.")
-        return Result.new(success: false, error: :same_email, message: msg)
+        return OpenStruct.new(success?: false, code: :same_email, error: msg, message: msg)
       end
 
       token = Rails.application.message_verifier(:email_update).generate(
@@ -30,8 +30,8 @@ module Accounts
       VerificationMailer.confirm_email(@old_email, @new_email, token).deliver_later
       Analytics::TrackEventService.call("email_update_requested", { old_email: @old_email, new_email: @new_email }) rescue nil
 
-      Result.new(
-        success: true,
+      OpenStruct.new(
+        success?: true,
         value: {
           email: @new_email,
           message: I18n.t("settings.email_update_requested_message", email: @new_email, default: "Se ha enviado un enlace de confirmación a #{@new_email}.")
@@ -43,21 +43,6 @@ module Accounts
 
     def valid_email?
       @new_email.present? && @new_email.match?(URI::MailTo::EMAIL_REGEXP)
-    end
-
-    class Result
-      attr_reader :value, :error, :message
-
-      def initialize(success:, value: nil, error: nil, message: nil)
-        @success = success
-        @value = value
-        @error = error
-        @message = message
-      end
-
-      def success?
-        @success
-      end
     end
   end
 end
