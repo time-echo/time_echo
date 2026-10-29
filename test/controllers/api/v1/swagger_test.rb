@@ -22,6 +22,7 @@ module Api
         assert_includes response.body, "/health"
         assert_includes response.body, "/sessions"
         assert_includes response.body, "/letters"
+        assert_includes response.body, "/account"
       end
     end
   end

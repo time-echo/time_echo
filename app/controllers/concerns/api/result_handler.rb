@@ -80,7 +80,7 @@ module Api
         )
       end
 
-      error_key = result.error
+      error_key = result.respond_to?(:code) && result.code ? result.code : result.error
       config = RESULT_ERRORS[error_key]
       custom_message = result.message if result.respond_to?(:message) && result.message.present?
       details = result.details if result.respond_to?(:details)

@@ -67,25 +67,11 @@ Rails.application.routes.draw do
         end
       end
       delete "sessions", to: "sessions#destroy"
-    end
-  end
 
-  if Rails.env.test?
-    namespace :api, defaults: { format: :json } do
-      namespace :v1 do
-        get "dummy/public", to: "dummy#public_action"
-        get "dummy/protected", to: "dummy#protected_action"
-        get "dummy/error", to: "dummy#error_action"
-        get "dummy/invalid", to: "dummy#invalid_action"
-        get "dummy/conflict", to: "dummy#conflict_action"
-        get "dummy/stale_object", to: "dummy#stale_object_action"
-        get "dummy/forbidden", to: "dummy#forbidden_action"
-        get "dummy/unknown_format", to: "dummy#unknown_format_action"
-        get "dummy/rate_limited", to: "dummy#rate_limited_action"
-        get "dummy/service_unavailable", to: "dummy#service_unavailable_action"
-        get "dummy/server_error", to: "dummy#server_error_action"
-        get "dummy/parse_error", to: "dummy#parse_error_action"
-        post "dummy/bad_request", to: "dummy#bad_request_action"
+      resource :account, only: [ :update, :destroy ] do
+        scope module: :accounts do
+          resource :email_confirmation, only: [ :show, :create ], path: "confirm_email"
+        end
       end
     end
   end
