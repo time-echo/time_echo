@@ -56,10 +56,10 @@ class RackAttackTest < ActionDispatch::IntegrationTest
 
   test "throttles sensitive account deletion attempts after 3 tries" do
     3.times do
-      delete settings_path
+      delete account_path
     end
 
-    delete settings_path
+    delete account_path
     assert_response :too_many_requests
   end
 

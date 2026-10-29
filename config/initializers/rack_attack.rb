@@ -39,7 +39,7 @@ class Rack::Attack
   # 4. Sensitive account destruction requests per IP
   # 3 requests per minute per IP
   throttle("account_deletion/ip", limit: 3, period: 1.minute) do |req|
-    req.ip if req.path == "/settings" && req.delete?
+    req.ip if (req.path == "/account" || req.path == "/api/v1/account") && req.delete?
   end
 
   ### Custom Blocked / Throttled Response ###

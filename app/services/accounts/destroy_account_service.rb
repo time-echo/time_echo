@@ -1,4 +1,6 @@
-module Settings
+# frozen_string_literal: true
+
+module Accounts
   class DestroyAccountService
     def self.call(email)
       new(email).call
@@ -34,9 +36,21 @@ module Settings
         end
 
         letters.destroy_all
+        SessionToken.where(email: @email).destroy_all
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
       end
-      true
+
+      Result.new(success: true)
+    end
+
+    class Result
+      def initialize(success:)
+        @success = success
+      end
+
+      def success?
+        @success
+      end
     end
   end
 end

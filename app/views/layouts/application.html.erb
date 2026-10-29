@@ -86,8 +86,8 @@
               </a>
 
               <!-- Settings -->
-              <% settings_active = current_page?(settings_path) %>
-              <a href="<%= settings_path %>" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-colors duration-150 <%= settings_active ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:bg-base-200 hover:text-primary' %>">
+              <% settings_active = current_page?(account_path) %>
+              <a href="<%= account_path %>" class="flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium transition-colors duration-150 <%= settings_active ? 'bg-primary text-primary-content' : 'text-base-content/70 hover:bg-base-200 hover:text-primary' %>">
                 <%= tabler_icon("settings", size: 18) %>
                 <span><%= t('navigation.settings') %></span>
               </a>
@@ -143,7 +143,7 @@
                 <li><a href="<%= dashboard_path %>" class="py-2 flex items-center gap-2"><%= tabler_icon("mail", size: 16) %> <%= t('navigation.vault') %></a></li>
                 <li><a href="<%= dashboard_path(timeline: true) %>" class="py-2 flex items-center gap-2"><%= tabler_icon("clock", size: 16) %> <%= t('navigation.timeline') %></a></li>
                 <li><a href="<%= analytics_path %>" class="py-2 flex items-center gap-2"><%= tabler_icon("chart-bar", size: 16) %> <%= t('navigation.analytics') %></a></li>
-                <li><a href="<%= settings_path %>" class="py-2 flex items-center gap-2"><%= tabler_icon("settings", size: 16) %> <%= t('navigation.settings') %></a></li>
+                <li><a href="<%= account_path %>" class="py-2 flex items-center gap-2"><%= tabler_icon("settings", size: 16) %> <%= t('navigation.settings') %></a></li>
                 <% if user_signed_in? %>
                   <div class="divider my-1"></div>
                   <li class="px-3 py-1.5 text-[10px] text-base-content/40 truncate"><%= current_user_email %></li>

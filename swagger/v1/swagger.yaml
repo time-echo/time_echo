@@ -48,6 +48,8 @@ tags:
     description: Core digital capsule creation, listing, delivery, and lifecycle management.
   - name: Letter Predictions
     description: Life predictions and future outcome verifications linked to letters.
+  - name: Account
+    description: Account email updates, email confirmations, and permanent vault deletion.
 
 paths:
   /health/liveness:
@@ -503,6 +505,85 @@ paths:
                 $ref: '#/components/schemas/ErrorEnvelope'
         '404':
           description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /account:
+    patch:
+      summary: Request account email update
+      description: Dispatches a confirmation link to the requested new email address.
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkRequest'
+      responses:
+        '200':
+          description: Email update confirmation link dispatched.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkSuccessResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Invalid or unchanged email address.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    delete:
+      summary: Permanently delete account and vault
+      description: Purges all letters, predictions, emotional snapshots, and active sessions for the authenticated user.
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      responses:
+        '204':
+          description: Account and vault permanently deleted; no content returned.
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /account/confirm_email:
+    get:
+      summary: Confirm account email update
+      description: Verifies the email confirmation token and migrates all user capsules to the new email address.
+      tags:
+        - Account
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email confirmed and migrated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkSuccessResponse'
+        '401':
+          description: Invalid or expired confirmation token.
           content:
             application/json:
               schema:
