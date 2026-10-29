@@ -14,7 +14,9 @@ Welcome to **TimeEcho**! As an AI coding assistant, you must strictly adhere to 
 
 ## 🎨 2. Design System & Premium Aesthetics (Postal & Archival Standard)
 
-TimeEcho enforces a tactile, nostalgic, and secure visual identity built on top of **Tailwind CSS v4** and **DaisyUI v5**. The application consciously rejects generic corporate SaaS tropes in favor of an **archival, epistolary, and postal aesthetic**. For full specification, read **[`docs/ui-ux.md`](docs/ui-ux.md)**.
+TimeEcho enforces a tactile, nostalgic, and secure visual identity built on top of **Tailwind CSS v4** and **DaisyUI v5**. The application consciously rejects generic corporate SaaS tropes in favor of an **archival, epistolary, and postal aesthetic**. For full specification, read **[docs/ui-ux.md](docs/ui-ux.md)** and the living Storybook mockup catalog in **[../mockups/](../mockups/README.md)** (also see [.agents/rules/mockups.md](.agents/rules/mockups.md)).
+
+- **Use Mockups for UI Changes**: Whenever any UI, layout, or visual component changes are made, always consult and follow the Storybook mockups in ../mockups/ (Tier 1 Primitives through Tier 5 Pages/Figma Frames) as the canonical visual reference.
 
 ### A. Tripartite Typography Hierarchy
 - **Editorial Serif (`font-serif-editorial`)**: Use **Fraunces** (`font-serif-editorial`) for page headers, capsule headlines, reveal screens, and literary reading passages.
