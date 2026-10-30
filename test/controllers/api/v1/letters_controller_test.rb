@@ -75,12 +75,25 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, letter_data["predictions"].length
   end
 
+  test "POST /api/v1/letters creates letter with empty predictions_attributes array" do
+    payload = @create_payload.deep_dup
+    payload[:letter][:predictions_attributes] = []
+
+    assert_difference -> { Letter.count } => 1, -> { EmotionalSnapshot.count } => 1, -> { Prediction.count } => 0 do
+      post "/api/v1/letters", params: payload, headers: @auth_headers, as: :json
+    end
+
+    json = assert_resource_response(expected_status: :created)
+    assert_equal [], json["data"]["predictions"]
+  end
+
   test "POST /api/v1/letters returns 422 for invalid parameters with details" do
     invalid_payload = { letter: { title: "", content: "Too short" } }
-    post "/api/v1/letters", params: invalid_payload, headers: @auth_headers
+    post "/api/v1/letters", params: invalid_payload, headers: @auth_headers.merge("X-Locale" => "es")
 
     json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
     assert json["error"]["details"].present?
+    assert_includes json["error"]["message"], "El título no puede estar en blanco"
   end
 
   test "GET /api/v1/letters/:id returns single letter in resource envelope" do

@@ -38,15 +38,15 @@ class LetterForm
   def initialize(attributes = {})
     attrs = attributes ? attributes.to_h.with_indifferent_access : {}
 
-    if attrs[:emotional_snapshot_attributes].present?
-      snap = attrs.delete(:emotional_snapshot_attributes)
+    snap = attrs.delete(:emotional_snapshot_attributes)
+    if snap.present?
       attrs[:happiness_level] ||= snap[:happiness_level]
       attrs[:anxiety_level] ||= snap[:anxiety_level]
       attrs[:motivation_level] ||= snap[:motivation_level]
     end
 
-    if attrs[:predictions_attributes].present?
-      preds = attrs.delete(:predictions_attributes)
+    preds = attrs.delete(:predictions_attributes)
+    if preds.present?
       list = preds.is_a?(Hash) ? preds.values : Array(preds)
       list.each do |p|
         cat = p[:category].to_s
@@ -55,6 +55,28 @@ class LetterForm
     end
 
     super(attrs)
+  end
+
+  def emotional_snapshot_attributes=(snap)
+    return if snap.blank?
+
+    self.happiness_level = snap[:happiness_level] if snap[:happiness_level].present?
+    self.anxiety_level = snap[:anxiety_level] if snap[:anxiety_level].present?
+    self.motivation_level = snap[:motivation_level] if snap[:motivation_level].present?
+  end
+
+  def predictions_attributes=(preds)
+    return if preds.blank?
+
+    list = preds.is_a?(Hash) ? preds.values : Array(preds)
+    list.each do |p|
+      cat = p[:category].to_s
+      public_send("prediction_#{cat}=", p[:prediction]) if Prediction::CATEGORIES.include?(cat)
+    end
+  end
+
+  def deliver_at
+    scheduled_at
   end
 
   def deliver_at=(val)
@@ -135,21 +157,22 @@ class LetterForm
   def scheduled_at_must_be_in_future
     utc_val = parsed_utc_scheduled_at
     if utc_val.blank?
-      errors.add(:scheduled_at, "is invalid")
+      errors.add(:scheduled_at, :invalid)
     elsif utc_val <= Time.current
-      errors.add(:scheduled_at, "must be in the future")
-      errors.add(:deliver_at, "must be in the future")
+      errors.add(:scheduled_at, :must_be_in_future)
+      errors.add(:deliver_at, :must_be_in_future)
     end
   end
 
   def valid_iana_timezone
     return if timezone.blank?
     unless Time.find_zone(timezone)
-      errors.add(:timezone, "is not a valid IANA timezone")
+      errors.add(:timezone, :invalid_timezone)
     end
   end
 
   def creation_limit_not_exceeded
+    return if Rails.env.development?
     return if email.blank?
     normalized_email = email.strip.downcase
     if Letter.for_email(normalized_email).where("created_at >= ?", 24.hours.ago).count >= 5

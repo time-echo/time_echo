@@ -22,7 +22,7 @@ class SessionTokenTest < ActiveSupport::TestCase
     invalid = SessionToken.new(email: "not-an-email")
 
     assert_not invalid.valid?
-    assert_includes invalid.errors[:email], "is invalid"
+    assert_includes invalid.errors[:email], I18n.t("errors.messages.invalid")
   end
 
   test "active scope only includes unexpired and unused tokens" do

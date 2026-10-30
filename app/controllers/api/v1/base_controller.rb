@@ -63,15 +63,19 @@ module Api
       end
 
       def set_locale
-        locale = request.headers["X-Locale"]&.to_sym
-        if locale.nil? || !I18n.available_locales.include?(locale)
-          locale = session[:locale]&.to_sym
-        end
-        if locale.nil? || !I18n.available_locales.include?(locale)
-          locale = request.env["HTTP_ACCEPT_LANGUAGE"]&.scan(/^[a-z]{2}/)&.first&.to_sym
-        end
+        locale = extract_valid_locale(request.headers["X-Locale"]) ||
+                 extract_valid_locale(params[:locale] || params.dig(:letter, :language)) ||
+                 extract_valid_locale(session[:locale]) ||
+                 extract_valid_locale(request.env["HTTP_ACCEPT_LANGUAGE"])
 
-        I18n.locale = (locale && I18n.available_locales.include?(locale)) ? locale : I18n.default_locale
+        I18n.locale = locale || I18n.default_locale
+      end
+
+      def extract_valid_locale(raw)
+        return nil if raw.blank?
+
+        code = raw.to_s.scan(/^[a-z]{2}/i).first&.downcase&.to_sym
+        code if code && I18n.available_locales.include?(code)
       end
 
       def set_current_attributes
