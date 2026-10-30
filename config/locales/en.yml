@@ -1,151 +1,7 @@
 ---
 en:
-  hello: Hello world
   brand: TimeEcho
-  slogan: A digital time capsule for the soul.
-  footer_copy: Sent with hope, received with nostalgia.
-  pages:
-    footer:
-      about: About
-      privacy: Privacy
-      terms: Terms
-    privacy:
-      title: Privacy Policy & Security Promise
-      last_updated: Last updated August 2026
-      subtitle: Your future letters are private and sacred. We encrypt your content, never sell your data, and run zero advertisements.
-      sections:
-        intro:
-          title: Our Commitment to Your Privacy
-          description: TimeEcho ("we", "us", or "our") exists to protect your personal evolution and private thoughts. This Privacy Policy outlines how we safeguard your information, handle data encryption, and ensure your time capsules remain private.
-        collect:
-          title: What Information We Collect
-          description: "We collect only what is essential to store and deliver your time capsules securely:"
-          item_email: Your email address (used strictly for passwordless magic-link sign-ins and letter delivery)
-          item_letters: Encrypted letter content and titles (protected with zero-knowledge encryption at rest)
-          item_predictions: Future predictions and retrospective reflections you choose to write
-          item_emotional: Emotional snapshot ratings (happiness, anxiety, and motivation levels)
-          item_preferences: Interface settings (color theme, language, and notification choices)
-          item_technical: Essential technical logs necessary for account security and service performance
-        how_use:
-          title: How We Use Your Information
-          description: "We use your data solely to fulfill your time capsule experience:"
-          item_accounts: Authenticate your account via single-use magic links
-          item_store: Safely store your encrypted letters until your chosen delivery date
-          item_deliver: Send your unsealed capsules to your verified email address on schedule
-          item_communicate: Send critical account confirmations and delivery notifications
-          item_improve: Maintain security, optimize page load speed, and enhance reliability
-          item_security: Block automated abuse, prevent spam, and protect user data
-        encryption:
-          title: End-to-End Privacy & Encryption
-          description: Letter titles and personal thoughts are encrypted before being stored. Nobody—not even our team—can read your words while your letter remains sealed in the vault.
-        retention:
-          title: Data Retention & Instant Deletion
-          description: We retain your time capsules for as long as your account remains active. If you choose to delete your account in Settings, all associated letters, emotional snapshots, predictions, and analytics events are permanently and irreversibly purged from our database.
-        third_parties:
-          title: Trusted Infrastructure Partners
-          description: "We work with trusted industry providers to process and deliver your capsules:"
-          item_email: Resend API for transactional email delivery
-          item_hosting: Hardened cloud infrastructure with isolated, encrypted databases
-        rights:
-          title: Your Data Rights & Control
-          description: "You retain total ownership of your words. You have the right to:"
-          item_access: Inspect and export your letter timeline at any time
-          item_delete: Delete individual letters or purge your entire account in one click
-          item_questions: Reach out to our team with privacy or technical data inquiries
-        changes:
-          title: Policy Updates
-          description: If we make material updates to this Privacy Policy, we will post the changes here and notify active users via email.
-        contact:
-          title: Contact & Support
-          description: "Have questions about how your letters are stored or encrypted? Reach out to our team directly at:"
-    terms:
-      title: Terms of Service
-      last_updated: Last updated August 2026
-      subtitle: Clear, human-readable terms outlining service commitments, letter scheduling integrity, and data ownership.
-      sections:
-        acceptance:
-          title: Agreement to Terms
-          description: By creating a capsule or using TimeEcho, you agree to these Terms of Service. If you do not agree, please do not access or use the platform.
-        about:
-          title: About TimeEcho
-          description: TimeEcho is a digital time capsule platform where you can write letters to your future self, record emotional baseline snapshots, make life predictions, and schedule delivery for future dates.
-        accounts:
-          title: Passwordless Account Access
-          description: TimeEcho uses secure magic-link authentication sent directly to your email inbox. You are responsible for keeping your email account secure.
-        creating:
-          title: Writing and Scheduling Capsules
-          description: You can schedule letters to unlock on any future date. You are responsible for ensuring the recipient email address is valid and that your content complies with applicable laws.
-        delivery:
-          title: Scheduled Delivery Commitment
-          description: TimeEcho processes scheduled capsules daily and sends them on or near your requested local unlock date using transactional mailers.
-          disclaimer: While we make every technical effort to ensure prompt delivery, delivery dates depend on email provider acceptance, network availability, and spam filter settings.
-        responsibilities:
-          title: User Conduct
-          description: You are responsible for maintaining account confidentiality and using TimeEcho respectfully.
-        content:
-          title: You Own 100% of Your Content
-          description: You retain full ownership of all letters, predictions, and reflections you create on TimeEcho. You grant us a limited license solely to store, encrypt, and deliver your content as requested.
-          license: This limited license permits us to hold your encrypted letters until their scheduled release date and transmit them to your email address upon unlock.
-        prohibited:
-          title: Prohibited Activities
-          description: "To maintain platform safety, you agree not to use TimeEcho to:"
-          item_spam: Send unsolicited emails or spam
-          item_harassment: Harass, intimidate, or harm others
-          item_threats: Issue threats of violence or illegal action
-          item_fraud: Engage in deceptive, fraudulent, or malicious practices
-          item_impersonation: Impersonate other individuals or entities
-          item_illegal: Violate local or international laws
-          item_malware: Distribute viruses, trojans, or harmful code
-          item_abuse: Abuse infrastructure, perform denial-of-service, or scrape system data
-          item_unauthorized: Attempt unauthorized database or server access
-          item_infringement: Infringe upon third-party copyrights or intellectual property
-        recipient:
-          title: Recipient Email Consent
-          description: When scheduling a capsule to a recipient email address, you confirm that you have permission to send messages to that address.
-        intellectual:
-          title: Platform Intellectual Property
-          description: TimeEcho software, branding, UI components, and logos are protected intellectual property. Your personal letters remain entirely yours.
-        availability:
-          title: Service Availability
-          description: We strive for 99.9% uptime, but access may occasionally be interrupted for scheduled maintenance, system updates, or emergency server repairs.
-        termination:
-          title: Account Cancellation
-          description: You may delete your account at any time via Settings. We reserve the right to suspend accounts that violate these prohibited conduct rules.
-        liability:
-          title: Limitation of Liability
-          description: TimeEcho is provided "as is". To the maximum extent permitted by law, TimeEcho shall not be liable for indirect or consequential damages arising from service usage or delivery delays.
-        changes:
-          title: Updates to Terms
-          description: We may update these Terms from time to time. Continued use of TimeEcho after updates constitutes acceptance of the new terms.
-        contact:
-          title: Contact Us
-          description: "For questions regarding these Terms, contact our team directly at:"
-    about:
-      title: Bridge who you are today with who you become tomorrow.
-      subtitle: TimeEcho is a secure digital time capsule platform. Write deeply private letters, track your emotional baseline, make bold life predictions, and unlock them years later to compare outcomes.
-      sections:
-        what_is:
-          title: Why Write to Your Future Self?
-          description: In a fast-moving world, it’s easy to forget how much you’ve grown, what you cared about, or what you predicted for your life. TimeEcho lets you capture your present reality — your hopes, fears, relationships, and emotional baseline — and lock them in a digital vault until your chosen future date.
-        how_works:
-          title: How TimeEcho Works
-          step_write_title: 1. Write & Capture
-          step_write_desc: Pour your thoughts into a private letter. Capture your happiness, anxiety, and motivation levels, and make predictions about your future.
-          step_seal_title: 2. Seal & Schedule
-          step_seal_desc: Pick your delivery date and timezone. Your letter is securely encrypted and locked in your private vault until that day arrives.
-          step_wait_title: 3. Live & Evolve
-          step_wait_desc: Focus on your life. As months or years pass, your memories stay safe while you grow and reach new milestones.
-          step_receive_title: 4. Open & Reflect
-          step_receive_desc: When your date arrives, your letter unlocks in your inbox. Read your past words, check your predictions, and see how much you’ve grown.
-        why_exists:
-          title: Built for Honest Self-Conversation
-          description: Social media forces us to perform for others. TimeEcho is designed for the opposite — a quiet, distraction-free space to be completely honest with yourself. No public feeds, no vanity metrics, no ads. Just a direct link between past you and future you.
-        philosophy:
-          title: Our Privacy Philosophy
-          description: Your memories belong to you. We never sell user data, track you with advertising cookies, or analyze your letter contents. When you delete your account, your data is permanently purged from our database forever.
-        contact:
-          title: Contact & Creators
-          description: "Have questions, feedback, or need assistance with TimeEcho? Reach out to our team directly:"
+  footer_copy: "Written now, read later."
   date:
     formats:
       default: "%m/%d/%Y"
@@ -201,20 +57,11 @@ en:
       short: "%m/%d %I:%M %P"
       long: "%B %d, %Y at %I:%M %P"
       long_date: "%B %d, %Y"
-  navigation:
-    write: Write a Letter
-    public_stories: Public Stories
-    vault: My Letters
-    timeline: Timeline
-    analytics: Analytics
-    settings: Settings
-    sign_in: Sign In
-    sign_out: Sign Out
-    anonymous: Anonymous
-    memories: Memories
-    switch_to_en: English
-    switch_to_es: Español
-    quote: The best way to predict the future is to create it.
+  support:
+    array:
+      words_connector: ", "
+      two_words_connector: " and "
+      last_word_connector: ", and "
   activemodel:
     attributes:
       letter_form:
@@ -223,9 +70,13 @@ en:
         email: "Email address"
         scheduled_at: "Delivery date"
         deliver_at: "Delivery date"
+        timezone: "Timezone"
+        language: "Language"
         happiness_level: "Happiness level"
         anxiety_level: "Anxiety level"
         motivation_level: "Motivation level"
+      magic_link_form:
+        email: "Email address"
   activerecord:
     attributes:
       letter:
@@ -234,8 +85,38 @@ en:
         email: "Email address"
         scheduled_at: "Delivery date"
         deliver_at: "Delivery date"
+        timezone: "Timezone"
+        language: "Language"
   errors:
+    format: "%{attribute} %{message}"
     messages:
+      blank: "can't be blank"
+      present: "must be blank"
+      invalid: "is invalid"
+      too_short:
+        one: "is too short (minimum is 1 character)"
+        other: "is too short (minimum is %{count} characters)"
+      too_long:
+        one: "is too long (maximum is 1 character)"
+        other: "is too long (maximum is %{count} characters)"
+      wrong_length:
+        one: "is the wrong length (should be 1 character)"
+        other: "is the wrong length (should be %{count} characters)"
+      not_a_number: "is not a number"
+      not_an_integer: "must be an integer"
+      greater_than: "must be greater than %{count}"
+      greater_than_or_equal_to: "must be greater than or equal to %{count}"
+      equal_to: "must be equal to %{count}"
+      less_than: "must be less than %{count}"
+      less_than_or_equal_to: "must be less than or equal to %{count}"
+      other_than: "must be other than %{count}"
+      in: "must be in %{count}"
+      inclusion: "is not included in the list"
+      exclusion: "is reserved"
+      taken: "has already been taken"
+      record_invalid: "Validation failed: %{errors}"
+      must_be_in_future: "must be in the future"
+      invalid_timezone: "is not a valid IANA timezone"
       word_too_long: "cannot contain words longer than 45 characters"
       too_few_words: "must contain at least 10 words"
       missing_paragraphs: "must be organized into paragraphs using line breaks"
@@ -243,698 +124,73 @@ en:
       magic_link_rate_limit_exceeded: "Too many login attempts. Please wait a few minutes before requesting another link."
   flash:
     errors_title: "Please correct the following errors:"
-    locked: This action cannot be undone once sealed.
-    login_required: Please sign in to access your digital capsule vault.
-    welcome_back: Welcome back to your digital time capsule.
-    invalid_link: This magic link is invalid or has expired.
-    logged_out: You have successfully signed out.
-    private_or_inaccessible: This letter is private or cannot be accessed.
-    unauthorized_view: You are not authorized to view this letter.
-    unauthorized_modify: You are not authorized to modify this letter.
-    reality_updated: Reality updated! Reflect on how your life has evolved.
-    letter_deleted: The letter has been permanently deleted.
-    letter_archived: The letter has been archived and will not be delivered.
-    letter_restored: The letter has been restored to your active vault.
-    cannot_archive_delivered: Delivered capsules cannot be archived.
-    cannot_restore: This capsule cannot be restored.
-    cannot_delete: Only archived letters can be deleted.
-    unauthorized_action: You are not authorized to perform this action.
-  landing:
-    badge: TimeEcho Time Capsule
-    title_html: TimeEcho
-    subtitle: Compare the future you imagined with the life you actually lived.
-    write_first: Write your first letter
-    how_it_works: How It Works
-    steps_title: Simple & Significant
-    steps_subtitle: Three simple steps to connect your present mind with your future self.
-    step1_title: 1. Write & Predict
-    step1_desc: Write honestly to your future self. Record how you feel today and make predictions about your career, relationships, and life goals.
-    step2_title: 2. Seal & Schedule
-    step2_desc: Pick when you want it back—from 6 months to 5 years. Your words are securely encrypted and locked in your private vault until that exact day.
-    step3_title: 3. Unlock & Compare
-    step3_desc: When the day arrives, your letter lands in your inbox. Rediscover who you were, see which predictions came true, and reflect on how much you’ve grown.
-    headline: Write today.<br>Discover tomorrow.
-    private_and_secure: 100% Private & Sealed
-    private_desc: Only you can read your letter. It remains securely locked in your personal vault until your delivery date.
-    delivered_on_time: Delivered on Schedule
-    delivery_desc: Arrives straight to your inbox on the exact morning you chose, in your local timezone.
-    connect_with_yourself: Predictions vs. Reality
-    compare_desc: Put your past expectations side-by-side with real life to see how much you’ve evolved.
-    write_card_title: Write your letter to your future
-    your_letter: Your letter
-    dear_future_self: Dear future self...
-    when_do_you_want_it: When do you want to receive it?
-    six_months: 6 months
-    one_year: 1 year
-    three_years: 3 years
-    five_years: 5 years
-    custom_date: Custom date
-    choose_specific_date: Choose a specific date
-    predictions_annex: FUTURE PREDICTIONS
-    current_emotional_state: CURRENT EMOTIONAL STATE
-    your_predictions_optional: Your predictions (optional)
-    where_will_you_live: Where do you think you will live?
-    what_work_will_you_do: What will you work as?
-    how_much_money_will_you_earn: How much money do you think you will earn?
-    how_will_your_relationship_be: How will your relationship be?
-    what_will_be_your_achievement: What will be your greatest achievement?
-    how_happy_will_you_be: How happy will you be?
-    how_do_you_feel_today: How do you feel today?
-    happiness: Happiness
-    anxiety: Anxiety
-    motivation: Motivation
-    where_do_we_send_letter: Where do we send your letter?
-    email_placeholder: you@email.com
-    send_to_future_self: Seal & Send to Future Self
-    private_and_secure_badge: Your letter is 100% private and secure.
-    how_it_looks: This is how it will look when you open your letter
-    compare_reflect_desc:
-      Compare your predictions with your reality and reflect on
-      your evolution.
-    dossier_revealed: "UNLOCKED LETTER · TE-00412"
-    mock_prediction_city: I will live in Barcelona
-    mock_reality_city: I live in Medellín
-    mock_prediction_career: I will be a freelance designer
-    mock_reality_career: I'm a Product Designer
-    mock_prediction_salary: I will earn $4,000/month
-    mock_reality_salary: I earn $5,500/month
-    mock_prediction_happiness: 8 / 10 happiness
-    mock_reality_happiness: 7 / 10 happiness
-    prediction_vs_reality: Prediction vs Reality
-    prediction: Prediction
-    reality: Reality
-    one_year_ago: 1 year ago
-    today: Today
-    your_overall_accuracy: Your overall accuracy
-    accurate_predictions: You got %{count} out of %{total} predictions right
-    you_are_on_track: You are on the right track!
-    journey_desc: A simple journey toward your best self.
-    your_past: Your past
-    your_present: Your present
-  letters:
-    annex_1: ANNEX I
-    annex_2: ANNEX II
-    fact_matching: FACT MATCHING
-    current_state_badge: CURRENT STATE
-    new_header: Sealing a memory
-    new_subheader: Pour your thoughts onto the page, then seal it for the future.
-    label_email: Your Email Address
-    label_email_help:
-      We will send a verification link to confirm this letter before
-      scheduling it.
-    label_content: Your Letter to the Future
-    placeholder_content:
-      Dear future self... What are you hoping for? What are your
-      current struggles? What do you want to remember about today?
-    label_deliver_at: When should this capsule open?
-    preset_6m: 6 Months
-    preset_1y: 1 Year
-    preset_3y: 3 Years
-    preset_5y: 5 Years
-    label_attachments: Attach Memories (Photos, Audio, Files)
-    label_attachments_help:
-      Add up to 5 items (max 10MB each) to seal inside your
-      capsule.
-    label_public: Share Publicly Once Opened
-    label_public_help:
-      Check this to share this letter anonymously with our public
-      memories feed once it is delivered. Keep unchecked to keep it entirely private.
-    btn_submit: Seal & Send to Future
-    label_title: Capsule Title
-    label_title_help:
-      Give your time capsule a meaningful name so you can identify
-      it in your timeline dashboard.
-    evolution_tracker: Personal Evolution Tracker
-    evolution_tracker_help:
-      Capture your present self and imagine the life you'll
-      live. These will become interactive echos once opened.
-    emotional_snapshot: Emotional snapshot
-    emotional_snapshot_help:
-      Rate your current levels from 1 to 10. We'll show you
-      how much your internal baseline has shifted when this letter is unlocked in
-      the future.
-    happiness_level: Happiness level
-    struggling: Struggling
-    content_state: Content
-    joyful: Joyful
-    anxiety_level: Anxiety level
-    calm: Calm
-    moderate: Moderate
-    overwhelmed: Overwhelmed
-    motivation_level: Motivation level
-    uninspired: Uninspired
-    steady: Steady
-    driven: Driven
-    predictions_vs_reality: Predictions vs Reality
-    predictions_vs_reality_help:
-      Where do you see yourself? When this letter is delivered,
-      the app will ask you to compare these predictions with your actual reality.
-    prediction_city_label: Where will you live?
-    prediction_salary_label: Future Salary/Income level?
-    prediction_relationship_label: Relationship status?
-    prediction_career_label: Career/Job situation?
-    prediction_achievement_label: Biggest personal achievement?
-    future_integration: Future Integration
-    bridge_past_present: Bridge the Past and Present
-    future_integration_help:
-      Your time capsule has arrived. Before we open the full
-      comparison dashboard, let's capture your life and state of mind today.
-    feel_today: How do you feel TODAY?
-    feel_today_help:
-      Rate your today's self to see how your baseline evolved since
-      writing this letter.
-    happiness: Happiness
-    anxiety: Anxiety
-    motivation: Motivation
-    what_happened_predictions: What happened to your Predictions?
-    what_happened_predictions_help:
-      Read what you expected, then tell us what actually
-      happened.
-    placeholder_reality: Describe your reality now...
-    prediction_came_true: This prediction came true!
-    btn_reveal_dashboard: Save & Reveal Comparison Dashboard
-    reflection_matrix: Reflection Matrix
-    personal_evolution: Your Personal Evolution
-    personal_evolution_help:
-      Compare the life you imagined with the life you actually
-      lived since %{date}.
-    emotional_snapshot_shifts: Emotional Snapshot Shifts
-    growth: Growth
-    shift: Shift
-    steady_status: Steady
-    past_self: Past Self
-    present_self: Present Self
-    calmer: Calmer
-    stress: Stress
-    inspired: Inspired
-    predictions_vs_reality_grid: Predictions vs Reality Grid
-    matched: Matched
-    evolved: Evolved
-    then_you_imagined: "Then you imagined:"
-    now_living_reality: "Now living in / Reality:"
-    success_header: Your memory is sealed
-    success_sub:
-      We have safely stored your letter in the digital vault.<br>It will
-      remain locked until
-    success_date_fallback: its delivery date
-    success_seal: Seal
-    success_opening: Scheduled opening
-    success_next_title: What happens next?
-    success_next_desc:
-      We have sent a confirmation email to %{email}.
-      On that special day, it will arrive back in your inbox.
-    success_btn_dashboard: Go to Your Vault Dashboard
-    success_btn_signin: Sign In to Track Your Vault
-    success_signin_help: Sign in with magic link to view all your scheduled capsules.
-    success_btn_home: "Return to Home"
-    show_locked_title: This capsule is sealed
-    show_locked_desc:
-      This message was sealed by %{email} and is currently traveling
-      through time.
-    show_opening_in: Opening in
-    show_target_date: "Target delivery date: %{date}"
-    show_btn_dashboard: Return to Dashboard
-    show_written: Written
-    show_delivered: Delivered
-    show_attachments_title: Attached Memories
-    show_download: Download
-    show_back_timeline: "Back to Timeline"
-    show_back_public: "View Public Stories"
-    show_time_remaining: Time remaining
-    back_to_vault: "Back to my letters"
-    unlocked_badge: Capsule Unlocked
-    show_unlocked_title: Your letter from the past is waiting for you.
-    show_unlocked_desc:
-      Before reading it, tell us what really happened. This will
-      allow us to calculate the prediction score and emotional shifts.
-    start_comparison: Start
-    takes_two_minutes: It will only take 2 minutes
-    tell_reality_title: Tell us your current reality
-    tell_reality_desc:
-      Answer these questions to compare your past with your current
-      self.
-    question_where_do_you_live: Where do you live today?
-    question_what_do_you_do: What do you do today?
-    question_how_much_do_you_earn: How much do you earn today?
-    question_how_is_your_relationship: How is your relationship today?
-    question_what_was_your_achievement: What ended up being your greatest achievement?
-    question_how_happy_are_you: How happy do you feel in general today?
-    question_what_happened_with: "What happened with: %{category}?"
-    your_past_prediction: "Your past prediction: %{text}"
-    your_current_level: "Your current level:"
-    did_prediction_come_true: Did your prediction come true?
-    yes_i_did_it: "Yes, I did it"
-    not_exactly: Not exactly
-    emotional_state_today: Emotional state today
-    how_do_you_feel_now: How do you feel right now?
-    reflection_tip: "Reflection tip:"
-    reflection_tip_text:
-      Be honest with yourself. There are no right or wrong answers.
-      This experience is 100% yours and helps you see how much you have grown in this
-      time.
-    save_and_view: Save and view my letter
-    past_letter: Letter from the past
-    delivered_on: Delivered on
-    will_open_on: Will open on
-    viewed_times: "Viewed %{count} times"
-    predictions_vs_reality_desc:
-      Compare what you imagined some time ago with the
-      life you are living today.
-    past_prediction_label: "Past prediction:"
-    reality_today_label: "Reality today:"
-    your_prediction_score: Your Prediction Score
-    score_message_high: Your future compass is extremely sharp! Excellent intuition.
-
-    score_message_medium:
-      You are on a great path. Many things changed, but your direction
-      remains clear.
-    score_message_low:
-      Life surprised you with unexpected turns! And that makes the
-      journey more interesting.
-    no_predictions_registered: You did not register predictions for this letter.
-    emotional_evolution: Emotional evolution
-    internal_wellbeing_change: Change in your internal wellbeing
-    no_emotional_data: No emotional data available.
-    whats_next: What is next?
-    whats_next_desc:
-      Discover how your story evolves over the years. Keep writing
-      letters and save your memories in the time vault.
-    write_new_letter: Write new letter
-    pending_revelation: Pending revelation
-    revealed_and_compared: Revealed & Compared
-    sealed_capsule: Sealed Capsule
-    created_on: Created on
-    delivered_on: Delivered on
-    emotional_evolution_badge: "Emotional Evolution"
-    happiness_to_anxiety: "Happiness: %{happiness} &rarr; Anxiety: %{anxiety}"
-    waiting_for_reality: Waiting for reality reveal.
-    matched_predictions_count:
-      You got %{matched} out of %{total} predictions right
-      (%{pct}%).
-    complete_comparison: Complete comparison
-    view_full_comparison: View full comparison
-    time_capsule_sealed: Time capsule sealed
-    sealed_desc:
-      This letter travels privately and encrypted into the future. There
-      are approximately %{days} days left until delivery.
-    requires_revelation: Requires revelation
-    delivered_and_evaluated: Delivered & Evaluated
-    in_transit_to_future: In transit to the future
-    opens_on: Opens on
-    emotional_snapshot_badge: "emotional snapshot"
-    emotional_snapshot_summary:
-      "Happiness: %{happiness} | Anxiety: %{anxiety} | Motivation:
-      %{motivation}"
-    predictions_made_badge: "predictions made"
-    predictions_sealed_pending: "%{count} predictions sealed. Pending comparison."
-    predictions_sealed_completed: "%{count} predictions sealed. Comparison completed."
-    complete_revelation: Complete and reveal reality
-    view_predictions_vs_reality: View predictions vs reality
-    capsule_in_transit: Capsule in transit
-    transit_desc: It is privately stored in your temporary vault.
-    opens_in_days: Opens in %{days} days
-    write_letter: "Write letter"
-    write_first_letter: Write my first letter
-    one_day: 1 day
-    x_days: "%{count} days"
-    not_configured: Not configured
-    tomorrow: Tomorrow
-    prediction_vs_reality: Prediction vs Reality
-    prediction: Prediction
-    reality: Reality
-    partially: Partially
-    you_did_it: You did it!
-    superaste: You surpassed it!
-    you_missed: You missed it
-    not_yet: Not Yet
-    very_close: Very Close
-    category_city: "Location"
-    category_career: "Work / Career"
-    category_salary: "Income"
-    category_relationship: "Relationship"
-    category_achievement: "Greatest achievement"
-    category_happiness: "Happiness"
-    category_other: "%{category}"
-    capsule_in_transit_badge: Capsule in transit
-    capsule_unlocked_badge: Capsule unlocked
-    error_saving: Error saving changes.
-    privacy: Privacy
-    only_you_can_see: Only you can see it
-    delivery_date: Opens on
-    within: Within
-    x_days_count: "%{count} days"
-    days_word: days
-    focus_mode_enter: Focus Mode
-    focus_mode_exit: "Exit Focus Mode"
-    word_count: "%{count} words"
-    char_count: "%{count} characters"
-    min_chars_progress: "%{count} / 80 min (2000 max)"
-    time_travel_duration: "⏳ This letter will travel through time for %{days} days"
-    label_visibility: Visibility Options
-    form_step_title: 1. When you write your letter
-    form_step_subtitle: You are creating a letter for your future self.
-    deliver_date_prefix: It will open on
-    when_do_you_want_it: When do you want to receive it?
-    six_months: 6 months
-    one_year: 1 year
-    three_years: 3 years
-    five_years: 5 years
-    custom_date: Custom date
-    choose_specific_date: Choose a specific date
-    form_letter_heading: Your letter
-    title_label: Title
-    title_placeholder: "E.g: For my future self"
-    content_label: Content
-    content_placeholder_form: Write here everything you want to tell your future self...
-    email_placeholder_form: you@email.com
-    prediction_placeholder: Write your prediction...
-    predictions_heading: Your predictions
-    predictions_subtitle_form:
-      How do you think your life will be when you open this
-      letter?
-    prediction_work_label: What will you work as?
-    prediction_income_label_form: How much will you earn per month?
-    prediction_relationship_label_form: How will your relationship be?
-    prediction_achievement_label_form: What will be your greatest achievement?
-    prediction_happiness_label_form: How happy do you think you'll be?
-    emotional_snapshot_heading: Emotional state today
-    feeling_now_short: How do you feel right now?
-    emotion_happiness: Happiness
-    emotion_anxiety: Anxiety
-    emotion_motivation: Motivation
-    summary_heading: Summary
-    summary_opening_label: Opens on
-    summary_time_label: Within
-    summary_privacy_label: Privacy
-    summary_loading: Loading...
-    summary_na: N/A
-    summary_not_configured: Not configured
-    summary_tomorrow: Tomorrow
-    btn_save_letter: Save letter
-    prediction_score_title: Prediction Score
-    past_label: "Past:"
-    today_label: "Today:"
-    emotional_snapshot_badge_short: Emotional Snapshot
-    predictions_badge_short: Predictions
-    prediction_comparison_pending: Pending comparison
-    prediction_comparison_completed: Comparison completed
-    reality_pending: Waiting for reality reveal.
-    btn_complete_revelation: Complete Revelation
-    btn_view_predictions: View Predictions vs Reality
-    timeline_empty_title: Your timeline is empty
-    timeline_empty_desc:
-      Write your first letter to the future to start charting your
-      growth story.
-    btn_start_writing: Start Writing
-    empty_title: Your vault is empty
-    empty_desc:
-      You haven't written any letters yet. Future letters help you reflect
-      and compare your predictions with reality.
-    my_letters_title: My Letters
-    my_letters_subtitle: Manage your digital time capsules, emotional states and predictions.
-    btn_write_letter_short: Write Letter
-    btn_view_timeline: View Timeline
-    stat_total_capsules: Total Capsules
-    stat_future_messages: Future Messages
-    stat_delivered_label: Delivered
-    stat_ready_to_compare: Ready to Compare
-    stat_in_transit: In Transit
-    stat_sealed_in_time: Sealed in Time
-    status_pending_reveal_short: Pending Revelation
-    status_revealed_compared: Revealed & Compared
-    status_sealed_short: Sealed Capsule
-    capsule_in_transit_short: Capsule in transit
-    capsule_transit_desc: Privately stored in your temporary vault.
-    btn_archive: Archive letter
-    confirm_archive: "Are you sure you want to archive this capsule? It will be moved to the archive and will not be delivered to the future."
-    btn_restore: Restore letter
-    confirm_restore: "Are you sure you want to restore this capsule to your active vault?"
-    btn_delete: Delete letter
-    confirm_delete: "Are you sure you want to permanently delete this letter? This action cannot be undone."
-    archived_section_title: Archived Letters
-    archived_section_subtitle: Letters you have archived. They will not be delivered unless restored.
-    archived_badge: Archived
-    archived_on: Archived on
-    empty_archived: No archived capsules in storage.
-    prediction_accuracy: You got %{matched} out of %{total} predictions right (%{pct}%).
-    prediction_score_perfect: Your future compass is extremely sharp! Excellent intuition.
-    prediction_score_good:
-      You are on a great path. Many things changed, but your
-      direction remains clear.
-    prediction_score_low:
-      Life surprised you with unexpected turns! And that makes
-      the journey more interesting.
-    no_predictions_text: You did not register predictions for this letter.
-    whats_next_heading: What is next?
-    whats_next_body:
-      Discover how your story evolves over the years. Keep writing
-      letters and save your memories in the time vault.
-    write_new_letter_text: Write new letter
-    emotional_evolution_heading: Emotional evolution
-    wellbeing_change: Change in your internal wellbeing
-    no_emotional_data_text: No emotional data available.
-    prediction_score_heading: Your Prediction Score
-    past_label_short: "Past:"
-    today_label_short: "Today:"
-    growth_label: Growth
-    decline_label: Decline
-    calm_label: More Calm
-    stress_label: Stress
-    inspired_label: Inspired
-    steady_label: Steady
-    emotional_snapshot_heading_short: Emotional Snapshot
-  dashboard:
-    title: Your digital vault
-    subtitle: Safekeeping your memories, dreams, and check-ins across time.
-    btn_write: Write New Letter
-    stat_total: Total Capsules
-    stat_total_sub: Written letters sealed
-    stat_delivered: Delivered
-    stat_delivered_sub: Successfully opened
-    stat_sealed: Sealed
-    stat_sealed_sub: Awaiting delivery date
-    delivered_tag: Delivered Capsule
-    sealed_tag: Sealed Vault Item
-    opening_on: Opening on %{date}
-    public_badge: Publicly Shared
-    private_badge: Private
-    attachments_badge: "%{count} attachment"
-    attachments_badge_plural: "%{count} attachments"
-    opening_in: Opening in %{count} day
-    opening_in_plural: Opening in %{count} days
-    sealed_info_title: Sealed away safely
-    sealed_info_desc: The content is hidden until the delivery date is reached.
-    btn_open: Open Full Capsule &rarr;
-    empty_title: Your vault is empty
-    empty_desc:
-      You haven't written any letters yet! Start your journey by writing
-      a message to your future self.
-    empty_btn: Write Your First Letter
-    needs_reflection: Needs Reflection / Reality Update
-    predictions_badge: "%{count} prediction"
-    predictions_badge_plural: "%{count} predictions"
-    snapshot_badge: Snapshot
-    unrevealed_capsule_help: Unrevealed - Open to record your reality!
-    predictions_matched_desc: "%{matched} out of %{total} prediction categories matched!"
-    complete_reveal_btn: Complete & Reveal Reality
-    sealed_capsule_title: Sealed Capsule in Travel
-    sealed_capsule_desc:
-      "This capsule contains: %{details} (hidden until delivery
-      date)."
-    predictions_word: Predictions
-    emotional_snapshot_word: Emotional snapshot
-    view_timeline: "View timeline"
-  public_feed:
-    badge: Community Vault
-    title: Public stories from the past
-    subtitle:
-      A collection of letters shared anonymously by users after their digital
-      time capsules opened. Read the hopes, growth, and echoes of traveling minds.
-    written: Written %{date}
-    opened: Opened %{date}
-    anonymous_traveler: Anonymous Traveler
-    btn_read: Read Story &rarr;
-    empty_title: No public stories yet
-    empty_desc:
-      As capsules open in the coming months, public stories shared by our
-      community will appear here.
-    empty_btn: Write Your Capsule Letter
-    cta_title: Ready to speak to your future self?
-    cta_desc:
-      Seal a memory today and let it open in the future. You can choose to
-      keep it completely private or share it here once opened.
-  sessions:
-    title: Enter your vault
-    subtitle:
-      We'll send a secure magic login link directly to your email. No passwords
-      needed.
-    error_header: "Could not send link:"
-    label_email: Your Email Address
-    btn_submit: Send Magic Link
-    back_to_landing: "Back to Landing Page"
-    check_email_title: Check your inbox
-    check_email_subtitle: We have dispatched a magic login link to
-    check_email_spam_notice:
-      Please check your spam or promotions folder if the email
-      does not arrive in a couple of minutes.
-    try_another_email: Try another email address &rarr;
-  analytics:
-    title: Vault Reflection & Analytics
-    subtitle:
-      A peaceful retrospective of your emotional evolution, predictions, and
-      capsule delivery metrics.
-    btn_back: "Back to Timeline"
-    back_to_vault: "Back to Vault"
-    match_rate_label: Prediction Match Rate
-    total_capsules: Total Capsules
-    delivered: Delivered
-    in_transit: In Transit
-    your_past: Past Self
-    your_present: Present Self
-    match_summary:
-      "%{matched} of %{completed} predictions matched. %{total} still
-      in transit."
-    stat_total: Total Capsules
-    stat_delivered: Delivered
-    stat_sealed: Scheduled Sealed
-    emotional_evolution_title: Emotional Evolution Averages
-    emotional_evolution_desc:
-      Observe the average shifts in your baseline emotional
-      metrics over time. Values represent a comparison of your initial states at writing
-      vs your current state when capsules are unlocked.
-    happiness_index: Happiness Index
-    anxiety_index: Anxiety Index
-    motivation_index: Motivation Index
-    past_self_label: Initial (Past Self)
-    present_self_label: Current (Present Self)
-    predictions_reality_title: Predictions vs Reality Index
-    predictions_reality_desc:
-      Observe how accurate your predictions about the future
-      are! The rate represents the percentage of completed predictions where reality
-      aligned with what you expected.
-    match_accuracy_rate: Match Accuracy Rate
-    match_accuracy_desc_html:
-      "%{matched} of %{completed} completed predictions matched
-      successfully.<br>(%{transit} predictions are currently in transit / unrevealed)."
-    activity_log_title: Recent Capsule Activity Log
-    no_activity: No activity has been logged inside your capsule history ledger yet.
-    at_word: at
-    events:
-      user_logged_in: Signed in to digital vault session.
-      magic_link_requested: Requested magic sign-in link.
-      letter_created: Sealed new time capsule scheduled for delivery on %{date}.
-      letter_opened: Opened time capsule ID %{id}.
-      email_delivered: Resend successfully delivered letter notification.
-      link_clicked: Clicked vault verification or access link.
-      prediction_completion: Updated predictions vs reality comparisons.
-      emotional_snapshot_completion: Logged today's emotional state baseline evaluation.
-      general: "Performed general vault operation: %{operation}."
+    locked: "This action cannot be undone once sealed."
+    login_required: "Please sign in to see your letters."
+    welcome_back: "You're signed in."
+    magic_link_sent: "We sent you a sign-in link."
+    invalid_link: "This link is invalid or has expired."
+    logged_out: "You signed out."
+    private_or_inaccessible: "This letter is private or cannot be accessed."
+    unauthorized_view: "You are not authorized to view this letter."
+    unauthorized_modify: "You are not authorized to modify this letter."
+    reality_updated: "Reality Ledger saved."
+    letter_deleted: "The letter has been permanently deleted."
+    letter_archived: "The letter was archived and won't be delivered."
+    letter_restored: "The letter was restored."
+    cannot_archive_delivered: "Delivered capsules cannot be archived."
+    cannot_restore: "This capsule cannot be restored."
+    cannot_delete: "Only archived letters can be deleted."
+    unauthorized_action: "You are not authorized to perform this action."
+    service_unavailable: "Service temporarily unavailable. Please retry later."
   mailers:
     common:
-      postal_archive: Postal Archive
-      access_token_badge: Official Access Key
-      email_update_badge: Address Update Request
+      postal_archive: "TimeEcho"
+      access_token_badge: "Sign-in link"
+      email_update_badge: "Email change"
       docket_prefix: Docket
       postal_address: Calle Mayor 12, 3rd Floor, 28013 Madrid, Spain
     magic_link:
-      subject: Your Sign-In Link for TimeEcho
-      preheader: Use this secure link to access your personal letter vault.
-      header: Sign in to your digital time capsule
+      subject: "Your TimeEcho sign-in link"
+      preheader: "Use this link to sign in to TimeEcho."
+      header: "Sign in to TimeEcho"
       greeting: Hello,
-      body:
-        Click the button below to log in to your TimeEcho dashboard and view your
-        letters or write to your future self.
-      btn: Sign in to TimeEcho
-      body_text:
-        "Open the link below or copy and paste it into your browser to log
-        in to your TimeEcho dashboard:"
-      expiry_help:
-        This link will expire in 15 minutes. If you did not request this
-        email, you can safely ignore it.
-      footer_subtitle: Nostalgic & hopeful journaling to your future self.
+      body: "Click the button below to sign in and see your letters or write a new one."
+      btn: "Sign in"
+      body_text: "Open the link below, or copy and paste it into your browser, to sign in:"
+      expiry_help: "This link expires in 15 minutes. If you didn't request it, you can ignore this email."
+      footer_subtitle: "Letters to your future self."
     future_letter:
-      subject: Your letter from the past is ready
-      preheader: You wrote this message for today. Open it to revisit your thoughts.
-      header: A Message from Your Past Self
+      subject: "Your letter has arrived"
+      preheader: "You wrote this letter to yourself. Open it to read it."
+      header: "A letter from your past self"
       written_on: Written on %{date}
-      open_btn: Open My Letter
-      view_full_prompt: View your full letter and compare your past predictions.
-      footer_html:
-        You wrote this letter to yourself via TimeEcho.<br><em>"Sent with
-        hope, received with nostalgia."</em>
-      footer_text:
-        You received this because you wrote a letter to your future self
-        using TimeEcho. "Sent with hope, received with nostalgia."
-      text_body_help: "To view this letter in your secure vault, visit:"
+      open_btn: "Open My Letter"
+      view_full_prompt: "View your full letter and compare your past predictions."
+      footer_html: "You wrote this letter to yourself with TimeEcho."
+      footer_text: "You received this because you wrote a letter to your future self with TimeEcho."
+      text_body_help: "To read this letter, go to:"
     confirm_email:
-      subject: Confirm your email address change in TimeEcho
-      header: Confirm your new email address
+      subject: "Confirm your new email address"
+      header: "Confirm your new email address"
       greeting: Hello,
-      body:
-        You have requested to change your email address on TimeEcho from %{old_email}
-        to %{new_email}. Please click the button below to confirm this change and
-        activate your account under your new address.
-      btn: Confirm Email Change
-      expiry_help:
-        This link will expire in 15 minutes. If you did not request this
-        change, you can safely ignore this email.
+      body: "You asked to change your TimeEcho email from %{old_email} to %{new_email}. Click the button below to confirm the change."
+      btn: "Confirm email change"
+      expiry_help: "This link expires in 15 minutes. If you didn't request this change, you can ignore this email."
     stamped_confirmation:
-      badge: Capsule Sealed
-      subject: "Confirmed & Sealed: %{title}"
-      preheader: Your capsule is locked and safely stored. It will arrive on the chosen date.
-      header: Your Letter is Stamped and Sealed
-      body:
-        We have safely registered and sealed your time capsule "%{title}". It has been locked
-        and will be delivered to your inbox on %{date}.
-      footer_subtitle: Nostalgic & hopeful journaling to your future self.
+      badge: "Letter sealed"
+      subject: "Letter sealed: %{title}"
+      preheader: "Your letter is sealed and stored. It will arrive on the date you chose."
+      header: "Your letter is sealed"
+      body: "Your letter \"%{title}\" is sealed and stored. It will arrive in your inbox on %{date}."
+      footer_subtitle: "Letters to your future self."
   settings:
-    title: Account Settings
-    subtitle:
-      Manage the email address associated with your vault and handle your
-      session.
-    change_email: Change Email
-    new_email_address: New Email Address
-    email_placeholder: you@email.com
-    email_change_note:
-      "Note: When changing your email, all your future letters and
-      saved predictions will be automatically linked to the new address."
-    update_email: Update Email Address
-    danger_zone: Danger Zone
-    delete_account_permanently: Delete account permanently
-    delete_account_desc:
-      This will immediately delete all your sealed letters, predictions
-      and emotional state. This action is completely irreversible.
-    delete_confirm:
-      Are you absolutely sure you want to permanently delete your vault
-      and all your letters? All your saved memories and predictions will be lost forever.
-    delete_my_vault: Delete my vault
-    updated_successfully: Settings updated successfully
-    account_deleted:
-      Your vault and all your data have been permanently deleted. Thank
-      you for your time at TimeEcho.
-    email_confirmed: Email address confirmed and updated successfully!
-    confirmation_link_invalid: The confirmation link is invalid or has expired.
-    email_update_requested_message:
-      "We have sent a confirmation email to your new
-      address: %{email}. Please click the link to confirm and activate the change."
-    saved_successfully: Settings saved
-    could_not_save: Could not save settings.
-  predictions:
-    category_city: Location
-    category_career: Work / Career
-    category_salary: Income
-    category_relationship: Relationship
-    category_achievement: Greatest Achievement
-    category_happiness: Happiness
-    category_other: "%{category}"
-    superaste: You surpassed it!
-    you_did_it: You did it!
-    partially: Partially
-    you_missed: You missed it
-  timeline:
-    subtitle:
-      Your evolution, emotional moments, and prediction milestones ordered
-      chronologically.
-  common:
-    cancel: Cancel
-    save: Save
+    confirmation_link_invalid: "The confirmation link is invalid or has expired."
+    email_confirmed: "Email address confirmed and updated."
+    email_update_requested_message: "We sent a confirmation to your new address: %{email}. Click the link to confirm the change."
+    invalid_email: "Please enter a valid email address."
+    same_email: "The new email cannot be the same as your current email."
+    updated_successfully: "Settings updated."
+    account_deleted: "Your account and all your data were permanently deleted."
+    could_not_save: "Couldn't save settings."
+  letters:
+    error_saving: "Couldn't save changes."

@@ -1,5 +1,7 @@
 ---
 es:
+  brand: TimeEcho
+  footer_copy: "Se escriben hoy, se leen después."
   date:
     formats:
       default: "%d/%m/%Y"
@@ -55,166 +57,11 @@ es:
       short: "%d/%m %H:%M"
       long: "%d de %B de %Y a las %H:%M"
       long_date: "%d de %B de %Y"
-  hello: Hola mundo
-  brand: TimeEcho
-  slogan: Una cápsula del tiempo digital para el alma.
-  footer_copy: Enviado con esperanza, recibido con nostalgia.
-  pages:
-    footer:
-      about: Acerca de
-      privacy: Privacidad
-      terms: Términos
-    privacy:
-      title: Política de Privacidad y Compromiso de Seguridad
-      last_updated: "Última actualización: agosto de 2026"
-      subtitle: Tus cartas del futuro son privadas y sagradas. Ciframos tu contenido, nunca vendemos tus datos y no mostramos publicidad.
-      sections:
-        intro:
-          title: Nuestro Compromiso con tu Privacidad
-          description: TimeEcho ("nosotros", "nuestro") existe para proteger tu evolución personal y tus pensamientos. Esta Política de Privacidad describe cómo resguardamos tu información, gestionamos el cifrado de datos y aseguramos que tus cápsulas permanezcan privadas.
-        collect:
-          title: Información que Recopilamos
-          description: "Recopilamos únicamente lo esencial para almacenar y entregar tus cápsulas de forma segura:"
-          item_email: Tu correo electrónico (usado exclusivamente para inicio de sesión sin contraseña mediante enlaces mágicos y entrega de cartas)
-          item_letters: Título y contenido cifrado de tus cartas (protegidos con cifrado seguro en reposo)
-          item_predictions: Predicciones futuras y reflexiones retrospectivas que decidas escribir
-          item_emotional: Evaluaciones de estado emocional (niveles de felicidad, ansiedad y motivación)
-          item_preferences: Preferencias de interfaz (tema de color, idioma y opciones de notificación)
-          item_technical: Registros técnicos esenciales para la seguridad de la cuenta y el rendimiento del servicio
-        how_use:
-          title: Cómo Utilizamos tu Información
-          description: "Utilizamos tus datos únicamente para hacer posible tu experiencia en la cápsula del tiempo:"
-          item_accounts: Autenticar tu cuenta mediante enlaces mágicos de un solo uso
-          item_store: Almacenar de forma segura tus cartas cifradas hasta su fecha de entrega programada
-          item_deliver: Enviar tus cápsulas desbloqueadas a tu correo verificado según el calendario
-          item_communicate: Enviar confirmaciones críticas de cuenta y notificaciones de entrega
-          item_improve: Mantener la seguridad, optimizar la velocidad y mejorar la confiabilidad del servicio
-          item_security: Bloquear abusos automatizados, prevenir spam y proteger los datos del usuario
-        encryption:
-          title: Privacidad y Cifrado de Alto Nivel
-          description: Los títulos y contenidos de tus cartas se cifran antes de guardarse en nuestra base de datos. Nadie, ni siquiera nuestro equipo, puede leer tus palabras mientras la carta permanezca sellada en la bóveda.
-        retention:
-          title: Retención de Datos y Eliminación Instantánea
-          description: Conservamos tus cápsulas del tiempo mientras tu cuenta permanezca activa. Si decides eliminar tu cuenta en Configuración, todas tus cartas, estados emocionales, predicciones y eventos analíticos asociados se borran de manera permanente e irreversible de nuestra base de datos.
-        third_parties:
-          title: Aliados de Infraestructura Confiables
-          description: "Trabajamos con proveedores líderes de la industria para procesar y entregar tus cápsulas:"
-          item_email: Resend API para la entrega transaccional de correos electrónicos
-          item_hosting: Infraestructura en la nube de alta seguridad con bases de datos aisladas y cifradas
-        rights:
-          title: Tus Derechos y Control sobre tus Datos
-          description: "Mantienes la propiedad total de tus palabras. Tienes derecho a:"
-          item_access: Inspeccionar y exportar la cronología de tus cartas en cualquier momento
-          item_delete: Eliminar cartas individuales o borrar tu cuenta completa en un solo clic
-          item_questions: Contactar a nuestro equipo ante cualquier duda técnica o de privacidad
-        changes:
-          title: Actualizaciones de la Política
-          description: Si realizamos cambios significativos en esta Política de Privacidad, los publicaremos aquí y notificaremos a los usuarios activos vía correo electrónico.
-        contact:
-          title: Contacto y Soporte
-          description: "¿Tienes preguntas sobre cómo se almacenan o cifran tus cartas? Contáctanos directamente a:"
-    terms:
-      title: Términos de Servicio
-      last_updated: "Última actualización: agosto de 2026"
-      subtitle: Términos claros y humanos que definen nuestros compromisos de servicio, integridad en la entrega y propiedad de tus datos.
-      sections:
-        acceptance:
-          title: Aceptación de los Términos
-          description: Al crear una cápsula o utilizar TimeEcho, aceptas estos Términos de Servicio. Si no estás de acuerdo, por favor no uses la plataforma.
-        about:
-          title: Acerca de TimeEcho
-          description: TimeEcho es una plataforma de cápsulas del tiempo digitales que te permite escribir cartas a tu yo futuro, registrar evaluaciones emocionales, hacer predicciones de vida y programar entregas futuras.
-        accounts:
-          title: Acceso a Cuenta Sin Contraseña
-          description: TimeEcho utiliza autenticación segura mediante enlaces mágicos enviados directamente a tu bandeja de entrada. Eres responsable de mantener la seguridad de tu correo electrónico.
-        creating:
-          title: Escritura y Programación de Cápsulas
-          description: Puedes programar cartas para abrirse en cualquier fecha futura. Eres responsable de asegurar que las direcciones de correo sean válidas y que el contenido cumpla con las leyes aplicables.
-        delivery:
-          title: Compromiso de Entrega Programada
-          description: TimeEcho procesa las cápsulas programadas diariamente y las envía en o cerca de tu fecha de desbloqueo local mediante correos transaccionales.
-          disclaimer: Aunque aplicamos los máximos esfuerzos técnicos para garantizar entregas puntuales, los horarios exactos dependen de los proveedores de correo, disponibilidad de red y filtros de spam.
-        responsibilities:
-          title: Conducta del Usuario
-          description: Eres responsable de mantener la confidencialidad de tu cuenta y de utilizar TimeEcho de manera respetuosa.
-        content:
-          title: Eres Dueño del 100% de tu Contenido
-          description: Conservas la propiedad absoluta de todas las cartas, predicciones y reflexiones que creas en TimeEcho. Nos otorgas una licencia limitada únicamente para almacenar, cifrar y entregar tu contenido según lo solicites.
-          license: Esta licencia limitada nos permite guardar tus cartas cifradas hasta su fecha de apertura programada y transmitirlas a tu correo al desbloquearse.
-        prohibited:
-          title: Actividades Prohibidas
-          description: "Para mantener la seguridad de la plataforma, aceptas no utilizar TimeEcho para:"
-          item_spam: Enviar correos no solicitados o spam
-          item_harassment: Acosar, intimidar o dañar a otros
-          item_threats: Realizar amenazas de violencia o acciones ilegales
-          item_fraud: Participar en prácticas engañosas, fraudulentas o maliciosas
-          item_impersonation: Suplantar la identidad de otras personas o entidades
-          item_illegal: Violar leyes locales o internacionales
-          item_malware: Distribuir virus, troyanos o código dañino
-          item_abuse: Abusar de la infraestructura, realizar ataques de denegación de servicio o extraer datos del sistema
-          item_unauthorized: Intentar accesos no autorizados a servidores o bases de datos
-          item_infringement: Infringir derechos de autor o propiedad intelectual de terceros
-        recipient:
-          title: Consentimiento del Destinatario
-          description: Al programar una cápsula para una dirección de correo de un tercero, confirmas que tienes permiso para enviar mensajes a dicha dirección.
-        intellectual:
-          title: Propiedad Intelectual de la Plataforma
-          description: El software, diseño, componentes de interfaz y marcas de TimeEcho son propiedad intelectual protegida. Tus cartas personales siguen siendo totalmente tuyas.
-        availability:
-          title: Disponibilidad del Servicio
-          description: Nos esforzamos por mantener una disponibilidad del 99.9%, pero el acceso puede interrumpirse ocasionalmente por mantenimiento programado o reparaciones de emergencia.
-        termination:
-          title: Cancelación de Cuenta
-          description: Puedes eliminar tu cuenta en cualquier momento desde Configuración. Nos reservamos el derecho de suspender cuentas que violen estas reglas de conducta.
-        liability:
-          title: Limitación de Responsabilidad
-          description: TimeEcho se proporciona "tal cual". En la máxima medida permitida por la ley, TimeEcho no será responsable por daños indirectos o consecuentes derivados del uso del servicio o retrasos de entrega.
-        changes:
-          title: Actualizaciones de los Términos
-          description: Podemos actualizar estos Términos periódicamente. El uso continuado de TimeEcho tras las actualizaciones constituye la aceptación de los nuevos términos.
-        contact:
-          title: Contacto
-          description: "Para preguntas sobre estos Términos, puedes contactar a nuestro equipo directamente a:"
-    about:
-      title: Conecta a quien eres hoy con la persona en la que te convertirás mañana.
-      subtitle: TimeEcho es una plataforma de cápsulas del tiempo digitales segura. Escribe cartas a tu yo del futuro, registra tu estado emocional, realiza predicciones de vida y desbloquéalas años después para comparar los resultados.
-      sections:
-        what_is:
-          title: ¿Por qué escribirle a tu yo del futuro?
-          description: En un mundo acelerado, es fácil olvidar cuánto has crecido, qué te preocupaba o qué soñabas para tu vida. TimeEcho te permite capturar tu realidad actual (tus esperanzas, miedos, relaciones y estado emocional) y guardarla en una bóveda digital hasta la fecha futura que elijas.
-        how_works:
-          title: Cómo Funciona TimeEcho
-          step_write_title: 1. Escribe y Registra
-          step_write_desc: Vierte tus pensamientos en una carta privada. Evalúa tu felicidad, ansiedad y motivación, y haz predicciones sobre tu futuro.
-          step_seal_title: 2. Sella y Programa
-          step_seal_desc: Elige tu fecha de entrega y zona horaria. Tu carta se cifra de forma segura y queda guardada en tu bóveda privada hasta ese momento.
-          step_wait_title: 3. Vive y Evoluciona
-          step_wait_desc: Concéntrate en tu vida. A medida que pasan los meses o años, tus palabras permanecen protegidas mientras creces y alcanzas nuevas metas.
-          step_receive_title: 4. Abre y Reflexiona
-          step_receive_desc: En la fecha elegida, tu carta llega a tu correo. Lee tus palabras pasadas, revisa tus predicciones y descubre cuánto has crecido.
-        why_exists:
-          title: Diseñado para una Conversación Honesta Contigo Mismo
-          description: "Las redes sociales nos obligan a actuar para otros. TimeEcho está diseñado para lo opuesto: un espacio tranquilo y libre de distracciones para ser completamente honesto contigo mismo. Sin muros públicos, sin métricas de vanidad, sin anuncios. Solo un puente directo entre tu yo pasado y tu yo futuro."
-        philosophy:
-          title: Nuestra Filosofía
-          description: Tus palabras importan. Tus memorias merecen ser preservadas. TimeEcho está diseñada con privacidad y simplicidad en su corazón—un rincón tranquilo de internet donde puedes ser honesto contigo mismo, sin algoritmos ni anuncios.
-        contact:
-          title: Contacto y Creadores
-          description: "¿Tienes preguntas, comentarios o necesitas asistencia con TimeEcho? Escríbenos directamente a los creadores:"
-  navigation:
-    write: Escribir una Carta
-    public_stories: Historias Públicas
-    vault: Mis Cartas
-    timeline: Línea de Tiempo
-    analytics: Estadísticas
-    settings: Ajustes
-    sign_in: Iniciar Sesión
-    sign_out: Cerrar Sesión
-    anonymous: Anónimo
-    memories: Recuerdos
-    switch_to_en: Inglés
-    switch_to_es: Español
-    quote: La mejor manera de predecir el futuro es crearlo.
+  support:
+    array:
+      words_connector: ", "
+      two_words_connector: " y "
+      last_word_connector: " y "
   activemodel:
     attributes:
       letter_form:
@@ -223,9 +70,13 @@ es:
         email: "El correo electrónico"
         scheduled_at: "La fecha de entrega"
         deliver_at: "La fecha de entrega"
+        timezone: "La zona horaria"
+        language: "El idioma"
         happiness_level: "El nivel de felicidad"
         anxiety_level: "El nivel de ansiedad"
         motivation_level: "El nivel de motivación"
+      magic_link_form:
+        email: "El correo electrónico"
   activerecord:
     attributes:
       letter:
@@ -234,8 +85,38 @@ es:
         email: "El correo electrónico"
         scheduled_at: "La fecha de entrega"
         deliver_at: "La fecha de entrega"
+        timezone: "La zona horaria"
+        language: "El idioma"
   errors:
+    format: "%{attribute} %{message}"
     messages:
+      blank: "no puede estar en blanco"
+      present: "debe estar en blanco"
+      invalid: "no es válido"
+      too_short:
+        one: "es demasiado corto (mínimo 1 carácter)"
+        other: "es demasiado corto (mínimo %{count} caracteres)"
+      too_long:
+        one: "es demasiado largo (máximo 1 carácter)"
+        other: "es demasiado largo (máximo %{count} caracteres)"
+      wrong_length:
+        one: "no tiene la longitud correcta (debe ser de 1 carácter)"
+        other: "no tiene la longitud correcta (debe ser de %{count} caracteres)"
+      not_a_number: "no es un número"
+      not_an_integer: "debe ser un número entero"
+      greater_than: "debe ser mayor que %{count}"
+      greater_than_or_equal_to: "debe ser mayor o igual que %{count}"
+      equal_to: "debe ser igual a %{count}"
+      less_than: "debe ser menor que %{count}"
+      less_than_or_equal_to: "debe ser menor o igual que %{count}"
+      other_than: "debe ser distinto de %{count}"
+      in: "debe estar en el rango %{count}"
+      inclusion: "no está incluido en la lista"
+      exclusion: "está reservado"
+      taken: "ya está en uso"
+      record_invalid: "La validación falló: %{errors}"
+      must_be_in_future: "debe estar en el futuro"
+      invalid_timezone: "no es una zona horaria válida"
       word_too_long: "no puede contener palabras de más de 45 caracteres"
       too_few_words: "debe contener al menos 10 palabras"
       missing_paragraphs: "debe estar organizado en párrafos mediante saltos de línea"
@@ -243,714 +124,73 @@ es:
       magic_link_rate_limit_exceeded: "Demasiados intentos de inicio de sesión. Por favor espera unos minutos antes de solicitar otro enlace."
   flash:
     errors_title: "Por favor, corrige los siguientes errores:"
-    locked: Esta acción no se puede deshacer una vez sellada.
-    login_required: Por favor, inicia sesión para acceder a tu baúl digital de cápsulas.
-    welcome_back: Bienvenido de nuevo a tu cápsula del tiempo digital.
-    invalid_link: Este enlace mágico no es válido o ha caducado.
-    logged_out: Has cerrado correctamente la sesión de tu baúl.
-    private_or_inaccessible: Esta carta es privada o no se puede acceder a ella.
-    unauthorized_view: No tienes autorización para ver esta carta.
-    unauthorized_modify: No tienes autorización para modificar esta carta.
-    reality_updated:
-      "¡Realidad actualizada! Reflexiona sobre cómo ha evolucionado
-      tu vida."
-    letter_deleted: La carta ha sido eliminada permanentemente.
-    letter_archived: La carta ha sido archivada y no será enviada.
-    letter_restored: La carta ha sido restaurada a tu baúl activo.
-    cannot_archive_delivered: Las cartas entregadas no pueden ser archivadas.
-    cannot_restore: Esta carta no puede ser restaurada.
-    cannot_delete: Solo se pueden eliminar las cartas archivadas.
-    unauthorized_action: No tienes autorización para realizar esta acción.
-  landing:
-    headline: Escribe hoy.<br>Descubre mañana.
-    subtitle: Escribe una carta a tu yo del futuro, registra tu estado emocional y formula predicciones de vida. Une a quien eres hoy con la persona en la que te convertirás.
-    private_and_secure: 100% Privado y Seguro
-    private_desc: Solo tú puedes leer tu carta. Permanece resguardada de forma segura en tu bóveda personal hasta la fecha que elijas.
-    delivered_on_time: Entrega a Tiempo
-    delivery_desc: Llega directo a tu bandeja de entrada en la mañana exacta que elegiste, en tu horario local.
-    connect_with_yourself: Predicciones vs. Realidad
-    compare_desc: Compara lo que imaginabas con lo que realmente viviste y descubre cuánto has evolucionado.
-    write_card_title: Escribe tu carta a tu futuro
-    your_letter: Tu carta
-    dear_future_self: Querido yo del futuro...
-    when_do_you_want_it: "¿Cuándo quieres recibirla?"
-    six_months: 6 meses
-    one_year: 1 año
-    three_years: 3 años
-    five_years: 5 años
-    custom_date: Fecha personalizada
-    choose_specific_date: Elige una fecha específica
-    predictions_annex: PREDICCIONES DEL FUTURO
-    current_emotional_state: ESTADO ANÍMICO ACTUAL
-    your_predictions_optional: Tus predicciones (opcional)
-    where_will_you_live: "¿Dónde crees que vivirás?"
-    what_work_will_you_do: "¿A qué te dedicarás?"
-    how_much_money_will_you_earn: "¿Cuánto dinero crees que ganarás?"
-    how_will_your_relationship_be: "¿Cómo será tu relación sentimental?"
-    what_will_be_your_achievement: "¿Cuál será tu mayor logro?"
-    how_happy_will_you_be: "¿Qué tan feliz serás?"
-    how_do_you_feel_today: "¿Cómo te sientes hoy?"
-    where_do_we_send_letter: "¿A dónde te enviamos tu carta?"
-    email_placeholder: tu@email.com
-    send_to_future_self: Sellar y Enviar a mi Yo Futuro
-    private_and_secure_badge: Tu carta es 100% privada y segura.
-    how_it_looks: Así se verá cuando abras tu carta
-    compare_reflect_desc: Compara tus predicciones con tu realidad y reflexiona sobre tu evolución.
-    dossier_revealed: "CÁPSULA DESBLOQUEADA · TE-00412"
-    mock_prediction_city: Viviré en Barcelona
-    mock_reality_city: Vivo en Medellín
-    mock_prediction_career: Seré diseñadora freelance
-    mock_reality_career: Soy Product Designer
-    mock_prediction_salary: Ganaré $5.000.000 COP
-    mock_reality_salary: Gano $7.200.000 COP
-    mock_prediction_happiness: 8 / 10 de felicidad
-    mock_reality_happiness: 7 / 10 de felicidad
-    prediction_vs_reality: Predicción vs Realidad
-    prediction: Predicción
-    reality: Realidad
-    one_year_ago: Hace 1 año
-    today: Hoy
-    your_overall_accuracy: Tu precisión general
-    accurate_predictions: Acertaste %{count} de %{total} predicciones
-    you_are_on_track: "¡Vas por buen camino!"
-    how_it_works: Cómo funciona
-    journey_desc: Un viaje simple hacia tu mejor yo.
-    step1_title: 1. Escribe y Predice
-    step1_desc: Escribe con honestidad a tu futuro yo. Registra cómo te sientes hoy y haz predicciones sobre tu trabajo, relaciones y metas.
-    step2_title: 2. Sella y Programa
-    step2_desc: Elige cuándo quieres recibirla, desde 6 meses hasta 5 años. Tus palabras quedan completamente cifradas y resguardadas en tu bóveda privada hasta ese día.
-    step3_title: 3. Desbloquea y Compara
-    step3_desc: El día señalado, tu carta llega a tu correo. Reencuéntrate con quién eras, comprueba qué predicciones se cumplieron y descubre cuánto has crecido.
-    your_past: Tu pasado
-    your_present: Tu presente
-    badge: Cápsula del Tiempo TimeEcho
-    title_html: TimeEcho
-    write_first: Escribe tu primera carta
-    steps_title: Simple y Significativo
-    steps_subtitle: Tres pasos simples para conectar tu mente presente con tu futuro yo.
-    happiness: Felicidad
-    anxiety: Ansiedad
-    motivation: Motivación
-  letters:
-    annex_1: ANEXO I
-    annex_2: ANEXO II
-    fact_matching: COTEJO DE HECHOS
-    current_state_badge: ESTADO ACTUAL
-    show_time_remaining: Tiempo restante
-    back_to_vault: "Volver a mis cartas"
-    unlocked_badge: Cápsula Desbloqueada
-    show_unlocked_title: Tu carta del pasado te está esperando.
-    show_unlocked_desc:
-      Antes de leerla, cuéntanos qué pasó realmente. Esto nos permitirá
-      calcular el score de predicciones y shifts emocionales.
-    start_comparison: Comenzar
-    takes_two_minutes: Tomará solo 2 minutos
-    tell_reality_title: Cuéntanos tu realidad actual
-    tell_reality_desc:
-      Responde estas preguntas para comparar tu pasado con tu yo
-      actual.
-    question_where_do_you_live: "¿Dónde vives hoy en día?"
-    question_what_do_you_do: "¿En qué trabajas hoy en día?"
-    question_how_much_do_you_earn: "¿Cuánto ganas hoy al mes?"
-    question_how_is_your_relationship: "¿Cómo está tu relación sentimental hoy?"
-    question_what_was_your_achievement: "¿Cuál terminó siendo tu mayor logro?"
-    question_how_happy_are_you: "¿Qué tan feliz te sientes en general hoy?"
-    question_what_happened_with: "¿Qué ocurrió con: %{category}?"
-    your_past_prediction: "Tu predicción del pasado: %{text}"
-    your_current_level: "Tu nivel actual:"
-    did_prediction_come_true: "¿Se cumplió tu predicción?"
-    yes_i_did_it: Sí, lo logré
-    not_exactly: No exactamente
-    emotional_state_today: Estado emocional hoy
-    how_do_you_feel_now: "¿Cómo te sientes en este preciso instante?"
-    reflection_tip: "Consejo de reflexión:"
-    reflection_tip_text:
-      Sé honesto contigo mismo. No hay respuestas correctas o incorrectas.
-      Esta experiencia es 100% tuya y te ayuda a ver lo mucho que has crecido en este
-      tiempo.
-    save_and_view: Guardar y ver mi carta
-    past_letter: Carta del pasado
-    delivered_on: Entregada el
-    will_open_on: Se abrirá el
-    viewed_times: Consultada %{count} veces
-    predictions_vs_reality: Predicciones vs Realidad
-    predictions_vs_reality_desc:
-      Compara lo que imaginabas hace un tiempo con la vida
-      que estás viviendo hoy.
-    past_prediction_label: "Predicción del pasado:"
-    reality_today_label: "Realidad hoy en día:"
-    your_prediction_score: Tu Score de Predicciones
-    score_message_high:
-      "¡Tu brújula del futuro está sumamente afilada! Excelente
-      intuición."
-    score_message_medium:
-      Vas por un gran camino. Muchas cosas cambiaron, pero tu
-      rumbo sigue claro.
-    score_message_low:
-      "¡La vida te sorprendió con giros inesperados! Y eso hace el
-      camino más interesante."
-    no_predictions_registered: No registraste predicciones para esta carta.
-    emotional_evolution: Evolución emocional
-    emotional_snapshot: Instantánea Emocional
-    internal_wellbeing_change: Cambio en tu bienestar interno
-    no_emotional_data: No hay datos emocionales disponibles.
-    whats_next: "¿Qué sigue?"
-    whats_next_desc:
-      Descubre cómo evoluciona tu historia a través de los años. Sigue
-      escribiendo cartas y guarda tus memorias en el baúl del tiempo.
-    write_new_letter: Escribir nueva carta
-    pending_revelation: Pendiente por revelación
-    revealed_and_compared: Revelada & Comparada
-    sealed_capsule: Cápsula Sellada
-    created_on: Creado el
-    delivered_on: Entregada el
-    emotional_evolution_badge: Evolución Emocional
-    happiness_to_anxiety: "Felicidad: %{happiness} &rarr; Ansiedad: %{anxiety}"
-    waiting_for_reality: Espera revelación de la realidad.
-    matched_predictions_count: Acertaste %{matched} de %{total} predicciones (%{pct}%).
-    complete_comparison: Completar comparación
-    view_full_comparison: Ver comparación completa
-    time_capsule_sealed: Cápsula del tiempo sellada
-    sealed_desc:
-      Esta carta viaja de forma privada y encriptada hacia el futuro. Quedan
-      aproximadamente %{days} días para su entrega.
-    requires_revelation: Requiere revelación
-    delivered_and_evaluated: Entregada & Evaluada
-    in_transit_to_future: En tránsito al futuro
-    opens_on: Se abre el
-    emotional_snapshot_badge: snapshot emocional
-    emotional_snapshot_summary:
-      "Felicidad: %{happiness} | Ansiedad: %{anxiety} |
-      Motivación: %{motivation}"
-    predictions_made_badge: predicciones hechas
-    predictions_sealed_pending: "%{count} predicciones selladas. Pendiente por comparar."
-    predictions_sealed_completed: "%{count} predicciones selladas. Comparación completada."
-    complete_revelation: Completar revelación
-    view_predictions_vs_reality: Ver predicciones vs realidad
-    capsule_in_transit: Cápsula en tránsito
-    transit_desc: Se encuentra resguardada de forma privada en tu baúl temporal.
-    opens_in_days: Se abre en %{days} días
-    write_letter: Escribir carta
-    write_first_letter: Escribir mi primera carta
-    one_day: 1 día
-    x_days: "%{count} días"
-    not_configured: No configurada
-    tomorrow: Mañana
-    prediction_vs_reality: Predicción vs Realidad
-    happiness: Felicidad
-    anxiety: Ansiedad
-    motivation: Motivación
-    prediction: Predicción
-    reality: Realidad
-    partially: Parcialmente
-    you_did_it: "¡Lo lograste!"
-    superaste: "¡Superaste!"
-    you_missed: No acertaste
-    not_yet: Aún no
-    very_close: Muy cerca
-    category_city: Ubicación
-    category_career: Trabajo / Carrera
-    category_salary: Ingresos
-    category_relationship: Relación sentimental
-    category_achievement: Mayor logro
-    category_happiness: Felicidad
-    category_other: "%{category}"
-    capsule_in_transit_badge: Cápsula en tránsito
-    capsule_unlocked_badge: Cápsula desbloqueada
-    error_saving: Error al guardar los ajustes.
-    privacy: Privacidad
-    only_you_can_see: Solo tú podrás verlo
-    min_chars_progress: "%{count} / 80 mín (2000 máx)"
-    delivery_date: Se abrirá el
-    within: Dentro de
-    x_days_count: "%{count} días"
-    days_word: días
-    new_header: Sellando un recuerdo
-    new_subheader: Vierte tus pensamientos en la página, luego séllalos para el futuro.
-    label_email: Tu Dirección de Correo
-    label_email_help:
-      Te enviaremos un enlace de verificación para confirmar esta
-      carta antes de programarla.
-    label_content: Tu Carta al Futuro
-    placeholder_content:
-      Querido yo del futuro...\n\n¿Qué esperas lograr? ¿Cuáles
-      son tus luchas actuales? ¿Qué quieres recordar del día de hoy?
-    focus_mode_enter: Modo Enfoque
-    focus_mode_exit: Salir de Enfoque
-    word_count: "%{count} palabras"
-    char_count: "%{count} caracteres"
-    time_travel_duration: Esta carta viajará en el tiempo durante %{days} días
-    label_deliver_at: "¿Cuándo debería abrirse esta cápsula?"
-    preset_6m: 6 Meses
-    preset_1y: 1 Año
-    preset_3y: 3 Años
-    preset_5y: 5 Años
-    label_attachments: Adjuntar Recuerdos (Fotos, Audio, Archivos)
-    label_attachments_help:
-      Sube hasta 5 elementos (máx. 10MB c/u) para sellar dentro
-      de tu cápsula.
-    label_visibility: Opciones de Visibilidad
-    label_public: Compartir Públicamente al Abrirse
-    label_public_help:
-      Marca esto para compartir esta carta de forma anónima en nuestro
-      feed público una vez que sea entregada. Déjalo desmarcado para mantenerla privada.
-    btn_submit: Sellar y Enviar al Futuro
-    label_title: Título de la cápsula
-    label_title_help:
-      Asigna un nombre significativo a tu cápsula del tiempo para
-      poder identificarla en tu línea de tiempo.
-    evolution_tracker: Rastreador de Evolución Personal
-    evolution_tracker_help:
-      Captura tu yo actual e imagina la vida que vivirás. Estos
-      se convertirán en ecos interactivos una vez abiertos.
-    emotional_snapshot_help:
-      Califica tus niveles actuales del 1 al 10. Te mostraremos
-      cuánto ha cambiado tu estado emocional interno cuando esta carta se abra en
-      el futuro.
-    happiness_level: Nivel de felicidad
-    struggling: Con dificultades
-    content_state: Tranquilo
-    joyful: Feliz
-    anxiety_level: Nivel de ansiedad
-    calm: Calma
-    moderate: Moderada
-    overwhelmed: Abrumado
-    motivation_level: Nivel de motivación
-    uninspired: Desanimado
-    steady: Estable
-    driven: Enérgico
-    predictions_vs_reality_help:
-      "¿Dónde te ves a ti mismo? Cuando se entregue esta
-      carta, la aplicación te pedirá que compares estas predicciones con tu realidad
-      actual."
-    prediction_city_label: "¿Dónde vivirás?"
-    prediction_salary_label: "¿Futuro nivel de salario/ingresos?"
-    prediction_relationship_label: "¿Estado civil/relación?"
-    prediction_career_label: "¿Situación laboral/carrera?"
-    prediction_achievement_label: "¿Mayor logro personal?"
-    future_integration: Integración Futura
-    bridge_past_present: Conecta el Pasado con el Presente
-    future_integration_help:
-      Tu cápsula del tiempo ha llegado. Antes de abrir el panel
-      de comparación completo, capturemos tu vida y estado de ánimo hoy.
-    feel_today: "¿Cómo te sientes HOY?"
-    feel_today_help:
-      Califica tu yo de hoy para ver cómo ha evolucionado tu estado
-      de ánimo desde que escribiste esta carta.
-    what_happened_predictions: "¿Qué pasó con tus predicciones?"
-    what_happened_predictions_help:
-      Lee lo que esperabas, luego cuéntanos qué sucedió
-      realmente.
-    placeholder_reality: Describe tu realidad ahora...
-    prediction_came_true: "¡Esta predicción se cumplió!"
-    btn_reveal_dashboard: Guardar y Revelar Panel de Comparación
-    reflection_matrix: Matriz de Reflexión
-    personal_evolution: Tu Evolución Personal
-    personal_evolution_help:
-      Compara la vida que imaginaste con la que realmente has
-      vivido desde el %{date}.
-    emotional_snapshot_shifts: Cambios en la Instantánea Emocional
-    growth: Crecimiento
-    shift: Cambio
-    steady_status: Estable
-    past_self: Yo del Pasado
-    present_self: Yo del Presente
-    calmer: Más Calma
-    stress: Estrés
-    inspired: Inspirado
-    predictions_vs_reality_grid: Cuadrícula de Predicciones vs Realidad
-    matched: Cumplido
-    evolved: Evolucionado
-    then_you_imagined: "Entonces imaginabas:"
-    now_living_reality: "Realidad actual:"
-    success_header: Tu recuerdo ha sido sellado
-    success_sub:
-      Hemos guardado tu carta de forma segura en nuestro baúl digital.<br>Permanecerá
-      bajo llave hasta el
-    success_date_fallback: su fecha de entrega
-    success_seal: Sello
-    success_opening: Apertura programada
-    success_next_title: "¿Qué pasa después?"
-    success_next_desc:
-      Hemos enviado un correo de confirmación a %{email}.
-      En ese día especial, llegará de nuevo a tu bandeja de entrada.
-    success_btn_dashboard: Ir a mi Panel de Control
-    success_btn_signin: Iniciar Sesión para ver mis Cápsulas
-    success_signin_help:
-      Inicia sesión con un enlace mágico para gestionar todas tus
-      cápsulas programadas.
-    success_btn_home: "Volver al Inicio"
-    show_locked_title: Esta cápsula está sellada
-    show_locked_desc:
-      Este mensaje fue sellado por %{email} y actualmente está viajando
-      a través del tiempo.
-    show_opening_in: Abriéndose en
-    show_target_date: "Fecha objetivo de entrega: %{date}"
-    show_btn_dashboard: Volver a la Línea de Tiempo
-    show_written: Escrito
-    show_delivered: Entregado
-    show_attachments_title: Recuerdos Adjuntos
-    show_download: Descargar
-    show_back_timeline: "Volver a la Línea de Tiempo"
-    show_back_public: "Ver Historias Públicas"
-    form_step_title: 1. Cuando escribes tu carta
-    form_step_subtitle: Estás creando una carta para tu yo del futuro.
-    deliver_date_prefix: Se entregará el
-    when_do_you_want_it: "¿Cuándo quieres recibirla?"
-    six_months: 6 meses
-    one_year: 1 año
-    three_years: 3 años
-    five_years: 5 años
-    custom_date: Fecha personalizada
-    choose_specific_date: Elige una fecha específica
-    form_letter_heading: Tu carta
-    title_label: Título
-    title_placeholder: "Ej: Para mi yo del futuro"
-    content_label: Contenido
-    content_placeholder_form:
-      Escribe aquí todo lo que quieras contarle a tu yo del
-      futuro...
-    email_placeholder_form: tu@email.com
-    prediction_placeholder: Escribe tu predicción...
-    predictions_heading: Tus predicciones
-    predictions_subtitle_form: "¿Cómo crees que será tu vida cuando abras esta carta?"
-    prediction_work_label: "¿En qué trabajarás?"
-    prediction_income_label_form: "¿Cuánto ganarás al mes?"
-    prediction_relationship_label_form: "¿Cómo estará tu relación sentimental?"
-    prediction_achievement_label_form: "¿Cuál será tu mayor logro?"
-    prediction_happiness_label_form: "¿Qué tan feliz crees que serás?"
-    emotional_snapshot_heading: Estado emocional hoy
-    feeling_now_short: "¿Cómo te sientes en este momento?"
-    emotion_happiness: Felicidad
-    emotion_anxiety: Ansiedad
-    emotion_motivation: Motivación
-    summary_heading: Resumen
-    summary_opening_label: Se abrirá el
-    summary_time_label: Dentro de
-    summary_privacy_label: Privacidad
-    summary_loading: Cargando...
-    summary_na: N/D
-    summary_not_configured: No configurada
-    summary_tomorrow: Mañana
-    btn_save_letter: Guardar carta
-    prediction_score_title: Tu Score de Predicciones
-    past_label: "Pasado:"
-    today_label: "Hoy:"
-    emotional_snapshot_badge_short: Instantánea emocional
-    predictions_badge_short: Predicciones
-    prediction_comparison_pending: Pendiente por comparar
-    prediction_comparison_completed: Comparación completada
-    reality_pending: Espera revelación de la realidad.
-    btn_complete_revelation: Completar revelación
-    btn_view_predictions: Ver predicciones vs realidad
-    timeline_empty_title: Tu línea de tiempo está vacía
-    timeline_empty_desc:
-      Escribe tu primera carta al futuro para comenzar a graficar
-      tu historia de crecimiento.
-    btn_start_writing: Comenzar a escribir
-    empty_title: Tu baúl está vacío
-    empty_desc:
-      No has escrito ninguna carta todavía. Las cartas al futuro te ayudan
-      a reflexionar y comparar tus predicciones con la realidad.
-    my_letters_title: Mis cartas
-    my_letters_subtitle:
-      Administra tus cápsulas del tiempo digital, estados emocionales
-      y predicciones.
-    btn_write_letter_short: Escribir carta
-    btn_view_timeline: Ver línea de tiempo
-    stat_total_capsules: Cápsulas totales
-    stat_future_messages: Mensajes al futuro
-    stat_delivered_label: Abiertas
-    stat_ready_to_compare: Listas para comparar
-    stat_in_transit: En tránsito
-    stat_sealed_in_time: Selladas en el tiempo
-    status_pending_reveal_short: Pendiente por revelación
-    status_revealed_compared: Revelada & Comparada
-    status_sealed_short: Cápsula Sellada
-    capsule_in_transit_short: Cápsula en tránsito
-    capsule_transit_desc: Se encuentra resguardada de forma privada en tu baúl temporal.
-    btn_archive: Archivar carta
-    confirm_archive: "¿Estás seguro de que deseas archivar esta cápsula? Se moverá al archivo y no se enviará al futuro."
-    btn_restore: Restaurar carta
-    confirm_restore: "¿Estás seguro de que deseas restaurar esta cápsula a tu baúl activo?"
-    btn_delete: Eliminar carta
-    confirm_delete: "¿Estás seguro de que deseas eliminar permanentemente esta carta? Esta acción no se puede deshacer."
-    archived_section_title: Cartas Archivadas
-    archived_section_subtitle: Cartas que has archivado. No se enviarán a menos que las restaures.
-    archived_badge: Archivada
-    archived_on: Archivada el
-    empty_archived: No hay cápsulas archivadas en el baúl.
-    prediction_accuracy: Acertaste %{matched} de %{total} predicciones (%{pct}%).
-    prediction_score_perfect:
-      "¡Tu brújula del futuro está sumamente afilada! Excelente
-      intuición."
-    prediction_score_good:
-      Vas por un gran camino. Muchas cosas cambiaron, pero tu
-      rumbo sigue claro.
-    prediction_score_low:
-      "¡La vida te sorprendió con giros inesperados! Y eso hace
-      el camino más interesante."
-    no_predictions_text: No registraste predicciones para esta carta.
-    whats_next_heading: "¿Qué sigue?"
-    whats_next_body:
-      Descubre cómo evoluciona tu historia a través de los años. Sigue
-      escribiendo cartas y guarda tus memorias en el baúl del tiempo.
-    write_new_letter_text: Escribir nueva carta
-    emotional_evolution_heading: Evolución emocional
-    wellbeing_change: Cambio en tu bienestar interno
-    no_emotional_data_text: No hay datos emocionales disponibles.
-    prediction_score_heading: Tu Score de Predicciones
-    past_label_short: "Pasado:"
-    today_label_short: "Hoy:"
-    growth_label: Crecimiento
-    decline_label: Descenso
-    calm_label: Más Calma
-    stress_label: Estrés
-    inspired_label: Inspirado
-    steady_label: Estable
-    emotional_snapshot_heading_short: Instantánea emocional
-  dashboard:
-    title: Tu baúl digital
-    subtitle: Guardando tus memorias, sueños y puntos de reflexión a través del tiempo.
-    btn_write: Escribir Nueva Carta
-    stat_total: Total Cápsulas
-    stat_total_sub: Cartas selladas
-    stat_delivered: Entregadas
-    stat_delivered_sub: Abiertas con éxito
-    stat_sealed: Selladas
-    stat_sealed_sub: A la espera de la fecha de entrega
-    delivered_tag: Cápsula Entregada
-    sealed_tag: Elemento Sellado del Baúl
-    opening_on: Se abre el %{date}
-    public_badge: Compartido Públicamente
-    private_badge: Privado
-    attachments_badge: "%{count} archivo adjunto"
-    attachments_badge_plural: "%{count} archivos adjuntos"
-    opening_in: Abriéndose en %{count} día
-    opening_in_plural: Abriéndose en %{count} días
-    sealed_info_title: Sellada de forma segura
-    sealed_info_desc: El contenido está oculto hasta que se alcance la fecha de entrega.
-    btn_open: Abrir Cápsula Completa &rarr;
-    empty_title: Tu baúl está vacío
-    empty_desc:
-      "¡Aún no has escrito ninguna carta! Comienza tu viaje escribiendo
-      un mensaje a tu futuro yo."
-    empty_btn: Escribe Tu Primera Carta
-    needs_reflection: Requiere Reflexión / Actualización de Realidad
-    predictions_badge: "%{count} predicción"
-    predictions_badge_plural: "%{count} predicciones"
-    snapshot_badge: Instantánea
-    unrevealed_capsule_help: Sin revelar - ¡Abre para registrar tu realidad!
-    predictions_matched_desc: "¡%{matched} de %{total} categorías de predicción coincidieron!"
-    complete_reveal_btn: Completar y Revelar Realidad
-    sealed_capsule_title: Cápsula Sellada en Viaje
-    sealed_capsule_desc:
-      "Esta cápsula contiene: %{details} (oculto hasta la fecha
-      de entrega)."
-    predictions_word: Predicciones
-    emotional_snapshot_word: Instantánea emocional
-    view_timeline: Ver línea de tiempo
-  public_feed:
-    badge: Baúl de la Comunidad
-    title: Historias públicas del pasado
-    subtitle:
-      Una colección de cartas compartidas de forma anónima por los usuarios
-      una vez que sus cápsulas se abrieron. Lee las esperanzas, crecimiento y ecos
-      de mentes viajeras.
-    written: Escrita el %{date}
-    opened: Abierta el %{date}
-    anonymous_traveler: Viajero Anónimo
-    btn_read: Leer Historia &rarr;
-    empty_title: No hay historias públicas aún
-    empty_desc:
-      A medida que las cápsulas se abran en los próximos meses, las historias
-      compartidas por nuestra comunidad aparecerán aquí.
-    empty_btn: Escribir mi cápsula del tiempo
-    cta_title: "¿Listo para hablarle a tu yo del futuro?"
-    cta_desc:
-      Sella un recuerdo hoy y deja que se abra en el futuro. Puedes elegir
-      mantenerlo completamente privado o compartirlo aquí una vez abierto.
-  sessions:
-    title: Ingresa a tu baúl
-    subtitle:
-      Te enviaremos un enlace seguro de inicio de sesión mágico directamente
-      a tu correo electrónico. Sin contraseñas.
-    error_header: "No se pudo enviar el enlace:"
-    label_email: Tu Dirección de Correo
-    btn_submit: Enviar enlace mágico
-    back_to_landing: "Volver a la página de inicio"
-    check_email_title: Revisa tu bandeja de entrada
-    check_email_subtitle: Hemos enviado un enlace de inicio de sesión mágico a
-    check_email_spam_notice:
-      Por favor, revisa tu carpeta de correo no deseado o promociones
-      si el correo electrónico no llega en un par de minutos.
-    try_another_email: Probar con otra dirección de correo &rarr;
-  analytics:
-    title: Reflexión y Estadísticas del Baúl
-    subtitle:
-      Una retrospectiva pacífica de tu evolución emocional, predicciones y
-      métricas de entrega de tus cápsulas.
-    btn_back: "Volver a la Línea de Tiempo"
-    back_to_vault: "Volver al Baúl"
-    match_rate_label: Tasa de Acierto de Predicciones
-    total_capsules: Total Cápsulas
-    delivered: Entregadas
-    in_transit: En Tránsito
-    your_past: Yo del Pasado
-    your_present: Yo del Presente
-    match_summary:
-      "%{matched} de %{completed} predicciones coincidieron. %{total}
-      aún en tránsito."
-    stat_total: Total Cápsulas
-    stat_delivered: Entregadas
-    stat_sealed: Programadas Selladas
-    emotional_evolution_title: Promedios de Evolución Emocional
-    emotional_evolution_desc:
-      Observa los cambios promedio en tus métricas emocionales
-      básicas a lo largo del tiempo. Los valores representan una comparación entre
-      tus estados iniciales al escribir y tu estado actual cuando se abren las cápsulas.
-    happiness_index: Índice de Felicidad
-    anxiety_index: Índice de Ansiedad
-    motivation_index: Índice de Motivación
-    past_self_label: Inicial (Yo del pasado)
-    present_self_label: Actual (Yo del presente)
-    predictions_reality_title: Índice de Predicciones vs Realidad
-    predictions_reality_desc:
-      "¡Observa qué tan precisas son tus predicciones sobre
-      el futuro! La tasa representa el porcentaje de predicciones cumplidas donde
-      la realidad se alineó con lo que esperabas."
-    match_accuracy_rate: Tasa de Precisión de Coincidencias
-    match_accuracy_desc_html:
-      "%{matched} de %{completed} predicciones completadas
-      coincidieron con éxito.<br>(%{transit} predicciones están actualmente en tránsito
-      / no reveladas)."
-    activity_log_title: Registro de Actividad Reciente del Baúl
-    no_activity:
-      Aún no se ha registrado ninguna actividad en el libro de historial
-      de tus cápsulas.
-    at_word: a las
-    events:
-      user_logged_in: Sesión iniciada en el baúl digital.
-      magic_link_requested: Enlace mágico de inicio de sesión solicitado.
-      letter_created:
-        Nueva cápsula del tiempo sellada y programada para entregarse
-        el %{date}.
-      letter_opened: Cápsula del tiempo abierta con ID %{id}.
-      email_delivered: Resend entregó correctamente la notificación de la carta.
-      link_clicked: Se hizo clic en el enlace de acceso o verificación del baúl.
-      prediction_completion: Comparaciones de predicciones vs realidad actualizadas.
-      emotional_snapshot_completion:
-        Registro inicial de evaluación del estado emocional
-        de hoy.
-      general: "Operación general del baúl realizada: %{operation}."
+    locked: "Esta acción no se puede deshacer una vez sellada."
+    login_required: "Inicia sesión para ver tus cartas."
+    welcome_back: "Has iniciado sesión."
+    magic_link_sent: "Te enviamos un enlace de acceso."
+    invalid_link: "Este enlace no es válido o venció."
+    logged_out: "Cerraste sesión."
+    private_or_inaccessible: "Esta carta es privada o no se puede acceder a ella."
+    unauthorized_view: "No tienes autorización para ver esta carta."
+    unauthorized_modify: "No tienes autorización para modificar esta carta."
+    reality_updated: "Reality Ledger guardado."
+    letter_deleted: "La carta ha sido eliminada permanentemente."
+    letter_archived: "La carta se archivó y no se entregará."
+    letter_restored: "La carta se restauró."
+    cannot_archive_delivered: "Las cartas entregadas no pueden ser archivadas."
+    cannot_restore: "Esta carta no puede ser restaurada."
+    cannot_delete: "Solo se pueden eliminar las cartas archivadas."
+    unauthorized_action: "No tienes autorización para realizar esta acción."
+    service_unavailable: "Servicio no disponible temporalmente. Inténtalo más tarde."
   mailers:
     common:
-      postal_archive: Baúl Postal
-      access_token_badge: Clave de Acceso Oficial
-      email_update_badge: Solicitud de Actualización
+      postal_archive: "TimeEcho"
+      access_token_badge: "Enlace de acceso"
+      email_update_badge: "Cambio de correo"
       docket_prefix: Expediente
       postal_address: Calle Mayor 12, Planta 3, 28013 Madrid, España
     magic_link:
-      subject: Tu enlace de acceso a TimeEcho
-      preheader: Usa este enlace directo para ingresar a tu baúl personal de cartas.
-      header: Inicia sesión en tu cápsula del tiempo digital
+      subject: "Tu enlace de acceso a TimeEcho"
+      preheader: "Usa este enlace para iniciar sesión en TimeEcho."
+      header: "Inicia sesión en TimeEcho"
       greeting: Hola,
-      body:
-        Haz clic en el botón de abajo para ingresar a tu panel de TimeEcho
-        y ver tus cartas o escribirle a tu yo del futuro.
-      btn: Iniciar sesión en TimeEcho
-      body_text:
-        "Abre el enlace de abajo o cópialo en tu navegador
-        para acceder a tu panel de TimeEcho:"
-      expiry_help:
-        Este enlace caducará en 15 minutos. Si no solicitaste este acceso,
-        puedes ignorar este correo de forma segura.
-      footer_subtitle: Diario nostálgico y esperanzador para tu yo del futuro.
+      body: "Haz clic en el botón de abajo para iniciar sesión, ver tus cartas o escribir una nueva."
+      btn: "Iniciar sesión"
+      body_text: "Abre el siguiente enlace, o cópialo y pégalo en tu navegador, para iniciar sesión:"
+      expiry_help: "Este enlace vence en 15 minutos. Si no lo pediste, puedes ignorar este correo."
+      footer_subtitle: "Cartas a tu yo del futuro."
     future_letter:
-      subject: Tu carta del pasado ya está lista
-      preheader: Escribiste este mensaje para hoy. Ábrelo y revive lo que pensabas.
-      header: Un mensaje de tu yo del pasado
+      subject: "Tu carta ha llegado"
+      preheader: "Te escribiste esta carta. Ábrela para leerla."
+      header: "Una carta de tu yo del pasado"
       written_on: Escrita el %{date}
-      open_btn: Abrir mi carta
-      view_full_prompt: Mira la carta completa y compara tus predicciones pasadas.
-      footer_html:
-        Te escribiste esta carta a ti mismo a través de TimeEcho.<br><em>"Enviado
-        con esperanza, recibido con nostalgia."</em>
-      footer_text:
-        Recibiste esto porque te escribiste una carta a tu yo del futuro
-        usando TimeEcho. "Enviado con esperanza, recibido con nostalgia."
-      text_body_help: "Para ver esta carta en tu baúl seguro, visita:"
+      open_btn: "Abrir carta"
+      view_full_prompt: "Lee la carta completa y compara tus predicciones."
+      footer_html: "Escribiste esta carta para ti con TimeEcho."
+      footer_text: "Recibiste esto porque escribiste una carta a tu yo del futuro con TimeEcho."
+      text_body_help: "Para leer esta carta, entra a:"
     confirm_email:
-      subject: Confirma tu cambio de correo electrónico en TimeEcho
-      header: Confirma tu nueva dirección de correo
+      subject: "Confirma tu nuevo correo electrónico"
+      header: "Confirma tu nuevo correo electrónico"
       greeting: Hola,
-      body:
-        Has solicitado cambiar tu dirección de correo electrónico en TimeEcho
-        de %{old_email} a %{new_email}. Por favor, haz clic en el botón de abajo para
-        confirmar este cambio y activar tu cuenta con tu nueva dirección.
-      btn: Confirmar Cambio de Correo
-      expiry_help:
-        Este enlace caducará en 15 minutos. Si no solicitaste este cambio,
-        puedes ignorar este correo de forma segura.
+      body: "Pediste cambiar tu correo de TimeEcho de %{old_email} a %{new_email}. Haz clic en el botón de abajo para confirmar el cambio."
+      btn: "Confirmar cambio de correo"
+      expiry_help: "Este enlace vence en 15 minutos. Si no pediste este cambio, puedes ignorar este correo."
     stamped_confirmation:
-      badge: Cápsula Sellada
-      subject: "Carta confirmada: %{title}"
-      preheader: Guardamos tu cápsula bajo llave. Llegará a tu correo en la fecha elegida.
-      header: Tu carta ha sido sellada y registrada
-      body:
-        Hemos registrado y sellado de manera segura tu cápsula del tiempo "%{title}". Ha quedado
-        cerrada bajo llave y será entregada en tu bandeja de entrada el %{date}.
-      footer_subtitle: Diario nostálgico y esperanzador para tu yo del futuro.
+      badge: "Carta sellada"
+      subject: "Carta sellada: %{title}"
+      preheader: "Tu carta está sellada y guardada. Llegará en la fecha que elegiste."
+      header: "Tu carta está sellada"
+      body: "Tu carta \"%{title}\" está sellada y guardada. Llegará a tu correo el %{date}."
+      footer_subtitle: "Cartas a tu yo del futuro."
   settings:
-    title: Ajustes de cuenta
-    subtitle:
-      Administra la dirección de correo electrónico asociada a tu baúl y gestiona
-      tu sesión.
-    change_email: Cambiar correo electrónico
-    new_email_address: Nueva dirección de correo electrónico
-    email_placeholder: ejemplo@correo.com
-    email_change_note:
-      "Nota: Al cambiar tu correo, todas tus cartas futuras y predicciones
-      guardadas se vincularán automáticamente a la nueva dirección."
-    update_email: Actualizar dirección de correo
-    danger_zone: Zona de Peligro
-    delete_account_permanently: Borrar cuenta de forma permanente
-    delete_account_desc:
-      Esto eliminará inmediatamente todas tus cartas selladas,
-      predicciones y estado emocional. Esta acción es totalmente irreversible.
-    delete_confirm:
-      "¿Estás completamente seguro de que deseas borrar permanentemente
-      tu baúl y todas tus cartas? Todos tus recuerdos y predicciones guardados se
-      perderán para siempre."
-    delete_my_vault: Eliminar mi baúl
-    updated_successfully: Ajustes actualizados correctamente
-    account_deleted:
-      Tu baúl y todos tus datos han sido borrados de forma permanente.
-      Gracias por tu tiempo en TimeEcho.
-    email_confirmed:
-      "¡Dirección de correo electrónico confirmada y actualizada con
-      éxito!"
-    confirmation_link_invalid: El enlace de confirmación no es válido o ha caducado.
-    email_update_requested_message:
-      "Hemos enviado un correo de confirmación a tu
-      nueva dirección: %{email}. Por favor, haz clic en el enlace para confirmar y
-      activar el cambio."
-    saved_successfully: Ajustes guardados
-    could_not_save: No se pudieron guardar los ajustes.
-  predictions:
-    category_city: Ubicación
-    category_career: Trabajo / Carrera
-    category_salary: Ingresos
-    category_relationship: Relación sentimental
-    category_achievement: Mayor logro
-    category_happiness: Felicidad
-    category_other: "%{category}"
-    superaste: Superaste
-    you_did_it: Lo lograste!
-    partially: Parcialmente
-    you_missed: No acertaste
-  timeline:
-    subtitle: Tu evolución, momentos emocionales y hitos de predicción ordenados cronológicamente.
-  common:
-    cancel: Cancelar
-    save: Guardar
+    confirmation_link_invalid: "El enlace de confirmación no es válido o ha caducado."
+    email_confirmed: "Correo electrónico confirmado y actualizado."
+    email_update_requested_message: "Enviamos una confirmación a tu nueva dirección: %{email}. Haz clic en el enlace para confirmar el cambio."
+    invalid_email: "Por favor introduce un correo electrónico válido."
+    same_email: "El nuevo correo no puede ser igual al actual."
+    updated_successfully: "Ajustes actualizados."
+    account_deleted: "Tu cuenta y todos tus datos se eliminaron de forma permanente."
+    could_not_save: "No se pudieron guardar los ajustes."
+  letters:
+    error_saving: "No se pudieron guardar los cambios."

@@ -1,3 +1,5 @@
+require "ostruct"
+
 module Settings
   class DestroyAccountService
     def self.call(email)
@@ -34,9 +36,11 @@ module Settings
         end
 
         letters.destroy_all
+        SessionToken.where(email: @email).destroy_all
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
       end
-      true
+
+      OpenStruct.new(success?: true)
     end
   end
 end

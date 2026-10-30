@@ -1,24 +1,25 @@
 module Letters
   class AccessService
-    def self.call(id_or_signed_id, current_user_email)
-      new(id_or_signed_id, current_user_email).call
+    def self.call(id_or_signed_id, current_user_email, include_archived: false)
+      new(id_or_signed_id, current_user_email, include_archived: include_archived).call
     end
 
-    def initialize(id_or_signed_id, current_user_email)
+    def initialize(id_or_signed_id, current_user_email, include_archived: false)
       @id_or_signed_id = id_or_signed_id
       @current_user_email = current_user_email
+      @include_archived = include_archived
     end
 
     def call
       letter = find_letter
 
-      if letter.nil? || letter.archived?
+      if letter.nil? || (!@include_archived && letter.archived?)
         return Result.new(success: false, error: :not_found)
       end
 
       policy = LetterPolicy.new(@current_user_email, letter)
       unless policy.show?
-        return Result.new(success: false, error: :unauthorized)
+        return Result.new(success: false, error: :not_found)
       end
 
       countdown = letter.pending?

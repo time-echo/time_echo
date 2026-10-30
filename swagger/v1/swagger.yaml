@@ -1,0 +1,921 @@
+openapi: 3.0.3
+info:
+  title: TimeEcho API
+  description: |
+    # ⏳ TimeEcho API — Future Letter Digital Capsule Platform
+    
+    TimeEcho is a secure, elegant RESTful API for writing, scheduling, encrypting, and delivering digital time capsules and future letters with emotional snapshots and milestone predictions.
+    
+    ### Standard Response Format
+    All successful responses follow the standard JSON envelope:
+    ```json
+    {
+      "data": { ... },
+      "meta": { ... }
+    }
+    ```
+    
+    ### Error Response Format
+    All error responses (4xx and 5xx) follow the standard error envelope:
+    ```json
+    {
+      "error": {
+        "code": "validation_failed",
+        "message": "Title can't be blank",
+        "details": { "title": ["can't be blank"] },
+        "requestId": "9c1b3f6e-..."
+      }
+    }
+    ```
+    
+    ### Authentication
+    Protected endpoints accept authentication via either:
+    1. **HTTP Bearer Token**: `Authorization: Bearer <session_token>`
+    2. **Custom Header**: `X-Session-Token: <session_token>`
+  version: 1.0.0
+  contact:
+    name: TimeEcho Engineering Team
+servers:
+  - url: /api/v1
+    description: API Version 1 Base Path
+
+tags:
+  - name: Health & Diagnostics
+    description: Probes and health diagnostics for container orchestrators and monitoring systems.
+  - name: Auth & Sessions
+    description: Passwordless magic link authentication and session management.
+  - name: Letters
+    description: Core digital capsule creation, listing, delivery, and lifecycle management.
+  - name: Letter Predictions
+    description: Life predictions and future outcome verifications linked to letters.
+  - name: Account
+    description: Account email updates, email confirmations, and permanent vault deletion.
+
+paths:
+  /health/liveness:
+    get:
+      summary: Liveness probe
+      description: Lightweight, non-blocking check to confirm the web process is running. Zero external dependencies.
+      tags:
+        - Health & Diagnostics
+      responses:
+        '200':
+          description: Application process is alive.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessResponse'
+
+  /health:
+    get:
+      summary: Healthcheck & Readiness probe
+      description: Verifies database connectivity, pending schema migrations, and background worker queues.
+      tags:
+        - Health & Diagnostics
+      responses:
+        '200':
+          description: All subsystems are healthy and ready to process traffic.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthcheckResponse'
+        '503':
+          description: One or more critical subsystems are unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /ping:
+    get:
+      summary: Diagnostic ping
+      description: Simple ping returning server status and current UTC timestamp.
+      tags:
+        - Health & Diagnostics
+      responses:
+        '200':
+          description: Ping successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+
+  /sessions:
+    post:
+      summary: Request magic link
+      description: Invalidates any existing active session tokens for the provided email, generates a secure, single-use token, and dispatches a fresh authentication magic link.
+      tags:
+        - Auth & Sessions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkRequest'
+      responses:
+        '201':
+          description: Magic link generated and dispatched.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkSuccessResponse'
+        '400':
+          description: Missing or malformed email parameter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Invalid email format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '429':
+          description: Rate limit exceeded for this email address.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    delete:
+      summary: Log out / revoke session
+      description: Invalidates the active session token and clears session state.
+      tags:
+        - Auth & Sessions
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      responses:
+        '204':
+          description: Successfully signed out; no content returned.
+        '401':
+          description: Missing, invalid, or expired session token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /sessions/{token}:
+    get:
+      summary: Authenticate magic link token
+      description: Validates single-use token, consumes it, and establishes an active session token.
+      tags:
+        - Auth & Sessions
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: The single-use magic login token from the user email.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Token verified successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionAuthResponse'
+        '401':
+          description: Token is expired, invalid, or already consumed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /sessions/me:
+    get:
+      summary: Get current authenticated user profile
+      description: Returns information about the currently authenticated session owner.
+      tags:
+        - Auth & Sessions
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      responses:
+        '200':
+          description: Current user profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUserResponse'
+        '401':
+          description: Unauthorized; valid token required.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /letters:
+    get:
+      summary: List user letters
+      description: Returns a paginated list of letters created by or delivered to the authenticated user.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number.
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            default: 20
+          description: Items per page (max 100).
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [scheduled, delivered, draft, archived]
+          description: Filter letters by status.
+      responses:
+        '200':
+          description: Paginated collection of letters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterCollectionResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    post:
+      summary: Create a future letter
+      description: Creates and schedules a new time capsule letter with optional recipient, emotional snapshots, and deliver_at date.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LetterCreateInput'
+      responses:
+        '201':
+          description: Letter created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Validation failed (e.g. deliver_at in past, missing title).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /letters/{id}:
+    get:
+      summary: Get letter details
+      description: Returns full details of a letter, including emotional snapshot and predictions.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detailed letter representation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found or does not belong to the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    patch:
+      summary: Update letter
+      description: Updates editable fields of a draft letter.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LetterUpdateInput'
+      responses:
+        '200':
+          description: Letter successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '403':
+          description: Forbidden or cannot edit delivered letter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    delete:
+      summary: Delete letter
+      description: Permanently deletes a draft or scheduled letter.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Letter deleted; no content returned.
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found or does not belong to the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Cannot delete letter (e.g. letter is not archived).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /letters/{letter_id}/predictions:
+    post:
+      summary: Add prediction to letter
+      description: Attaches a new milestone or outcome prediction to an existing letter.
+      tags:
+        - Letter Predictions
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: letter_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictionInput'
+      responses:
+        '201':
+          description: Prediction added to letter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictionSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /letters/{id}/archive:
+    post:
+      summary: Archive letter
+      description: Moves a delivered or scheduled letter into the user's archive view.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Letter archived.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /letters/{id}/restore:
+    post:
+      summary: Restore archived letter
+      description: Restores an archived letter back to active timeline.
+      tags:
+        - Letters
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Letter restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /account:
+    patch:
+      summary: Request account email update
+      description: Dispatches a confirmation link to the requested new email address.
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkRequest'
+      responses:
+        '200':
+          description: Email update confirmation link dispatched.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkSuccessResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '422':
+          description: Invalid or unchanged email address.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+    delete:
+      summary: Permanently delete account and vault
+      description: Purges all letters, predictions, emotional snapshots, and active sessions for the authenticated user.
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      responses:
+        '204':
+          description: Account and vault permanently deleted; no content returned.
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /account/confirm_email:
+    get:
+      summary: Confirm account email update
+      description: Verifies the email confirmation token and migrates all user capsules to the new email address.
+      tags:
+        - Account
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Email confirmed and migrated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MagicLinkSuccessResponse'
+        '401':
+          description: Invalid or expired confirmation token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token
+      description: Enter your active session token.
+    sessionTokenHeader:
+      type: apiKey
+      in: header
+      name: X-Session-Token
+      description: Session token header alternative.
+
+  schemas:
+    LivenessResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              example: alive
+            timestamp:
+              type: string
+              format: date-time
+        meta:
+          type: object
+
+    HealthcheckResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              example: healthy
+            timestamp:
+              type: string
+              format: date-time
+            version:
+              type: string
+              example: "1.0.0"
+            services:
+              type: object
+              properties:
+                database:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: ok
+                    latencyMs:
+                      type: number
+                      example: 1.2
+                migrations:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: up_to_date
+                jobs:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: ok
+        meta:
+          type: object
+          properties:
+            totalLatencyMs:
+              type: number
+              example: 3.4
+
+    PingResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: object
+          properties:
+            status:
+              type: string
+              example: ok
+            timestamp:
+              type: string
+              format: date-time
+        meta:
+          type: object
+
+    ErrorEnvelope:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+            - requestId
+          properties:
+            code:
+              type: string
+              example: validation_failed
+            message:
+              type: string
+              example: Title can't be blank
+            details:
+              type: object
+              additionalProperties: true
+            requestId:
+              type: string
+              format: uuid
+              example: 7b84cf22-90ab-4889-8d8a-6b896f642672
+
+    MagicLinkRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: traveler@timeecho.app
+
+    MagicLinkSuccessResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Magic link dispatched
+            email:
+              type: string
+              format: email
+        meta:
+          type: object
+
+    SessionAuthResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            token:
+              type: string
+            expiresAt:
+              type: string
+              format: date-time
+        meta:
+          type: object
+
+    CurrentUserResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+        meta:
+          type: object
+
+    Letter:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+          example: Note to my 30-year-old self
+        content:
+          type: string
+        recipientEmail:
+          type: string
+          format: email
+        deliverAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [draft, scheduled, delivered, archived]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        emotionalSnapshot:
+          $ref: '#/components/schemas/EmotionalSnapshot'
+        predictions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prediction'
+
+    EmotionalSnapshot:
+      type: object
+      properties:
+        id:
+          type: string
+        primaryEmotion:
+          type: string
+          example: nostalgic
+        intensity:
+          type: integer
+          minimum: 1
+          maximum: 10
+          example: 8
+        note:
+          type: string
+
+    Prediction:
+      type: object
+      properties:
+        id:
+          type: string
+        statement:
+          type: string
+          example: I will have published my first novel.
+        category:
+          type: string
+          example: career
+        realityState:
+          type: string
+          enum: [pending, realized, failed, abandoned]
+
+    LetterSingleResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Letter'
+        meta:
+          type: object
+
+    LetterCollectionResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Letter'
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+            perPage:
+              type: integer
+            total:
+              type: integer
+            totalPages:
+              type: integer
+
+    PredictionSingleResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Prediction'
+        meta:
+          type: object
+
+    LetterCreateInput:
+      type: object
+      required:
+        - title
+        - content
+        - deliverAt
+      properties:
+        title:
+          type: string
+          example: Letter to Future Self
+        content:
+          type: string
+          example: Remember why you started this journey...
+        recipientEmail:
+          type: string
+          format: email
+          example: future.self@timeecho.app
+        deliverAt:
+          type: string
+          format: date-time
+          example: "2030-01-01T00:00:00Z"
+        emotionalSnapshot:
+          type: object
+          properties:
+            primaryEmotion:
+              type: string
+              example: hope
+            intensity:
+              type: integer
+              example: 9
+
+    LetterUpdateInput:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        deliverAt:
+          type: string
+          format: date-time
+
+    PredictionInput:
+      type: object
+      required:
+        - statement
+      properties:
+        statement:
+          type: string
+          example: Will visit Japan before next year
+        category:
+          type: string
+          example: travel
