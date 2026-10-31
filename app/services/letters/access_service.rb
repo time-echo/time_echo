@@ -24,13 +24,6 @@ module Letters
 
       countdown = letter.pending?
 
-      unless countdown
-        if letter.opened_at.nil?
-          letter.update!(opened_at: Time.current)
-          Analytics::TrackEventService.call("letter_opened", { letter_id: letter.id, email: letter.email })
-        end
-      end
-
       Result.new(success: true, letter: letter, countdown: countdown)
     end
 

@@ -15,7 +15,7 @@ json.timezone letter.timezone
 json.reveal_happiness letter.reveal_happiness
 json.reveal_anxiety letter.reveal_anxiety
 json.reveal_motivation letter.reveal_motivation
-json.is_wax_broken letter.opened_at.present?
+json.is_wax_broken (letter.opened_at.present? && letter.reveal_happiness.present?)
 json.created_at letter.created_at&.iso8601
 json.updated_at letter.updated_at&.iso8601
 
