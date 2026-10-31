@@ -144,7 +144,6 @@ en:
     service_unavailable: "Service temporarily unavailable. Please retry later."
   mailers:
     common:
-      postal_archive: "TimeEcho"
       access_token_badge: "Sign-in link"
       email_update_badge: "Email change"
       docket_prefix: Docket
