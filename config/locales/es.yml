@@ -148,7 +148,6 @@ es:
       access_token_badge: "Enlace de acceso"
       email_update_badge: "Cambio de correo"
       docket_prefix: Expediente
-      postal_address: Calle Mayor 12, Planta 3, 28013 Madrid, España
     magic_link:
       subject: "Tu enlace de acceso a TimeEcho"
       preheader: "Usa este enlace para iniciar sesión en TimeEcho."

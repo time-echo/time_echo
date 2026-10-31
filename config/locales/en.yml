@@ -148,7 +148,6 @@ en:
       access_token_badge: "Sign-in link"
       email_update_badge: "Email change"
       docket_prefix: Docket
-      postal_address: Calle Mayor 12, 3rd Floor, 28013 Madrid, Spain
     magic_link:
       subject: "Your TimeEcho sign-in link"
       preheader: "Use this link to sign in to TimeEcho."
