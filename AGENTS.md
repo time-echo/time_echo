@@ -115,17 +115,14 @@ Views must remain lightweight and declarative.
 
 ## 🧰 11. Agent Skills Standard (`.agents/skills/`)
 
-TimeEcho maintains specialized agent skills in the `.agents/skills/` directory to guide domain-specific workflows and enforce best practices across architecture, design, and copywriting. AI assistants must proactively reference these skill guides before undertaking relevant work:
+TimeEcho maintains specialized agent skills in the `.agents/skills/` directory to guide domain-specific workflows and enforce best practices across architecture and backend development. AI assistants must proactively reference these skill guides before undertaking relevant work:
 
 - **`.agents/skills/rails-expert/` (`SKILL.md`)**: Modern Rails conventions, Hotwire (Turbo Frames & Streams), Active Record query optimization (eager loading, batch queries), background jobs with GoodJob, and robust test suite creation. Consult for complex Rails architecture or query design.
-- **`.agents/skills/frontend-design/` (`SKILL.md`)**: Guidance for distinctive, intentional visual design, typography hierarchy, and avoiding generic UI/SaaS patterns. Essential when shaping new visual components.
-- **`.agents/skills/impeccable/` (`SKILL.md`)**: Frontend design critique, UX audit, micro-interactions, responsive behavior, accessibility (WCAG AA), and visual polish.
-- **`.agents/skills/copywriting/` (`SKILL.md`)**: Conversion-oriented copywriting, hero messaging, value propositions, and editorial text guidance.
 - **`.agents/skills/find-skills/` (`SKILL.md`)**: Discovery and installation of new agent skills when extended workflows are requested.
 
 ### Operational Rules for Skills:
 - **Directory Location**: All skills reside in `.agents/skills/<skill_name>/SKILL.md`.
-- **Proactive Consultation**: Whenever a task touches an area covered by an existing skill (such as Rails optimizations, frontend styling, or copywriting), the agent should view and follow the corresponding `SKILL.md` instructions.
+- **Proactive Consultation**: Whenever a task touches an area covered by an existing skill (such as Rails optimizations or architecture), the agent should view and follow the corresponding `SKILL.md` instructions.
 - **Skill Tracking**: Installed skills and their source origins are tracked in `skills-lock.json`.
 
 ---
