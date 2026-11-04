@@ -23,6 +23,8 @@ module Letters
       end
 
       Letter.transaction do
+        was_unopened = letter.opened_at.blank?
+
         update_attrs = {
           reveal_happiness: @params[:reveal_happiness],
           reveal_anxiety: @params[:reveal_anxiety],
@@ -58,6 +60,7 @@ module Letters
           end
         end
 
+        Analytics::TrackEventService.call("letter_opened", { letter_id: letter.id, email: letter.email }) if was_unopened && letter.opened_at.present?
         Analytics::TrackEventService.call("prediction_completion", { letter_id: letter.id, email: letter.email })
         Analytics::TrackEventService.call("emotional_snapshot_completion", { letter_id: letter.id, email: letter.email })
       end
