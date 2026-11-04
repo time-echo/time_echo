@@ -249,6 +249,26 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_equal stamp.id, created_letter.stamp_id
   end
 
+  test "POST /api/v1/letters creates letter when stampId or both stampId and stamp_slug are passed" do
+    category = StampCategory.create!(slug: "postal", name: { "en" => "Postal", "es" => "Postal" }, position: 2, active: true)
+    stamp = Stamp.create!(
+      stamp_category: category,
+      slug: "post-horn",
+      name: { "en" => "Post Horn", "es" => "Corneta postal" },
+      svg_content: "<svg viewBox=\"0 0 48 48\"><path d=\"M0 0\"/></svg>",
+      position: 1,
+      active: true
+    )
+
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "post-horn"
+    payload[:letter][:stampId] = "post-horn"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    json = assert_resource_response(expected_status: :created)
+    assert_equal "post-horn", json["data"]["stamp"]["slug"]
+  end
+
   test "POST /api/v1/letters rejects non-existent stamp_slug" do
     payload = @create_payload.deep_dup
     payload[:letter][:stamp_slug] = "non-existent-stamp"

@@ -40,7 +40,9 @@ class LetterForm
   def initialize(attributes = {})
     attrs = attributes ? attributes.to_h.with_indifferent_access : {}
 
-    attrs[:stamp_slug] ||= attrs.delete(:stamp_id) || attrs.delete(:stampId)
+    legacy_stamp = attrs.delete(:stamp_id)
+    camel_stamp = attrs.delete(:stampId)
+    attrs[:stamp_slug] ||= legacy_stamp || camel_stamp
 
     snap = attrs.delete(:emotional_snapshot_attributes)
     if snap.present?
@@ -85,6 +87,14 @@ class LetterForm
 
   def deliver_at=(val)
     self.scheduled_at = val
+  end
+
+  def stamp_id=(val)
+    self.stamp_slug ||= val
+  end
+
+  def stampId=(val)
+    self.stamp_slug ||= val
   end
 
   def parsed_utc_scheduled_at
