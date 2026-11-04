@@ -18,6 +18,9 @@ Rails.application.routes.draw do
       get "health", to: "health#show"
       get "health/liveness", to: "health#liveness"
 
+      resources :stamps, only: [ :index, :show ], param: :slug
+      resources :stamp_categories, only: [ :index ]
+
       resources :letters, only: [ :index, :show, :create, :destroy ] do
         post "predictions", to: "letter_predictions#update"
         scope module: :letters do
