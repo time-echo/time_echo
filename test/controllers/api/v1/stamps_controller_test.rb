@@ -67,7 +67,7 @@ class Api::V1::StampsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET /api/v1/stamps returns only active stamps of active categories ordered" do
-    get "/api/v1/stamps?locale=es"
+    get "/api/v1/stamps", params: { locale: "es" }
     assert_response :ok
 
     json = JSON.parse(response.body)
@@ -88,18 +88,84 @@ class Api::V1::StampsControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes slugs, "orphaned-stamp"
   end
 
+  test "GET /api/v1/stamps filters by name (English and Spanish)" do
+    get "/api/v1/stamps", params: { name: "coffee" }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    assert_equal 1, json["stamps"].length
+    assert_equal "morning-coffee", json["stamps"].first["slug"]
+
+    get "/api/v1/stamps", params: { q: "café" }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    assert_equal 1, json["stamps"].length
+    assert_equal "morning-coffee", json["stamps"].first["slug"]
+  end
+
+  test "GET /api/v1/stamps filters by category slug and category_id" do
+    get "/api/v1/stamps", params: { category: "passage-of-time" }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    assert_equal 1, json["stamps"].length
+    assert_equal "one-more-year", json["stamps"].first["slug"]
+
+    get "/api/v1/stamps", params: { category_id: @cat1.id }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    assert_equal 1, json["stamps"].length
+    assert_equal "morning-coffee", json["stamps"].first["slug"]
+  end
+
+  test "GET /api/v1/stamps filters by activation status" do
+    # Only inactive stamps
+    get "/api/v1/stamps", params: { active: "false" }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    slugs = json["stamps"].map { |s| s["slug"] }
+    assert_includes slugs, "inactive-stamp"
+    assert_not_includes slugs, "morning-coffee"
+
+    # All stamps (active and inactive)
+    get "/api/v1/stamps", params: { active: "all" }
+    assert_response :ok
+    json = JSON.parse(response.body)
+    all_slugs = json["stamps"].map { |s| s["slug"] }
+    assert_includes all_slugs, "morning-coffee"
+    assert_includes all_slugs, "inactive-stamp"
+  end
+
+  test "GET /api/v1/stamps supports pagination" do
+    get "/api/v1/stamps", params: { page: 1, per_page: 1 }
+    assert_response :ok
+    json = JSON.parse(response.body)
+
+    assert_equal 1, json["stamps"].length
+    assert json.key?("meta")
+    meta = json["meta"]
+    assert_equal 1, meta["page"]
+    assert_equal 1, meta["per_page"]
+    assert_equal 2, meta["total"]
+    assert_equal 2, meta["total_pages"]
+
+    get "/api/v1/stamps", params: { page: 2, per_page: 1 }
+    assert_response :ok
+    json2 = JSON.parse(response.body)
+    assert_equal 1, json2["stamps"].length
+    assert_equal 2, json2["meta"]["page"]
+  end
+
   test "GET /api/v1/stamps supports HTTP caching with ETag" do
-    get "/api/v1/stamps?locale=en"
+    get "/api/v1/stamps", params: { locale: "en" }
     assert_response :ok
     etag = response.headers["ETag"]
     assert etag.present?
 
-    get "/api/v1/stamps?locale=en", headers: { "If-None-Match" => etag }
+    get "/api/v1/stamps", params: { locale: "en" }, headers: { "If-None-Match" => etag }
     assert_response :not_modified
   end
 
   test "GET /api/v1/stamp_categories returns active categories with active stamps ordered" do
-    get "/api/v1/stamp_categories?locale=es"
+    get "/api/v1/stamp_categories", params: { locale: "es" }
     assert_response :ok
 
     json = JSON.parse(response.body)
@@ -120,17 +186,17 @@ class Api::V1::StampsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET /api/v1/stamp_categories supports HTTP caching with ETag" do
-    get "/api/v1/stamp_categories?locale=en"
+    get "/api/v1/stamp_categories", params: { locale: "en" }
     assert_response :ok
     etag = response.headers["ETag"]
     assert etag.present?
 
-    get "/api/v1/stamp_categories?locale=en", headers: { "If-None-Match" => etag }
+    get "/api/v1/stamp_categories", params: { locale: "en" }, headers: { "If-None-Match" => etag }
     assert_response :not_modified
   end
 
   test "GET /api/v1/stamps/:slug returns historical stamp even if inactive" do
-    get "/api/v1/stamps/#{@inactive_stamp.slug}?locale=es"
+    get "/api/v1/stamps/#{@inactive_stamp.slug}", params: { locale: "es" }
     assert_response :ok
 
     json = JSON.parse(response.body)

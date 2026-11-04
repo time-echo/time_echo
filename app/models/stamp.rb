@@ -20,6 +20,33 @@ class Stamp < ApplicationRecord
     joins(:stamp_category).where(stamp_categories: { active: true })
   }
 
+  scope :by_category, ->(category_param) {
+    return all if category_param.blank?
+
+    if category_param.to_s.match?(/\A\d+\z/)
+      where(stamp_category_id: category_param)
+    else
+      joins(:stamp_category).where(stamp_categories: { slug: category_param.to_s.downcase })
+    end
+  }
+
+  scope :search_by_name, ->(query) {
+    return all if query.blank?
+
+    pattern = "%#{sanitize_sql_like(query.to_s.strip)}%"
+    where(
+      "stamps.slug ILIKE :term OR stamps.name->>'en' ILIKE :term OR stamps.name->>'es' ILIKE :term OR CAST(stamps.name AS text) ILIKE :term",
+      term: pattern
+    )
+  }
+
+  scope :filter_by_status, ->(status_or_active) {
+    return all if status_or_active.blank? || status_or_active.to_s.downcase == "all"
+
+    is_active = ActiveRecord::Type::Boolean.new.cast(status_or_active)
+    where(active: is_active)
+  }
+
   def localized_name(locale = I18n.locale)
     return "" unless name.is_a?(Hash)
 
