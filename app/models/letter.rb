@@ -69,15 +69,15 @@ class Letter < ApplicationRecord
 
   def scheduled_at_must_be_in_future
     if scheduled_at.present? && scheduled_at <= Time.current
-      errors.add(:scheduled_at, "must be in the future")
-      errors.add(:deliver_at, "must be in the future") if errors[:deliver_at].empty?
+      errors.add(:scheduled_at, :must_be_in_future)
+      errors.add(:deliver_at, :must_be_in_future) if errors[:deliver_at].empty?
     end
   end
 
   def valid_iana_timezone
     return if timezone.blank?
     unless Time.find_zone(timezone)
-      errors.add(:timezone, "is not a valid IANA timezone")
+      errors.add(:timezone, :invalid_timezone)
     end
   end
 end

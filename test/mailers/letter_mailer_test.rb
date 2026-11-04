@@ -126,6 +126,6 @@ class LetterMailerTest < ActionMailer::TestCase
     refute_match(/class="[^"]*btn-carmine[^"]*"/, html_body)
 
     assert_match(%r{<a [^>]*href="[^"]*"[^>]*>.*#{Regexp.escape(I18n.t("brand"))}.*#{Regexp.escape(I18n.t("mailers.stamped_confirmation.footer_subtitle"))}.*</a>}m, html_body)
-    assert_includes text_body, "http://localhost:3000"
+    assert_includes text_body, "http://localhost:3001/"
   end
 end

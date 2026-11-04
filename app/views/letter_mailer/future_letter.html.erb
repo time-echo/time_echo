@@ -37,7 +37,7 @@
   </tr>
   <tr>
     <td align="center" style="padding-top: 8px; padding-bottom: 28px;">
-      <a class="btn-carmine mobile-btn" href="<%= Rails.application.routes.url_helpers.letter_url(@letter.signed_id, host: ENV.fetch('APP_HOST') { 'localhost:3000' }) %>">
+      <a class="btn-carmine mobile-btn" href="<%= @letter_url %>">
         <%= t('mailers.future_letter.open_btn') %>
       </a>
     </td>

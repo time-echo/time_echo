@@ -7,13 +7,6 @@ class MagicLinkForm
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validate :request_limit_not_exceeded
 
-  def submit
-    return false unless valid?
-
-    Auth::MagicLinkService.generate_and_send(email)
-    true
-  end
-
   private
 
   def request_limit_not_exceeded

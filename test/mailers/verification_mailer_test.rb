@@ -17,6 +17,7 @@ class VerificationMailerTest < ActionMailer::TestCase
     assert_includes html_body, "old@example.com"
     assert_includes html_body, "new@example.com"
     assert_includes html_body, "btn-carmine"
+    assert_includes html_body, "http://localhost:3001/settings/confirm_email?token=token123"
     assert_includes text_body, "new@example.com"
   end
 end
