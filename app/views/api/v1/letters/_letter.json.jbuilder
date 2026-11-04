@@ -19,6 +19,17 @@ json.is_wax_broken (letter.opened_at.present? && letter.reveal_happiness.present
 json.created_at letter.created_at&.iso8601
 json.updated_at letter.updated_at&.iso8601
 
+if letter.stamp.present?
+  json.stamp do
+    json.slug letter.stamp.slug
+    json.name letter.stamp.localized_name(params[:locale] || I18n.locale)
+    json.category_slug letter.stamp.stamp_category.slug
+    json.categorySlug letter.stamp.stamp_category.slug
+  end
+else
+  json.stamp nil
+end
+
 if letter.emotional_snapshot.present?
   json.emotional_snapshot do
     json.id letter.emotional_snapshot.id.to_s
