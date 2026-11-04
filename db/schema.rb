@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_09_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -194,8 +194,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_170000) do
     t.string "timezone", default: "UTC", null: false
     t.string "title"
     t.datetime "updated_at", null: false
+    t.bigint "stamp_id"
     t.index ["email"], name: "index_letters_on_email"
     t.index ["scheduled_at"], name: "index_letters_on_scheduled_at"
+    t.index ["stamp_id"], name: "index_letters_on_stamp_id"
     t.index ["status"], name: "index_letters_on_status"
   end
 
@@ -221,7 +223,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_09_170000) do
     t.index ["token"], name: "index_session_tokens_on_token", unique: true
   end
 
+  create_table "stamp_categories", force: :cascade do |t|
+    t.string "slug", null: false
+    t.jsonb "name", default: {}, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_stamp_categories_on_position"
+    t.index ["slug"], name: "index_stamp_categories_on_slug", unique: true
+  end
+
+  create_table "stamps", force: :cascade do |t|
+    t.bigint "stamp_category_id", null: false
+    t.string "slug", null: false
+    t.jsonb "name", default: {}, null: false
+    t.text "svg_content", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active", "position"], name: "index_stamps_on_active_and_position"
+    t.index ["slug"], name: "index_stamps_on_slug", unique: true
+    t.index ["stamp_category_id", "position"], name: "index_stamps_on_stamp_category_id_and_position"
+    t.index ["stamp_category_id"], name: "index_stamps_on_stamp_category_id"
+  end
+
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "emotional_snapshots", "letters"
+  add_foreign_key "letters", "stamps", on_delete: :restrict
   add_foreign_key "predictions", "letters"
+  add_foreign_key "stamps", "stamp_categories"
 end
