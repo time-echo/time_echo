@@ -93,6 +93,7 @@ en:
       blank: "can't be blank"
       present: "must be blank"
       invalid: "is invalid"
+      unavailable: "is unavailable"
       too_short:
         one: "is too short (minimum is 1 character)"
         other: "is too short (minimum is %{count} characters)"

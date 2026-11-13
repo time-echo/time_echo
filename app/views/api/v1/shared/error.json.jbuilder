@@ -6,3 +6,7 @@ json.error do
   json.details @error_details if @error_details.present?
   json.request_id @request_id || request.request_id
 end
+
+if @error_details.present?
+  json.errors @error_details
+end

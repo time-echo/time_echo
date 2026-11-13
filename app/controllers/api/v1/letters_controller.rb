@@ -12,7 +12,7 @@ module Api
           ::UserTimelineQuery.call(current_user_email)
         end
 
-        scope = scope.includes(:emotional_snapshot, :predictions)
+        scope = scope.includes(:emotional_snapshot, :predictions, stamp: :stamp_category)
         @letters = paginate(scope)
 
         ::Analytics::TrackEventService.call("dashboard_viewed", { email: current_user_email })
@@ -46,6 +46,7 @@ module Api
         raw = params[:letter].present? ? params.require(:letter) : params
         raw.permit(
           :title, :email, :content, :deliver_at, :scheduled_at, :timezone, :language,
+          :stamp_slug, :stamp_id, :stampId,
           :happiness_level, :anxiety_level, :motivation_level,
           :prediction_city, :prediction_salary, :prediction_relationship,
           :prediction_career, :prediction_achievement, :prediction_happiness,

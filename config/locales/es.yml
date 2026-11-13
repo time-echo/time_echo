@@ -93,6 +93,7 @@ es:
       blank: "no puede estar en blanco"
       present: "debe estar en blanco"
       invalid: "no es válido"
+      unavailable: "no está disponible"
       too_short:
         one: "es demasiado corto (mínimo 1 carácter)"
         other: "es demasiado corto (mínimo %{count} caracteres)"

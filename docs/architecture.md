@@ -1,6 +1,6 @@
-# ⏳ TimeEcho — System Architecture & Design
+# ⏳ TimeEcho — Backend Architecture & System Design
 
-Welcome to the architectural overview of **TimeEcho**, a premium future-letter digital capsule platform built with **Ruby on Rails 8** and **Tailwind CSS v4 / DaisyUI v5**.
+Welcome to the architectural overview of the **TimeEcho Backend**, a high-integrity, API-only future-letter digital capsule platform built with **Ruby on Rails 8** (`config.api_only = true`), **PostgreSQL**, **Active Record Encryption**, and **GoodJob**.
 
 This document details the layered architectural patterns, data relationships, transactional boundaries, background job execution lifecycles, and the secure authentication flow powering the TimeEcho ecosystem.
 
@@ -8,28 +8,27 @@ This document details the layered architectural patterns, data relationships, tr
 
 ## 🏛️ 1. Layered Architecture & Architectural Patterns
 
-TimeEcho adopts a highly decoupled, layered architecture built on top of the traditional Model-View-Controller (MVC) paradigm. By isolating business logic, query parameters, presentation formats, authorization checks, and form validations into dedicated layers, the codebase remains clean, testable, and highly maintainable.
+TimeEcho adopts a decoupled, layered API architecture. By isolating business logic, query parameters, presentation serialization, authorization checks, and form validations into dedicated layers, the backend remains clean, testable, and highly maintainable.
 
 ```mermaid
 graph TD
-    Client[Browser / Client View]
+    Client[Next.js Web / API Clients]
 
-    subgraph Controllers [RESTful Controller Layer]
+    subgraph Controllers [API Controller Layer - Api::V1]
         LC[LettersController]
-        SC[SettingsController]
-        SessC[SessionsController]
-        AC[AnalyticsController]
+        SC[SessionsController]
+        AC[AccountsController]
         LPC[LetterPredictionsController]
-        LSC[LetterSuccessesController]
-        CEC[CheckEmailsController]
-        SEC[Settings::EmailConfirmationsController]
-        LocC[LocalesController]
-        PC[PagesController]
+        ArchC[Letters::ArchivesController]
+        RestC[Letters::RestoresController]
+        EC[Accounts::EmailConfirmationsController]
+        StC[StampsController]
+        SCC[StampCategoriesController]
+        HC[HealthController]
     end
 
-    subgraph Decorators [Decorator Layer]
-        LD[LetterDecorator]
-        PD[PredictionDecorator]
+    subgraph Presenters [Jbuilder Serialization Layer]
+        JV[app/views/api/v1/*.json.jbuilder]
     end
 
     subgraph Policies [Authorization Layer]
@@ -47,7 +46,9 @@ graph TD
         DPS[Letters::DispatchPendingService]
         AS[Letters::AccessService]
         UPS[Letters::UpdatePredictionsService]
-        MLS[Auth::MagicLinkService]
+        RMLS[Auth::RequestMagicLinkService]
+        ATLS[Auth::AuthenticateTokenService]
+        DMLS[Auth::DestroySessionService]
         TES[Analytics::TrackEventService]
         FMS[Analytics::FetchMetricsService]
         REUS[Settings::RequestEmailUpdateService]
@@ -66,13 +67,15 @@ graph TD
         Snap[EmotionalSnapshot]
         Pred[Prediction]
         Tok[SessionToken]
+        Stmp[Stamp]
+        StCat[StampCategory]
     end
 
     subgraph Database [Database Persistence]
         PG[(PostgreSQL DB)]
     end
 
-    Client -->|HTTP Requests| Controllers
+    Client -->|REST JSON Requests| Controllers
     Controllers -->|Authorizes Actions| Policies
     Controllers -->|Validates Input Data| Forms
     Forms -->|Orchestrates Multi-Model Saving| Services
@@ -80,46 +83,46 @@ graph TD
     Controllers -->|Fetches Complex Data| Queries
     Queries -->|Queries Database| Models
     Services -->|Manipulates Data| Models
-    Controllers -->|Formats Presentation| Decorators
-    Decorators -->|Wraps Models| Models
+    Controllers -->|Serializes JSON Responses| JV
     Models -->|Performs Actions / SQL Queries| PG
 ```
 
 ### Key Structural Layers:
 
-1. **Model-View-Controller (MVC) & RESTful Controller Design**:
-   - **Controllers**: Extremely thin layers strictly focused on the seven standard RESTful actions (`index`, `show`, `new`, `create`, `update`, `destroy`). Any custom collection or member flows are extracted into dedicated, single-responsibility controllers (e.g., `LocalesController` for session-persisted locale selection, `LetterPredictionsController` to update reality states, `Settings::EmailConfirmationsController` to process confirmation links, `PagesController` for landing and static info pages).
-   - **Views**: Rendered in English/Spanish (using Rails i18n localization). Powered by Tailwind CSS v4 and DaisyUI v5, using semantic component layout rules.
-   - **Models**: Encapsulate basic relationships, validations, and scopes. Heavy business actions are offloaded to Services.
+1. **RESTful API Controllers (`app/controllers/api/v1/`)**:
+   - Inherit from `Api::V1::BaseController < ActionController::API`.
+   - Focused strictly on standard RESTful actions (`index`, `show`, `create`, `update`, `destroy`).
+   - Delegates business execution to domain services via `ResultHandler#unwrap!`.
+   - Centralized exception mapping and standard JSON envelopes via `ErrorHandler`.
 
-2. **Decorator / Presenter Layer (`app/decorators/`)**:
-   - Completely decouples visual presentation logic, custom date formatting, dynamic icons, status pills, and localized conditional class tags from views and database models.
-   - **`LetterDecorator`**: Handles letters relative date strings, delivery states, countdown days left metrics, and localized title resolution.
-   - **`PredictionDecorator`**: Manages prediction category labels, achievement victory badges, and status colors.
+2. **Jbuilder JSON Serialization Layer (`app/views/api/v1/`)**:
+   - Serializes domain records into strictly formatted JSON envelopes with lowerCamelCase keys (`Jbuilder.key_format camelize: :lower`).
+   - Standardized `data`, `meta`, and `error` payloads.
 
 3. **Form Objects Layer (`app/forms/`)**:
    - Encapsulate form validation and multi-model record synchronization.
-   - **`LetterForm`**: Collects and validates inputs for `Letter`, `EmotionalSnapshot`, and several potential `Prediction` fields in a single schema. It executes the creation inside a single ActiveRecord database transaction with IANA timezone conversion.
-   - **`MagicLinkForm`**: Validates the email submitted during login.
+   - **`LetterForm`**: Collects and validates inputs for `Letter`, `EmotionalSnapshot`, optional digital `Stamp` (via `stamp_slug` or `stamp_id`), and nested `Prediction` records in a single transactional schema.
+   - **`MagicLinkForm`**: Validates the email address submitted during passwordless sign-in.
 
 4. **Service Objects Layer (`app/services/`)**:
    - Encapsulate single-responsibility business operations across domain namespaces:
-   - **`Letters::CreateService`**: Receives params, validates them via `LetterForm`, and persists the future capsule.
-   - **`Letters::DeliverService`**: Transitions capsule status (`pending` -> `queued` -> `delivered`/`failed`), sends the email via `LetterMailer`, tracks success/failure analytics, and rolls back if errors arise.
+   - **`Letters::CreateService`**: Validates parameters via `LetterForm` and persists the future capsule.
+   - **`Letters::DeliverService`**: Transitions capsule status (`pending` -> `queued` -> `delivered`/`failed`), sends the email via `LetterMailer`, tracks analytics, and logs audit events.
    - **`Letters::DispatchPendingService`**: Finds due pending capsules and enqueues deliver jobs into GoodJob.
-   - **`Letters::AccessService`**: Handles authorization access logic for private letter retrieval.
+   - **`Letters::AccessService`**: Handles authorization and access logging for private letter retrieval.
    - **`Letters::UpdatePredictionsService`**: Updates reality reflections and match states for delivered predictions.
-   - **`Auth::MagicLinkService`**: Generates, signs, sends, and authenticates cryptographically secure passwordless tokens.
-   - **`Analytics::TrackEventService`**: Logs granular user actions to `analytics_events` for retrospection.
-   - **`Analytics::FetchMetricsService`**: Aggregates retrospective dashboard metrics (capsule counts, emotional baselines, prediction match ratios).
-   - **`Settings::RequestEmailUpdateService`**: Dispatches email address update confirmation magic links.
+   - **`Auth::RequestMagicLinkService`**: Generates and emails cryptographic sign-in tokens.
+   - **`Auth::AuthenticateTokenService`**: Validates tokens, sets session state, and marks tokens used.
+   - **`Auth::DestroySessionService`**: Revokes active session tokens and clears session state.
+   - **`Analytics::TrackEventService`**: Logs user actions to `analytics_events`.
+   - **`Analytics::FetchMetricsService`**: Aggregates retrospective metrics (capsule counts, emotional baselines, prediction accuracy).
+   - **`Settings::RequestEmailUpdateService`**: Dispatches email update confirmation magic links.
    - **`Settings::ConfirmEmailUpdateService`**: Atomically updates user email address across preferences, letters, and events.
-   - **`Settings::UpdatePreferencesService`**: Updates user appearance mode, theme, reflection style, and notification preferences.
-   - **`Settings::DestroyAccountService`**: Atomically purges all user records ("Danger Zone" account deletion).
+   - **`Settings::DestroyAccountService`**: Atomically purges all user records.
 
 5. **Query Objects Layer (`app/queries/`)**:
-   - Isolate complex ActiveRecord operations from controllers and models to maintain clean separation of concerns.
-   - **`UserTimelineQuery`**: Loads all capsules owned by a user, utilizing eager-loading (`includes(:predictions, :emotional_snapshot)`) to avoid $N+1$ query issues.
+   - Isolate complex ActiveRecord operations from controllers and models.
+   - **`UserTimelineQuery`**: Loads all capsules owned by a user, utilizing eager-loading (`includes(:predictions, :emotional_snapshot, :stamp)`) to eliminate $N+1$ queries.
    - **`PendingLettersQuery`**: Finds letters ready for release, employing high-concurrency database row locking (`FOR UPDATE SKIP LOCKED`).
 
 6. **Policy Layer (`app/policies/`)**:
@@ -136,32 +139,32 @@ TimeEcho implements a secure, passwordless authentication workflow utilizing sin
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as User Browser
-    participant App as Rails App
+    actor Client as Web / API Client
+    participant API as Rails API (SessionsController)
     participant DB as PostgreSQL
     participant SMTP as Resend Mailer
 
-    User->>App: Submits email at /login
-    activate App
-    App->>App: Validates & Normalizes Email
-    App->>App: Generates Cryptographically Secure Token (SecureRandom.hex(24))
-    App->>DB: Stores Hashed Token (expires in 15 minutes)
-    App->>SMTP: Dispatches magic link email containing Token URL
-    App-->>User: Renders check email page
-    deactivate App
+    Client->>API: POST /api/v1/sessions { email: "user@example.com" }
+    activate API
+    API->>API: Validates & Normalizes Email
+    API->>API: Generates Cryptographic Token (SecureRandom.hex(24))
+    API->>DB: Stores Token (expires in 15 minutes)
+    API->>SMTP: Dispatches magic link email containing Token
+    API-->>Client: 201 Created { data: { email, token, message }, meta: {} }
+    deactivate API
 
-    User->>App: Clicks Magic Link in Email
-    activate App
-    App->>DB: Looks up and decodes Token in active scope
+    Client->>API: GET /api/v1/sessions/:token (User clicks magic link)
+    activate API
+    API->>DB: Looks up Token in active, unexpired scope
     alt Token Valid & Unexpired
-        App->>DB: Invalidates Token (sets used_at = Time.current)
-        App->>App: Establishes session cookie (session[:current_user_email])
-        App->>DB: Logs "user_logged_in" event
-        App-->>User: Redirects to /dashboard (Success Notice)
+        API->>DB: Invalidates Token (sets used_at = Time.current)
+        API->>API: Establishes session cookie (session[:current_user_email])
+        API->>DB: Logs "user_logged_in" event
+        API-->>Client: 200 OK { data: { email, authenticated: true }, meta: {} }
     else Token Expired / Invalid
-        App-->>User: Redirects to /login (Error Alert)
+        API-->>Client: 401 Unauthorized { error: { code: "invalid_or_expired_token", ... } }
     end
-    deactivate App
+    deactivate API
 ```
 
 ---
@@ -175,6 +178,7 @@ erDiagram
     Letter {
         bigint id PK
         string email FK
+        bigint stamp_id FK "optional"
         string title "Active Record Encrypted"
         text content "Active Record Encrypted"
         string status "pending/queued/delivered/failed"
@@ -187,6 +191,28 @@ erDiagram
         integer reveal_happiness
         integer reveal_anxiety
         integer reveal_motivation
+        datetime created_at
+        datetime updated_at
+    }
+
+    StampCategory {
+        bigint id PK
+        string slug UK
+        jsonb name "bilingual {en, es}"
+        integer position
+        boolean active
+        datetime created_at
+        datetime updated_at
+    }
+
+    Stamp {
+        bigint id PK
+        bigint stamp_category_id FK
+        string slug UK
+        jsonb name "bilingual {en, es}"
+        text svg_content
+        integer position
+        boolean active
         datetime created_at
         datetime updated_at
     }
@@ -245,6 +271,8 @@ erDiagram
 
     Letter ||--o| EmotionalSnapshot : "has one"
     Letter ||--o{ Prediction : "has many"
+    StampCategory ||--o{ Stamp : "has many"
+    Stamp ||--o{ Letter : "has many (optional)"
 ```
 
 > [!SECURITY]
@@ -350,94 +378,39 @@ graph TD
 
 ---
 
-## 🎨 6. Premium Theme System & Styling Tokens
+## 🎨 6. Client Decoupling & Epistolary Metaphor
 
-TimeEcho operates on a tailored design system powered by Tailwind CSS v4 and DaisyUI v5. The application achieves its **Calm, Nostalgic, Secure** aesthetic through strict, consistent visual variables.
+TimeEcho's user interface is fully decoupled from the Rails API backend. The web application is built with **Next.js 16**, **React 19**, and **Tailwind CSS v4** (located in `frontend/`), and its component design system is maintained in isolation via **Storybook 10** (`mockups/`).
 
-### Semantic Design Tokens:
+The backend's role in the design system is strictly informational and contract-based:
+- Serving dynamic stamp assets (`svg_content`, `slug`, `name`, `category`) via `/api/v1/stamps`.
+- Persisting letters with docket identifiers (`TE-XXXXX`), status progressions (`pending`, `queued`, `delivered`), and retrospective evaluation data.
+- Sending transactional emails via ActionMailer (`app/views/*_mailer/`) that reflect the epistolary tone and postal typography.
 
-- **Typography Hierarchy**:
-  - _UI & Body Copy_: Use the geometric **Inter** sans-serif stack exclusively across all views, headers, forms, settings cards, and letter representations. Typographic consistency is crucial to maintaining our high-integrity digital vault aesthetics.
-- **Palette Design Rules**:
-  - Uses tailored HSL and OkLCH-supported color configurations (avoiding raw hex values) to maintain high contrast standards.
-  - Uses a dedicated postal and archival palette with light (`timeecho`) and dark (`timeecho-dark`) modes, ensuring visual coherence across all devices.
-- **Consistent Shapes**:
-  - Standardized white content container cards must always use `rounded-3xl` border-radius shapes, thin border boundaries (`border-slate-100`), and clean micro-shadows (`shadow-2xs`) across all views.
+For complete UI/UX specifications, design tokens, and components, consult:
+👉 **[Frontend Design System Documentation (frontend/docs/design.md)](../../frontend/docs/design.md)**
 
 ---
 
 ## 🌐 7. Internationalization (i18n) Architecture
 
-TimeEcho implements a lightweight, two-locale internationalization system using Rails' built-in `I18n` framework. The architecture prioritizes explicit locale control, graceful fallbacks, and clean separation between view templates and translated strings.
+TimeEcho implements a lightweight, two-locale internationalization system using Rails' built-in `I18n` framework.
 
 ### 7.1 Locale Configuration
 
-The application's locale settings are configured in `config/application.rb`:
+Configured in `config/application.rb`:
 
 ```ruby
 config.i18n.available_locales = [ :es, :en ]
 config.i18n.default_locale = :en
 ```
 
-- **Allowed locales**: Only `:es` (Spanish) and `:en` (English) are permitted. Any other locale requested by the browser is rejected and falls back to the default.
-- **Default locale**: `:en` (English) serves as both the default UI language and the ultimate fallback for unsupported locales or missing translations.
-- **Fallbacks**: Enabled in `config/environments/production.rb` and `config/environments/test.rb` via `config.i18n.fallbacks = true`. When `fallbacks = true`, any missing key in a locale falls back to the `default_locale` rather than rendering the raw key name.
-
-### 7.2 Locale Resolution & Session Toggling (`set_locale`)
-
-Locale resolution is handled by the `set_locale` before_action in `ApplicationController`. It supports both explicit user selection (persisted across sessions via `LocalesController`) and automatic browser header detection:
-
-```mermaid
-flowchart TD
-    A[Request received] --> B{session[:locale] present & valid?}
-    B -- Yes --> C[Set I18n.locale to session locale]
-    B -- No --> D{HTTP_ACCEPT_LANGUAGE present?}
-    D -- No --> E[Locale unchanged, uses default]
-    D -- Yes --> F[Extract 2-letter browser locale]
-    F --> G{Locale in [:es, :en]?}
-    G -- Yes --> H[Set I18n.locale to browser locale]
-    G -- No --> E
-```
-
-| Source | Input Value | Supported? | Resulting Locale |
-| ------ | ----------- | ---------- | ---------------- |
-| Session | `session[:locale] = "es"` | Yes | `:es` |
-| Session | `session[:locale] = "en"` | Yes | `:en` |
-| Browser Header | `HTTP_ACCEPT_LANGUAGE: "es-ES,es;q=0.9"` | Yes | `:es` |
-| Browser Header | `HTTP_ACCEPT_LANGUAGE: "en-US,en;q=0.9"` | Yes | `:en` |
-| Browser Header | `HTTP_ACCEPT_LANGUAGE: "fr-FR,fr;q=0.9"` | No | `:en` (default, unchanged) |
-| None | (no session, no header) | No | `:en` (default, unchanged) |
-
-### 7.3 LocalesController & Navigation Toggle
-
-Users can switch languages on the fly from the navigation bar. The toggle button uses the `toggle_locale` helper to submit to `LocalesController`:
-
-- `POST /locales?locale=es` / `POST /locales?locale=en`: Writes `params[:locale]` to `session[:locale]` and redirects back to the previous page.
-- `DELETE /locales/:id`: Clears `session[:locale]` to return to browser auto-detection.
-
-### 7.4 Test Locale Strategy
-
-The test suite establishes `I18n.locale = :es` globally in `test/test_helper.rb` via a `setup` block on `ActiveSupport::TestCase`. Because test requests do not send an `Accept-Language` header or a preset session locale by default, the `set_locale` before_action does not override this pre-set Spanish locale, ensuring all assertions match Spanish text expectations.
-
-```ruby
-# test/test_helper.rb
-class TestCase
-  setup { I18n.locale = :es }
-end
-```
-
-The `ApplicationControllerTest` and `LocalesControllerTest` cover session persistence, language toggling, and fallback behavior across supported (`es`, `en`) and unsupported (`fr`) headers.
-
-### 7.5 Decorator Integration & Title Localization
-
-All locale-dependent formatting (dates, status badges, category labels, countdown strings) is encapsulated in decorators within `app/decorators/`:
-
-- **LetterDecorator**: `display_title` (translates default `"your_letter"` / localized title placeholders dynamically based on `I18n.locale`), `formatted_created_at`, `formatted_delivered_at`, `days_left_text`, `status_badge`.
-- **PredictionDecorator**: `category_label`, `result_badge`.
-
-### 7.6 View Text Policy
-
-All user-facing strings in ERB views must use `t()` calls — no hardcoded Spanish or English text is permitted. HTML comments in views should be in English for consistency.
+- **Allowed locales**: Only `:es` (Spanish) and `:en` (English) are supported.
+- **Fallbacks**: Enabled in production and test environments via `config.i18n.fallbacks = true`.
+- **Locale in API & Mailers**:
+  - Letters store the author's chosen `language` (`"en"` or `"es"`).
+  - Mailers (`LetterMailer`, `AuthMailer`, `VerificationMailer`) set `I18n.locale` based on the letter or user preference before rendering email templates (`time_echo/config/locales/{en,es}.yml`).
+  - Stamp names and categories store localized JSON (`{ "en": "...", "es": "..." }`) and serialize based on the active request locale.
 
 ---
 
@@ -557,19 +530,24 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 | `GET` | `/api/v1/ping` | Rack proc | `200 OK` | Timestamp & status diagnostic |
 | `GET` | `/api-docs` | `Rswag::Ui::Engine` | `200 OK` | Interactive Swagger UI API documentation |
 | `GET` | `/api-docs/v1/swagger.yaml` | `Rswag::Api::Engine` | `200 OK` | OpenAPI 3.0.3 specification document |
-| `GET` | `/api/v1/letters` | `Api::V1::LettersController#index` | `200 OK` | Paginated scope via `UserTimelineQuery` |
-| `POST` | `/api/v1/letters` | `Api::V1::LettersController#create` | `201 Created` | `Letters::CreateService.call(...)` |
+| `GET` | `/api/v1/letters` | `Api::V1::LettersController#index` | `200 OK` | Paginated scope via `UserTimelineQuery` (with status filters & pagination) |
+| `POST` | `/api/v1/letters` | `Api::V1::LettersController#create` | `201 Created` | `Letters::CreateService.call(...)` (supports `stamp_slug` / `stamp_id`) |
 | `GET` | `/api/v1/letters/:id` | `Api::V1::LettersController#show` | `200 OK` | `Letters::AccessService.call(...)` |
-| `PATCH/PUT` | `/api/v1/letters/:id` | `Api::V1::LettersController#update` | `200 OK` | `Letters::UpdateService.call(...)` |
-| `DELETE` | `/api/v1/letters/:id` | `Api::V1::LettersController#destroy` | `204 No Content` | `Letters::DeleteService.call(...)` |
-| `POST` | `/api/v1/letters/:letter_id/predictions` | `Api::V1::LetterPredictionsController#create` | `201 Created` | Letter lookup + nested prediction creation |
-| `POST` | `/api/v1/letters/:id/archive` | `Api::V1::Letters::ArchivesController#create` | `200 OK` | `Letters::ArchiveService.call(...)` |
-| `POST` | `/api/v1/letters/:id/restore` | `Api::V1::Letters::RestoresController#create` | `200 OK` | `Letters::RestoreService.call(...)` |
-| `POST` | `/api/v1/sessions` | `Api::V1::SessionsController#create` | `201 Created` | `Auth::RequestMagicLinkService.call(...)` (revokes active session tokens & issues fresh magic link) |
-| `GET` | `/api/v1/sessions/:token` | `Api::V1::SessionsController#show` | `200 OK` | `Auth::AuthenticateTokenService.call(...)` |
-| `GET` | `/api/v1/sessions/me` | `Api::V1::SessionsController#me` | `200 OK` | Current authenticated user profile |
-| `DELETE` | `/api/v1/sessions` | `Api::V1::SessionsController#destroy` | `204 No Content` | `Auth::DestroySessionService.call(...)` |
-| `*` | `/api/v1/*path` | `Api::V1::BaseController#route_not_found` | `404 Not Found` | Catch-all for undefined `/api/v1` routes |
+| `DELETE` | `/api/v1/letters/:id` | `Api::V1::LettersController#destroy` | `204 No Content` | Direct deletion of unqueued letters |
+| `POST` | `/api/v1/letters/:letter_id/predictions` | `Api::V1::LetterPredictionsController#update` | `200 OK` | Updates predictions and emotional deltas for delivered capsules |
+| `POST` | `/api/v1/letters/:id/archive` | `Api::V1::Letters::ArchivesController#create` | `200 OK` | Archives capsule from active timeline |
+| `POST` | `/api/v1/letters/:id/restore` | `Api::V1::Letters::RestoresController#create` | `200 OK` | Restores archived capsule to active timeline |
+| `GET` | `/api/v1/stamps` | `Api::V1::StampsController#index` | `200 OK` | Stamp catalog with `q` search, `category` filter, `status` filter, and Pagy pagination |
+| `GET` | `/api/v1/stamps/:slug` | `Api::V1::StampsController#show` | `200 OK` | Single stamp details and SVG content |
+| `GET` | `/api/v1/stamp_categories` | `Api::V1::StampCategoriesController#index` | `200 OK` | Active stamp categories ordered by position |
+| `POST` | `/api/v1/sessions` | `Api::V1::SessionsController#create` | `201 Created` | `Auth::RequestMagicLinkService.call(...)` (issues magic link token) |
+| `GET` | `/api/v1/sessions/:token` | `Api::V1::SessionsController#show` | `200 OK` | `Auth::AuthenticateTokenService.call(...)` (authenticates and invalidates token) |
+| `GET` | `/api/v1/sessions/me` | `Api::V1::SessionsController#me` | `200 OK` | Current authenticated session details |
+| `DELETE` | `/api/v1/sessions` | `Api::V1::SessionsController#destroy` | `204 No Content` | Destroys current session and cookies |
+| `PATCH` | `/api/v1/account` | `Api::V1::AccountsController#update` | `200 OK` | Requests email update via confirmation token |
+| `DELETE` | `/api/v1/account` | `Api::V1::AccountsController#destroy` | `204 No Content` | `Settings::DestroyAccountService.call(...)` (full account purge) |
+| `GET` | `/api/v1/account/confirm_email` | `Api::V1::Accounts::EmailConfirmationsController#show` | `200 OK` | `Settings::ConfirmEmailUpdateService.call(...)` |
+| `*` | `/api/v1/*path` | `Api::V1::BaseController#route_not_found` | `404 Not Found` | Catch-all for undefined routes |
 
 ### 9.6 OpenAPI & Health Probes Architecture
 

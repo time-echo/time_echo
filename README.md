@@ -1,298 +1,171 @@
-# ⏳ TimeEcho — Secure Digital Time Capsule
+# ⏳ TimeEcho — Rails 8 API Backend
 
-TimeEcho is a premium future-letter digital capsule platform built to capture personal evolution, emotional shifts, and life predictions over time. Unlike generic platforms, TimeEcho lets users bridge their past and present selves through an interactive comparison dashboard, vertical reflective timelines, and rich retrospective analytics.
+TimeEcho is a secure, digital time-capsule platform designed to capture personal evolution, emotional shifts, and life predictions across time.
 
-Built with **Ruby on Rails 8**, **Tailwind CSS v4 / DaisyUI v5**, and a PostgreSQL backend, the application has been architected from the ground up for high integrity, passwordless security, and asynchronous scalability.
+This repository (`time_echo`) is the **API-only Ruby on Rails 8 backend** (`config.api_only = true`), built for transactional integrity, passwordless security, and asynchronous scalability. The user-facing application is served by the Next.js frontend (`frontend/`), while UI components are maintained in Storybook (`mockups/`).
 
 ---
 
-## ✨ Features
+## ✨ Core Backend Features
 
-- **Future Letters (Digital Capsules)**: Write deeply private letters to your future self, scheduled for precise future delivery dates with timezone-aware release scheduling.
-- **Active Record Encryption**: Protect sensitive letter titles and content at rest using Rails Active Record Encryption (`encrypts :title`, `encrypts :content`).
-- **Personal Evolution Tracker**:
-  - **Emotional Snapshot**: Rate Happiness, Anxiety, and Motivation (1-10) when writing. TimeEcho calculates baseline shifts and traces emotional growth upon delivery.
-  - **Predictions vs. Reality**: Predict future milestones (city, salary, relationships, career, achievements). Once the capsule unlocks, rate whether they matched and add retrospective reflections.
-- **Minimalist Vertical Timeline**: Scroll through backdated, pending, and unlocked capsules in a premium journal-like design.
-- **Retrospective Analytics**: Visualize average emotional growth matrices, open rates, click rates, and prediction match accuracy with responsive progress meters and radial gauges.
-- **Architectural Integrity**: Atomic PostgreSQL transactional updates, single-use magic-link auth cycles, and concurrent-safe background delivery jobs.
+- **Future Letters (Digital Capsules)**: Schedule encrypted letters for future delivery dates with timezone-aware release logic.
+- **Active Record Encryption**: Protects sensitive letter titles and content at rest using Rails Active Record Encryption (`encrypts :title`, `encrypts :content`).
+- **Digital Postage Stamps Catalog**: Manage and serve dynamic postage stamps organized by category (`small-things`, `places-i-inhabit`, `stored-thoughts`, `passage-of-time`), with vector SVG content, search by name/denomination, and status filtering.
+- **Personal Evolution Tracking**:
+  - **Emotional Snapshots**: Record Happiness, Anxiety, and Motivation (1–10) when writing. Compute baseline shifts and emotional evolution upon delivery.
+  - **Predictions vs. Reality**: Track future predictions across life categories. Compare past forecasts with present outcomes upon unlock.
+- **Passwordless Magic Link Authentication**: Cryptographically signed single-use access tokens delivered via Resend transactional email.
+- **Background Job Scheduling (GoodJob)**: Database-backed Active Job queuing and cron execution for daily automated delivery dispatch (`0 0 * * *`) and hourly token cleanup (`0 * * * *`).
+- **Interactive OpenAPI Documentation**: Swagger UI served directly at `/api-docs` via Rswag.
 
 ---
 
 ## 🏛️ System Architecture & Design Patterns
 
-TimeEcho adopts a layered, highly decoupled design pattern that keeps models focused, controllers strictly RESTful, and templates thinned:
+TimeEcho adopts a layered, highly decoupled API architecture:
 
-1. **RESTful Controller Design**: All controllers are strictly focused on the seven standard RESTful actions (`index`, `show`, `new`, `create`, `update`, `destroy`). Non-RESTful custom actions are extracted into dedicated single-responsibility sub-resources (e.g. `LocalesController`, `LetterPredictionsController`, `Settings::EmailConfirmationsController`, `PagesController`).
-2. **Decorator / Presenter Pattern (`app/decorators/`)**: Removes all visual formatting, countdown calculations, and i18n label selectors from view templates. Built around a base `ApplicationDecorator` using Ruby's native `SimpleDelegator` standard library.
-3. **Form Objects (`app/forms/`)**: Enforce complex multi-model validation. `LetterForm` validates and saves `Letter`, `EmotionalSnapshot`, and several nested `Prediction` records within a single database transaction with IANA timezone conversion.
-4. **Service Objects (`app/services/`)**: Isolate single business actions across domain namespaces (`Letters::*`, `Auth::*`, `Analytics::*`, `Settings::*`).
-5. **Query Objects (`app/queries/`)**: Decouple database querying. `UserTimelineQuery` uses eager-loading (`includes(:predictions, :emotional_snapshot)`) to avoid $N+1$ query overheads, and `PendingLettersQuery` runs highly concurrent row locks (`FOR UPDATE SKIP LOCKED`).
-6. **Policy Layer (`app/policies/`)**: Manages access controls (`LetterPolicy` strictly locks private digital capsules to their creator's authenticated email).
-7. **Background Jobs & Rake Tasks (GoodJob)**: Database-backed Active Job queuing via GoodJob. Automated cron runs `CleanupExpiredTokensJob` hourly (`0 * * * *`) and `Letters::DispatchPendingJob` daily (`0 0 * * *`), which dispatches `Letters::DeliverLetterJob` workers with polynomial retry backoff. `rake letters:deliver` is available for manual or CLI dispatch.
+1. **RESTful API Controllers (`app/controllers/api/v1/`)**:
+   - Thin controllers inheriting from `Api::V1::BaseController < ActionController::API`.
+   - Adhere strictly to RESTful actions (`index`, `show`, `create`, `update`, `destroy`).
+   - Standardized exception mapping via `ErrorHandler` concern.
+   - Standardized pagination via `Pagy` clamped to a maximum of 100 items per page.
+2. **Form Objects (`app/forms/`)**:
+   - Complex multi-model schema validation.
+   - `LetterForm`: Atomically validates and persists `Letter`, `EmotionalSnapshot`, optional digital `Stamp` (via `stamp_slug` or `stamp_id`), and nested `Prediction` records in a single database transaction with IANA timezone conversion.
+   - `MagicLinkForm`: Normalizes and validates email addresses for authentication.
+3. **Service Objects (`app/services/`)**:
+   - Encapsulate single-responsibility business workflows (`Letters::*`, `Auth::*`, `Analytics::*`, `Settings::*`).
+   - Return clean `Result` objects unwrapped by `ResultHandler#unwrap!`.
+4. **Query Objects (`app/queries/`)**:
+   - `UserTimelineQuery`: Loads letters for an authenticated user with eager loading (`includes(:predictions, :emotional_snapshot, :stamp)`) to eliminate $N+1$ queries.
+   - `PendingLettersQuery`: Selects letters due for delivery using high-concurrency row locking (`FOR UPDATE SKIP LOCKED`).
+5. **Jbuilder JSON Serialization (`app/views/api/v1/`)**:
+   - Formats API responses into standardized JSON envelopes (`data`, `meta`, and `error`) with `camelCase` keys.
+6. **Policy Layer (`app/policies/`)**:
+   - Fine-grained access control (`LetterPolicy` locks letters strictly to their creator's authenticated email).
+7. **Background Jobs & Tasks (GoodJob)**:
+   - `Letters::DispatchPendingJob`: Automated daily cron (`0 0 * * *`) dispatching individual `Letters::DeliverLetterJob` workers with exponential/polynomial retry backoff.
+   - `CleanupExpiredTokensJob`: Automated hourly cron (`0 * * * *`) purging spent and expired tokens.
+   - `rake letters:deliver`: Standalone CLI delivery trigger.
 
-For detailed system sequence diagrams, database schemas, and transactional boundary details, read the:
-👉 **[System Architecture & Design Document (docs/architecture.md)](docs/architecture.md)**
+For detailed sequence diagrams, database schemas, and transactional boundary details:
+👉 **[Backend Architecture & System Design (docs/architecture.md)](docs/architecture.md)**
 
 ---
 
-## 📜 Postal & Archival Design System
+## 📡 REST API Endpoints (`/api/v1`)
 
-TimeEcho rejects generic SaaS clichés (uniform rounded cards, purple buttons, and icon pills) in favor of a physical, tactile **archival and epistolary design language**:
-
-- **Tripartite Typography**:
-  - **`font-serif-editorial` (Fraunces)**: Warm optical-sized serif for literary reflection, capsule titles, and letter reveals.
-  - **`font-letter` (Courier Prime)**: Authentic monospaced typewriter typeface for letter bodies, docket IDs (`№ TE-00042`), cancellation stamps, and dates.
-  - **`font-ui` (IBM Plex Sans / Work Sans)**: Clean grotesque sans-serif for operational controls, forms, buttons, and navigation.
-- **Physical Archival Palette**:
-  - **Wax Seal Carmine**: `#8E2818` (light theme primary) / `#D14930` (dark theme primary) / `#6A1E12` (active hover).
-  - **Postmark Ink Indigo**: `#2C485E` (ink light) / `#77A3C4` (ink dark).
-  - **Archival Manila & Parchment**: `#EFECE3` (manila folder) / `#FAF9F5` (stationery paper sheet) / `#D8D2C2` (crease hairline borders).
-- **Tactile Components**:
-  - `.paper-sheet` & `.archival-folder`: Crisp folio paper sheets and manila dossiers replacing generic cards.
-  - `.postmark-stamp`: Hand-stamped cancellation marks with realistic rotation (`-1.5deg` to `1.5deg`).
-  - `.wax-seal`: 3D embossed carmine seal badge with keyframe crack split animation (`seal-crack-left` / `seal-crack-right`) upon capsule reveal.
-  - `.lined-paper-canvas`: Ruled paper writing guide for letter drafting.
-  - `Expediente de Realidad`: Two-column retrospective ledger comparing past predictions against present reality.
-- **Bespoke Circular Favicon & Icon Suite**:
-  - 32-bit RGBA true alpha transparency across SVG, ICO, and PNG assets with high-contrast envelope and clock dial.
-
-For the complete design philosophy, CSS tokens, and component guidelines, see:
-👉 **[UI/UX Design System & Architectural Specification (docs/ui-ux.md)](docs/ui-ux.md)**
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/livez` | Lightweight process liveness probe |
+| `GET` | `/readyz` | Readiness healthcheck (verifies DB, migrations, GoodJob) |
+| `GET` | `/api/v1/ping` | Timestamp and status diagnostic |
+| `GET` | `/api-docs` | Interactive Swagger UI API documentation |
+| `GET` | `/api-docs/v1/swagger.yaml` | OpenAPI 3.0.3 specification document |
+| `GET` | `/api/v1/letters` | Paginated user capsule timeline (filters: `status`, `page`, `per_page`) |
+| `POST` | `/api/v1/letters` | Create a new capsule (supports `stamp_slug`, predictions, emotions) |
+| `GET` | `/api/v1/letters/:id` | Fetch a single letter's details |
+| `DELETE` | `/api/v1/letters/:id` | Delete an unqueued capsule |
+| `POST` | `/api/v1/letters/:letter_id/predictions` | Update reality comparisons and reveal emotions |
+| `POST` | `/api/v1/letters/:id/archive` | Move capsule to archive |
+| `POST` | `/api/v1/letters/:id/restore` | Restore capsule from archive |
+| `GET` | `/api/v1/stamps` | List stamp catalog (search `q`, `category`, `status`, pagination) |
+| `GET` | `/api/v1/stamps/:slug` | Fetch a single stamp with raw vector SVG |
+| `GET` | `/api/v1/stamp_categories` | List active stamp categories ordered by position |
+| `POST` | `/api/v1/sessions` | Request a passwordless magic login link |
+| `GET` | `/api/v1/sessions/:token` | Authenticate magic link token and start session |
+| `GET` | `/api/v1/sessions/me` | Fetch currently authenticated user session |
+| `DELETE` | `/api/v1/sessions` | Destroy active session and invalidate cookie |
+| `PATCH` | `/api/v1/account` | Request email change confirmation |
+| `DELETE` | `/api/v1/account` | Purge entire user account and related records |
+| `GET` | `/api/v1/account/confirm_email` | Confirm email change token |
 
 ---
 
 ## 🛠️ Prerequisites & Stack
 
 - **Ruby**: `~> 3.2` or `3.3` (with Rails `8.1.x`)
-- **Node.js**: `v18.x` or higher (with `npm`)
 - **Database**: PostgreSQL (v14+)
-- **Styling**: Tailwind CSS v4 & DaisyUI v5 (CSS-first setup with physical postal theme tokens)
-- **Typography**: Google Fonts (`Fraunces`, `Courier Prime`, `IBM Plex Sans`)
-- **Active Job Queue**: GoodJob (database-backed)
+- **Queue Adapter**: GoodJob (database-backed Active Job)
+- **Mailer**: Resend (`resend` gem)
+- **API Spec**: Rswag (OpenAPI 3.0.3)
 
 ---
 
 ## 🚀 Getting Started
 
-Follow these steps to set up and run the project locally.
-
-### 1. Clone & Set Up the Repository
+### 1. Clone & Setup
 
 ```bash
 git clone https://github.com/your-username/time_echo.git
 cd time_echo
-```
-
-### 2. Install Ruby & Node Dependencies
-
-Install all gems and frontend packages:
-
-```bash
 bundle install
-npm install
 ```
 
-### 3. Database Configuration
+### 2. Database Configuration
 
-Ensure PostgreSQL is running locally. You can customize connection credentials by setting the following environment variables (or let them fall back to standard defaults):
+Ensure PostgreSQL is running locally. Set environment variables in `.env` if using custom credentials:
 
 - `DATABASE_HOST` (default: `localhost`)
 - `DATABASE_PORT` (default: `5432`)
 - `DATABASE_USERNAME` (default: `postgres`)
 - `DATABASE_PASSWORD` (default: `postgres`)
 
-Initialize the database schema and apply migrations:
+Initialize the database schema:
 
 ```bash
-bundle exec rails db:create db:migrate
+bin/rails db:prepare
 ```
 
-### 4. Seed Simulated Capsule Data (Highly Recommended 🌟)
+### 3. Seed Demo Data
 
-To populate your dashboard timeline and analytics with realistic pre-delivered, pending, and sealed capsules instantly, run:
+Populate the database with sample letters, predictions, emotional baselines, and stamp categories:
 
 ```bash
-bundle exec rails db:seed
+bin/rails db:seed
 ```
 
-This seeds backdated letters, emotional snapshot metrics, and predictions, enabling you to inspect the full retrospective comparison interface right away.
-
----
-
-## 💻 Running the Application
-
-TimeEcho uses **Foreman** to execute the Rails server, watch Tailwind CSS v4 changes, and run the Active Job worker in tandem. To boot the full development stack, simply run:
+### 4. Run the Server
 
 ```bash
-bin/dev
+bin/rails server -p 3000
 ```
 
-This starts the application at `http://localhost:3000` and does the following:
-
-- Launches the Puma server on port 3000.
-- Compiles and hot-reloads Tailwind CSS v4 stylesheets.
-- Bootstraps the `GoodJob` in-process worker to process background jobs and cron schedules.
-
-_(Alternatively, you can run them manually in separate shells: `npm run watch:css` and `bundle exec rails server`)_
+The API will be accessible at `http://localhost:3000`. Explore endpoints at `http://localhost:3000/api-docs`.
 
 ---
 
 ## 🐳 Running with Docker
 
-TimeEcho ships with a multi-stage `Dockerfile` and a `docker-compose.yml` for containerized development and production builds.
+TimeEcho includes a multi-stage `Dockerfile` and `docker-compose.yml`.
 
-### Prerequisites
-
-- **Docker** installed locally (Docker Desktop on Windows/macOS, or Docker Engine on Linux).
-- A C compiled Ruby image is pulled automatically — no local Ruby installation required for container runs.
-
-### 1. Uncomment the `web` and `queue` Services
-
-The `web` and `queue` services in `docker-compose.yml` are commented out by default. Uncomment them to enable the Rails server and GoodJob worker:
-
-```yaml
-web:
-  build:
-    context: .
-    dockerfile: Dockerfile
-  command: ./bin/rails server -b 0.0.0.0
-  environment:
-    RAILS_ENV: development
-    DATABASE_HOST: db
-    DATABASE_USERNAME: postgres
-    DATABASE_PASSWORD: postgres
-    PORT: 3000
-  volumes:
-    - .:/rails
-    - bundle_cache:/usr/local/bundle
-  ports:
-    - "3000:3000"
-  depends_on:
-    db:
-      condition: service_healthy
-    mailpit:
-      condition: service_started
-
-queue:
-  build:
-    context: .
-    dockerfile: Dockerfile
-  command: bundle exec good_job start
-  environment:
-    RAILS_ENV: development
-    DATABASE_HOST: db
-    DATABASE_USERNAME: postgres
-    DATABASE_PASSWORD: postgres
-  volumes:
-    - .:/rails
-    - bundle_cache:/usr/local/bundle
-  depends_on:
-    db:
-      condition: service_healthy
-```
-
-### 2. Build and Start the Stack
+### Start the Stack
 
 ```bash
 docker compose up --build
 ```
 
-This starts three services:
-
-| Service   | Ports         | Purpose                                                      |
-| --------- | ------------- | ------------------------------------------------------------ |
-| `db`      | `5432`        | PostgreSQL 14 database (pre-seeded with default credentials) |
-| `web`     | `3000`        | Rails server (accessible at `http://localhost:3000`)         |
-| `queue`   | (internal)    | GoodJob background worker for scheduled deliveries           |
-| `mailpit` | `8025`/`1025` | Local SMTP catcher for previewing emails sent by the app     |
-
-The `entrypoint.sh` script automatically waits for PostgreSQL to be ready, runs `bundle install` as needed, and executes `rails db:prepare` to set up the schema and seed data before booting.
-
-### 3. Run Migrations (if needed)
-
-If you've added new migrations, run them from the host or inside the container:
-
-```bash
-docker compose exec web bundle exec rails db:migrate
-```
-
-> **Note**: The entrypoint already calls `db:prepare` on container start, which runs pending migrations automatically.
-
-### 4. Stop the Stack
-
-```bash
-docker compose down
-```
-
-To remove all data volumes (database and bundle cache) as well:
-
-```bash
-docker compose down -v
-```
-
-### 5. Production Image (Kamal / Deployment)
-
-For production builds, the same `Dockerfile` is used by Kamal. A lean, multi-stage image is produced. See [Production & Deployment](#-production--deployment-kamal) below for details.
-
----
-
-## 🌐 Internationalization (i18n)
-
-TimeEcho supports **English (`:en`)** and **Spanish (`:es`)** as the two available locales. The application's default locale is English, and content seamlessly toggles or auto-adapts to Spanish.
-
-### Locale Detection & Fallback Flow
-
-1. **Session Preference**: If the user explicitly switches language via the toggle button in the navigation header, the choice is saved to `session[:locale]` via `LocalesController` (`POST /locales`).
-2. **Browser Preference**: If no session preference exists or an invalid locale is stored, `ApplicationController#set_locale` inspects the browser's `Accept-Language` HTTP header for a supported two-letter code (`es` or `en`).
-3. **Application Default**: If neither matches a supported locale (e.g. `fr`, `de`), the application falls back to `config.i18n.default_locale` (`:en`).
-
-### Configuration
-
-- **`config/i18n.available_locales`**: `[:es, :en]` — strictly scoped to English and Spanish.
-- **`config/i18n.default_locale`**: `:en` — English is the fallback default.
-- **`config/i18n.fallbacks`**: `true` — in production and test environments, missing keys in one locale fall back to the default locale rather than displaying raw key paths.
-
-### Test Environment
-
-All tests establish `I18n.locale = :es` globally via `test/test_helper.rb`, ensuring assertions match Spanish text expectations. The `set_locale` method respects this pre-set locale because test requests do not send an `Accept-Language` header or preset session locale by default.
-
-### File Structure
-
-```
-config/locales/
-├── en.yml  # English translations (no Spanish text)
-└── es.yml  # Spanish translations (full coverage of en.yml keys)
-```
+Services started:
+- `db`: PostgreSQL 14 (port `5432`)
+- `web`: Rails 8 API server (port `3000`)
+- `queue`: GoodJob background worker
+- `mailpit`: Local SMTP catcher (web UI at `http://localhost:8025`)
 
 ---
 
 ## 🧪 Testing the Suite
 
-TimeEcho has a comprehensive Minitest test suite covering controllers, decorators, services, forms, models, jobs, and mailers with **100% line coverage**:
+TimeEcho has a comprehensive Minitest test suite covering controllers, models, services, forms, queries, policies, jobs, and mailers:
 
 ```bash
 bundle exec rails test
 ```
 
-Coverage reports are generated automatically via SimpleCov and stored in the `coverage/` directory.
+Generate test coverage with SimpleCov:
 
----
-
-## 🚀 Production Environment Checklist
-
-| Variable | Description |
-| :--- | :--- |
-| `RAILS_ENV` | Must be set to `production`. |
-| `DATABASE_URL` | PostgreSQL production database connection URL. |
-| `RAILS_MASTER_KEY` | Decrypts credentials and Active Record encrypted columns. |
-| `APP_HOST` | Production domain for magic login links and email notifications. |
-| `APP_PROTOCOL` | Protocol scheme (`https`). |
-| `GOOD_JOB_EXECUTION_MODE` | Set to `async` for in-process background worker and cron execution. |
-| `WEB_CONCURRENCY` | Number of Puma worker processes (set to `0` for single-mode memory efficiency). |
-| `RAILS_MAX_THREADS` | Active Record connection and Puma thread pool size (default: `3`). |
-| `RAILS_SERVE_STATIC_FILES` | Set to `true` to serve precompiled assets via Puma. |
-| `RESEND_API_KEY` | API key for transactional email delivery via Resend. |
+```bash
+COVERAGE=true bundle exec rails test
+```
 
 ---
 

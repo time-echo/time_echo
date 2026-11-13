@@ -8,6 +8,7 @@ class LetterForm
   attribute :scheduled_at
   attribute :timezone, :string, default: -> { Time.zone&.name || "America/Bogota" }
   attribute :language, :string, default: -> { I18n.locale.to_s }
+  attribute :stamp_slug, :string
 
   attribute :prediction_city, :string
   attribute :prediction_salary, :string
@@ -28,6 +29,7 @@ class LetterForm
   validate :scheduled_at_must_be_in_future
   validate :valid_iana_timezone
   validate :creation_limit_not_exceeded
+  validate :validate_stamp_availability
 
   validates :happiness_level, presence: true, numericality: { only_integer: true, in: 1..10 }
   validates :anxiety_level, presence: true, numericality: { only_integer: true, in: 1..10 }
@@ -37,6 +39,10 @@ class LetterForm
 
   def initialize(attributes = {})
     attrs = attributes ? attributes.to_h.with_indifferent_access : {}
+
+    legacy_stamp = attrs.delete(:stamp_id)
+    camel_stamp = attrs.delete(:stampId)
+    attrs[:stamp_slug] ||= legacy_stamp || camel_stamp
 
     snap = attrs.delete(:emotional_snapshot_attributes)
     if snap.present?
@@ -83,6 +89,14 @@ class LetterForm
     self.scheduled_at = val
   end
 
+  def stamp_id=(val)
+    self.stamp_slug ||= val
+  end
+
+  def stampId=(val)
+    self.stamp_slug ||= val
+  end
+
   def parsed_utc_scheduled_at
     val = scheduled_at
     return nil if val.blank?
@@ -105,6 +119,8 @@ class LetterForm
     utc_time = parsed_utc_scheduled_at
 
     Letter.transaction do
+      resolved_stamp = Stamp.find_by(slug: stamp_slug.to_s.strip) if stamp_slug.present?
+
       @letter = Letter.new(
         title: title,
         email: email,
@@ -112,7 +128,8 @@ class LetterForm
         scheduled_at: utc_time,
         timezone: timezone.presence || "UTC",
         language: language.presence || I18n.locale.to_s,
-        status: "pending"
+        status: "pending",
+        stamp: resolved_stamp
       )
 
       @letter.build_emotional_snapshot(
@@ -144,6 +161,17 @@ class LetterForm
   end
 
   private
+
+  def validate_stamp_availability
+    return if stamp_slug.blank?
+
+    resolved = Stamp.find_by(slug: stamp_slug.to_s.strip)
+    if resolved.nil?
+      errors.add(:stamp_slug, :invalid)
+    elsif !resolved.active? || !resolved.stamp_category.active?
+      errors.add(:stamp_slug, :unavailable)
+    end
+  end
 
   def build_prediction(category, text)
     return if text.blank?

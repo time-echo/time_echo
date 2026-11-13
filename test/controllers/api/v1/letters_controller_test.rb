@@ -212,4 +212,116 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, updated_pred["matched"]
     assert_equal "fulfilled", updated_pred["outcome"]
   end
+
+  test "POST /api/v1/letters creates letter without stamp when stamp_slug is absent" do
+    post "/api/v1/letters", params: @create_payload, headers: @auth_headers
+    json = assert_resource_response(expected_status: :created)
+
+    assert_nil json["data"]["stamp"]
+    created_letter = Letter.find(json["data"]["id"])
+    assert_nil created_letter.stamp_id
+  end
+
+  test "POST /api/v1/letters creates letter with valid active stamp" do
+    category = StampCategory.create!(slug: "travel", name: { "en" => "Travel", "es" => "Viajes" }, position: 1, active: true)
+    stamp = Stamp.create!(
+      stamp_category: category,
+      slug: "vintage-plane",
+      name: { "en" => "Vintage Plane", "es" => "Avión clásico" },
+      svg_content: "<svg viewBox=\"0 0 48 48\"><path d=\"M0 0\"/></svg>",
+      position: 1,
+      active: true
+    )
+
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "vintage-plane"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    json = assert_resource_response(expected_status: :created)
+
+    stamp_data = json["data"]["stamp"]
+    assert_not_nil stamp_data
+    assert_equal "vintage-plane", stamp_data["slug"]
+    assert_equal "Avión clásico", stamp_data["name"]
+    assert_equal "travel", stamp_data["categorySlug"]
+
+    created_letter = Letter.find(json["data"]["id"])
+    assert_equal stamp.id, created_letter.stamp_id
+  end
+
+  test "POST /api/v1/letters creates letter when stampId or both stampId and stamp_slug are passed" do
+    category = StampCategory.create!(slug: "postal", name: { "en" => "Postal", "es" => "Postal" }, position: 2, active: true)
+    stamp = Stamp.create!(
+      stamp_category: category,
+      slug: "post-horn",
+      name: { "en" => "Post Horn", "es" => "Corneta postal" },
+      svg_content: "<svg viewBox=\"0 0 48 48\"><path d=\"M0 0\"/></svg>",
+      position: 1,
+      active: true
+    )
+
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "post-horn"
+    payload[:letter][:stampId] = "post-horn"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    json = assert_resource_response(expected_status: :created)
+    assert_equal "post-horn", json["data"]["stamp"]["slug"]
+  end
+
+  test "POST /api/v1/letters rejects non-existent stamp_slug" do
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "non-existent-stamp"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    assert_response :unprocessable_content
+
+    json = JSON.parse(response.body)
+    details = json.dig("error", "details") || json["errors"]
+    assert (details["stamp_slug"] || details["stampSlug"]).present?
+  end
+
+  test "POST /api/v1/letters rejects inactive stamp_slug" do
+    category = StampCategory.create!(slug: "nature", name: { "en" => "Nature", "es" => "Naturaleza" }, position: 1, active: true)
+    Stamp.create!(
+      stamp_category: category,
+      slug: "inactive-leaf",
+      name: { "en" => "Leaf", "es" => "Hoja" },
+      svg_content: "<svg viewBox=\"0 0 48 48\"><path d=\"M0 0\"/></svg>",
+      position: 1,
+      active: false
+    )
+
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "inactive-leaf"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    assert_response :unprocessable_content
+
+    json = JSON.parse(response.body)
+    details = json.dig("error", "details") || json["errors"]
+    assert (details["stamp_slug"] || details["stampSlug"]).present?
+  end
+
+  test "POST /api/v1/letters rejects stamp in inactive category" do
+    category = StampCategory.create!(slug: "archived-cat", name: { "en" => "Archived", "es" => "Archivado" }, position: 1, active: false)
+    Stamp.create!(
+      stamp_category: category,
+      slug: "valid-stamp-in-inactive-cat",
+      name: { "en" => "Stamp", "es" => "Estampilla" },
+      svg_content: "<svg viewBox=\"0 0 48 48\"><path d=\"M0 0\"/></svg>",
+      position: 1,
+      active: true
+    )
+
+    payload = @create_payload.deep_dup
+    payload[:letter][:stamp_slug] = "valid-stamp-in-inactive-cat"
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers
+    assert_response :unprocessable_content
+
+    json = JSON.parse(response.body)
+    details = json.dig("error", "details") || json["errors"]
+    assert (details["stamp_slug"] || details["stampSlug"]).present?
+  end
 end
