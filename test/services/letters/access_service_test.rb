@@ -28,7 +28,7 @@ class Letters::AccessServiceTest < ActiveSupport::TestCase
     assert result.countdown?
   end
 
-  test "returns unauthorized for letter found but policy denies" do
+  test "returns not_found for letter found but policy denies" do
     letter = Letter.new(title: "Test", email: @user, content: "Hello", deliver_at: 1.day.ago, status: "delivered")
     letter.save!(validate: false)
 
@@ -40,7 +40,7 @@ class Letters::AccessServiceTest < ActiveSupport::TestCase
 
     result = Letters::AccessService.call(letter.id, @user)
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
   ensure
     LetterPolicy.class_eval do
       alias_method :show?, :original_show?
@@ -56,20 +56,20 @@ class Letters::AccessServiceTest < ActiveSupport::TestCase
     assert_equal letter, result.letter
   end
 
-  test "returns unauthorized for signed_id when user is not owner" do
+  test "returns not_found for signed_id when user is not owner" do
     letter = Letter.new(title: "Test", email: @user, content: "Hello", deliver_at: 1.day.ago, status: "delivered")
     letter.save!(validate: false)
     result = Letters::AccessService.call(letter.signed_id, "other@example.com")
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
   end
 
-  test "returns unauthorized for signed_id when user is nil" do
+  test "returns not_found for signed_id when user is nil" do
     letter = Letter.new(title: "Test", email: @user, content: "Hello", deliver_at: 1.day.ago, status: "delivered")
     letter.save!(validate: false)
     result = Letters::AccessService.call(letter.signed_id, nil)
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
   end
 
   test "returns not_found for archived letter" do

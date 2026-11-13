@@ -17,7 +17,7 @@ Rails.application.configure do
   config.active_job.queue_adapter = :good_job
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST") { "localhost:3000" } }
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST") { "localhost:3001" } }
   config.action_mailer.delivery_method = :resend
 
   config.i18n.fallbacks = true

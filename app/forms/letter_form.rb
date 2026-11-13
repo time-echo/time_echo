@@ -8,6 +8,7 @@ class LetterForm
   attribute :scheduled_at
   attribute :timezone, :string, default: -> { Time.zone&.name || "America/Bogota" }
   attribute :language, :string, default: -> { I18n.locale.to_s }
+  attribute :stamp_slug, :string
 
   attribute :prediction_city, :string
   attribute :prediction_salary, :string
@@ -28,6 +29,7 @@ class LetterForm
   validate :scheduled_at_must_be_in_future
   validate :valid_iana_timezone
   validate :creation_limit_not_exceeded
+  validate :validate_stamp_availability
 
   validates :happiness_level, presence: true, numericality: { only_integer: true, in: 1..10 }
   validates :anxiety_level, presence: true, numericality: { only_integer: true, in: 1..10 }
@@ -35,12 +37,64 @@ class LetterForm
 
   attr_reader :letter
 
+  def initialize(attributes = {})
+    attrs = attributes ? attributes.to_h.with_indifferent_access : {}
+
+    legacy_stamp = attrs.delete(:stamp_id)
+    camel_stamp = attrs.delete(:stampId)
+    attrs[:stamp_slug] ||= legacy_stamp || camel_stamp
+
+    snap = attrs.delete(:emotional_snapshot_attributes)
+    if snap.present?
+      attrs[:happiness_level] ||= snap[:happiness_level]
+      attrs[:anxiety_level] ||= snap[:anxiety_level]
+      attrs[:motivation_level] ||= snap[:motivation_level]
+    end
+
+    preds = attrs.delete(:predictions_attributes)
+    if preds.present?
+      list = preds.is_a?(Hash) ? preds.values : Array(preds)
+      list.each do |p|
+        cat = p[:category].to_s
+        attrs["prediction_#{cat}"] ||= p[:prediction] if Prediction::CATEGORIES.include?(cat)
+      end
+    end
+
+    super(attrs)
+  end
+
+  def emotional_snapshot_attributes=(snap)
+    return if snap.blank?
+
+    self.happiness_level = snap[:happiness_level] if snap[:happiness_level].present?
+    self.anxiety_level = snap[:anxiety_level] if snap[:anxiety_level].present?
+    self.motivation_level = snap[:motivation_level] if snap[:motivation_level].present?
+  end
+
+  def predictions_attributes=(preds)
+    return if preds.blank?
+
+    list = preds.is_a?(Hash) ? preds.values : Array(preds)
+    list.each do |p|
+      cat = p[:category].to_s
+      public_send("prediction_#{cat}=", p[:prediction]) if Prediction::CATEGORIES.include?(cat)
+    end
+  end
+
   def deliver_at
-    parsed_utc_scheduled_at
+    scheduled_at
   end
 
   def deliver_at=(val)
     self.scheduled_at = val
+  end
+
+  def stamp_id=(val)
+    self.stamp_slug ||= val
+  end
+
+  def stampId=(val)
+    self.stamp_slug ||= val
   end
 
   def parsed_utc_scheduled_at
@@ -65,6 +119,8 @@ class LetterForm
     utc_time = parsed_utc_scheduled_at
 
     Letter.transaction do
+      resolved_stamp = Stamp.find_by(slug: stamp_slug.to_s.strip) if stamp_slug.present?
+
       @letter = Letter.new(
         title: title,
         email: email,
@@ -72,7 +128,8 @@ class LetterForm
         scheduled_at: utc_time,
         timezone: timezone.presence || "UTC",
         language: language.presence || I18n.locale.to_s,
-        status: "pending"
+        status: "pending",
+        stamp: resolved_stamp
       )
 
       @letter.build_emotional_snapshot(
@@ -105,6 +162,17 @@ class LetterForm
 
   private
 
+  def validate_stamp_availability
+    return if stamp_slug.blank?
+
+    resolved = Stamp.find_by(slug: stamp_slug.to_s.strip)
+    if resolved.nil?
+      errors.add(:stamp_slug, :invalid)
+    elsif !resolved.active? || !resolved.stamp_category.active?
+      errors.add(:stamp_slug, :unavailable)
+    end
+  end
+
   def build_prediction(category, text)
     return if text.blank?
     @letter.predictions.build(category: category, prediction: text)
@@ -117,21 +185,22 @@ class LetterForm
   def scheduled_at_must_be_in_future
     utc_val = parsed_utc_scheduled_at
     if utc_val.blank?
-      errors.add(:scheduled_at, "is invalid")
+      errors.add(:scheduled_at, :invalid)
     elsif utc_val <= Time.current
-      errors.add(:scheduled_at, "must be in the future")
-      errors.add(:deliver_at, "must be in the future")
+      errors.add(:scheduled_at, :must_be_in_future)
+      errors.add(:deliver_at, :must_be_in_future)
     end
   end
 
   def valid_iana_timezone
     return if timezone.blank?
     unless Time.find_zone(timezone)
-      errors.add(:timezone, "is not a valid IANA timezone")
+      errors.add(:timezone, :invalid_timezone)
     end
   end
 
   def creation_limit_not_exceeded
+    return if Rails.env.development?
     return if email.blank?
     normalized_email = email.strip.downcase
     if Letter.for_email(normalized_email).where("created_at >= ?", 24.hours.ago).count >= 5

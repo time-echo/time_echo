@@ -1,6 +1,7 @@
 class LetterMailer < ApplicationMailer
   def future_letter(letter)
     @letter = letter
+    @letter_url = "#{app_base_url}/letters/#{@letter.signed_id}"
     locale = @letter.language.presence || I18n.default_locale
 
     headers["X-Letter-ID"] = @letter.id.to_s
@@ -19,7 +20,7 @@ class LetterMailer < ApplicationMailer
 
   def stamped_confirmation(letter)
     @letter = letter
-    @time_echo_url = Rails.application.routes.url_helpers.root_url(host: ENV.fetch("APP_HOST") { "localhost:3000" })
+    @time_echo_url = "#{app_base_url}/"
     locale = @letter.language.presence || I18n.default_locale
 
     headers["X-Letter-ID"] = @letter.id.to_s
