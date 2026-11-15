@@ -117,8 +117,12 @@ Views must remain lightweight and declarative.
 
 TimeEcho maintains specialized agent skills in the `.agents/skills/` directory to guide domain-specific workflows and enforce best practices across architecture and backend development. AI assistants must proactively reference these skill guides before undertaking relevant work:
 
-- **`.agents/skills/rails-expert/` (`SKILL.md`)**: Modern Rails conventions, Hotwire (Turbo Frames & Streams), Active Record query optimization (eager loading, batch queries), background jobs with GoodJob, and robust test suite creation. Consult for complex Rails architecture or query design.
-- **`.agents/skills/find-skills/` (`SKILL.md`)**: Discovery and installation of new agent skills when extended workflows are requested.
+- **`.agents/skills/rails-expert/` (`SKILL.md`)**: Rails 7.1+ & 8 architectural patterns and implementation standards — covering the directory contract, skinny controllers, service objects with Result structs, form objects, query objects, Hotwire (Turbo Frames & Streams), Active Record query optimization (N+1 prevention), background jobs with GoodJob/Solid Queue, and test suite creation.
+- **`.agents/skills/api-designer/` (`SKILL.md`)**: REST API design, resource modeling, versioning strategies, pagination standards, and error contract specifications.
+- **`.agents/skills/architecture-designer/` (`SKILL.md`)**: High-level system architecture, ADR authoring, trade-off evaluations, service boundaries, and scalability planning.
+- **`.agents/skills/database-optimizer/` (`SKILL.md`)**: Query optimization, index strategies, execution plan (EXPLAIN) interpretation, and lock contention mitigation.
+- **`.agents/skills/secure-code-guardian/` (`SKILL.md`)**: Authentication/authorization hardening, input sanitization, OWASP Top 10 mitigation, secure headers, and secrets safety.
+- **`.agents/skills/test-master/` (`SKILL.md`)**: Test planning, test suite generation, mocking strategies, edge-case coverage, and flaky test remediation.
 
 ### Operational Rules for Skills:
 - **Directory Location**: All skills reside in `.agents/skills/<skill_name>/SKILL.md`.
