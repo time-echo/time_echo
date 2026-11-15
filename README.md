@@ -147,11 +147,8 @@ docker compose up -d
 
 Services started:
 
-- `db`: PostgreSQL 17 (port `5432`) — hosts both `time_echo_development` and the `glitchtip` database (auto-provisioned via healthcheck)
+- `db`: PostgreSQL 17 (port `5432`) — hosts `time_echo_development`
 - `mailpit`: Local SMTP server (port `1025`) and web UI (`http://localhost:8025`)
-- `glitchtip-redis`: Redis 7 cache and Celery broker for GlitchTip
-- `glitchtip-web`: Self-hosted GlitchTip error tracking UI (`http://localhost:8000`) connected to the shared `db` service
-- `glitchtip-worker`: GlitchTip Celery worker & beat scheduler
 
 ---
 

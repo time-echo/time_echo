@@ -10,11 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U postgres && (psql -U postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'glitchtip'\" | grep -q 1 || psql -U postgres -c \"CREATE DATABASE glitchtip\")"
-        ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d time_echo_development"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -46,50 +42,6 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
-
-  glitchtip-redis:
-    image: redis:7-alpine
-
-  glitchtip-web:
-    image: glitchtip/glitchtip:latest
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/glitchtip
-      REDIS_URL: redis://glitchtip-redis:6379/0
-      SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
-      GLITCHTIP_DOMAIN: http://localhost:8000
-      DEFAULT_FROM_EMAIL: glitchtip@example.com
-      EMAIL_URL: smtp://mailpit:1025
-      ENABLE_USER_REGISTRATION: "True"
-      ENABLE_ORGANIZATION_CREATION: "True"
-      RUN_MIGRATIONS: "1"
-    depends_on:
-      db:
-        condition: service_healthy
-      glitchtip-redis:
-        condition: service_started
-      mailpit:
-        condition: service_started
-
-  glitchtip-worker:
-    image: glitchtip/glitchtip:latest
-    command: ./bin/run-celery-with-beat.sh
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/glitchtip
-      REDIS_URL: redis://glitchtip-redis:6379/0
-      SECRET_KEY: time-echo-local-glitchtip-secret-key-32chars
-      GLITCHTIP_DOMAIN: http://localhost:8000
-      DEFAULT_FROM_EMAIL: glitchtip@example.com
-      EMAIL_URL: smtp://mailpit:1025
-      ENABLE_USER_REGISTRATION: "True"
-      ENABLE_ORGANIZATION_CREATION: "True"
-    depends_on:
-      db:
-        condition: service_healthy
-      glitchtip-redis:
-        condition: service_started
-
 volumes:
   postgres_data:
   bundle_cache:
