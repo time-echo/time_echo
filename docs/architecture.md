@@ -50,7 +50,6 @@ graph TD
         ATLS[Auth::AuthenticateTokenService]
         DMLS[Auth::DestroySessionService]
         TES[Analytics::TrackEventService]
-        FMS[Analytics::FetchMetricsService]
         REUS[Settings::RequestEmailUpdateService]
         CEUS[Settings::ConfirmEmailUpdateService]
         DAS[Settings::DestroyAccountService]
@@ -115,15 +114,14 @@ graph TD
    - **`Auth::AuthenticateTokenService`**: Validates tokens, sets session state, and marks tokens used.
    - **`Auth::DestroySessionService`**: Revokes active session tokens and clears session state.
    - **`Analytics::TrackEventService`**: Logs user actions to `analytics_events`.
-   - **`Analytics::FetchMetricsService`**: Aggregates retrospective metrics (capsule counts, emotional baselines, prediction accuracy).
    - **`Settings::RequestEmailUpdateService`**: Dispatches email update confirmation magic links.
-   - **`Settings::ConfirmEmailUpdateService`**: Atomically updates user email address across preferences, letters, and events.
+   - **`Settings::ConfirmEmailUpdateService`**: Atomically updates user email address across letters, session tokens, and audit logs.
    - **`Settings::DestroyAccountService`**: Atomically purges all user records.
 
 5. **Query Objects Layer (`app/queries/`)**:
    - Isolate complex ActiveRecord operations from controllers and models.
-   - **`UserTimelineQuery`**: Loads all capsules owned by a user, utilizing eager-loading (`includes(:predictions, :emotional_snapshot, :stamp)`) to eliminate $N+1$ queries.
-   - **`PendingLettersQuery`**: Finds letters ready for release, employing high-concurrency database row locking (`FOR UPDATE SKIP LOCKED`).
+   - **`UserTimelineQuery`**: Scopes active or archived capsules owned by a user (`UserTimelineQuery.call(email, status: ...)`), paired with eager loading (`includes(:emotional_snapshot, :predictions, stamp: :stamp_category)`) in `LettersController#index` to eliminate $N+1$ queries.
+   - **`PendingLettersQuery`**: Finds letters ready for release, employing high-concurrency database row locking (`FOR UPDATE SKIP LOCKED`) inside a transaction.
 
 6. **Policy Layer (`app/policies/`)**:
    - Decouples authorization rules.
@@ -221,8 +219,8 @@ erDiagram
         bigint id PK
         bigint letter_id FK
         string category "city/salary/relationship/career/achievement/happiness"
-        text prediction
-        text reality
+        text prediction "Active Record Encrypted"
+        text reality "Active Record Encrypted"
         boolean matched
         datetime created_at
         datetime updated_at
@@ -276,7 +274,7 @@ erDiagram
 ```
 
 > [!SECURITY]
-> **Active Record Encryption**: Letter titles (`encrypts :title`) and letter body content (`encrypts :content`) are encrypted at rest using Rails Active Record Encryption. Keys are configured via environment variables (`ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`, `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT`).
+> **Active Record Encryption**: Letter titles (`encrypts :title`), letter body content (`encrypts :content`), and prediction/reality texts (`encrypts :prediction`, `encrypts :reality`) are encrypted at rest using Rails Active Record Encryption. Keys are configured via environment variables (`ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY`, `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY`, `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT`).
 
 ---
 
@@ -286,22 +284,21 @@ To guarantee absolute transactional integrity and prevent orphaned rows or secur
 
 ### Email Update Transaction
 
-When a user updates their email inside `SettingsController#update`, all associated entities must migrate in tandem to prevent locking out the user from their historical capsules.
+When a user confirms an email update via `Accounts::EmailConfirmationsController#show`, all associated entities migrate in tandem inside `Settings::ConfirmEmailUpdateService` to prevent locking out the user from their historical capsules.
 
 ```mermaid
 flowchart TD
-    Start[User Submits New Email] --> CheckValid{Validations Pass?}
-    CheckValid -- No --> RenderErr[Render error view]
+    Start[User Clicks Confirmation Link] --> CheckValid{Token Valid?}
+    CheckValid -- No --> RenderErr[Return 401 Unauthorized]
     CheckValid -- Yes --> StartTx[Open ActiveRecord::Base.transaction]
 
-    StartTx --> LockPref[Acquire row lock on UserPreferences]
-    LockPref --> UpdatePref[Update Preferences Email]
-    UpdatePref --> CascadeLetters[Update all matching Letters to new email]
-    CascadeLetters --> CascadeEvents[Update all historical AnalyticsEvents]
-    CascadeEvents --> CommitTx[Commit Database Transaction]
+    StartTx --> CascadeLetters[Update all matching Letters to new email]
+    CascadeLetters --> CascadeTokens[Update all matching SessionTokens to new email]
+    CascadeTokens --> RecordAudit[Record AuditLog entry]
+    RecordAudit --> CommitTx[Commit Database Transaction]
 
     CommitTx --> UpdateSession[Synchronize active session cookie]
-    UpdateSession --> Success[Redirect with success flash banner]
+    UpdateSession --> Success[Return 200 OK JSON envelope]
 
     classDef danger fill:#fee2e2,stroke:#f87171,stroke-width:1px;
     classDef success fill:#dcfce7,stroke:#4ade80,stroke-width:1px;
@@ -414,16 +411,24 @@ config.i18n.default_locale = :en
 
 ---
 
-## 🚀 8. Production Deployment Architectures
+## 🚀 8. Production & Local Deployment Architectures
 
-TimeEcho supports modern production deployment workflows designed for reliability and low resource overhead:
+TimeEcho supports modern production and local infrastructure workflows designed for reliability and low resource overhead:
 
 ### 8.1 Kamal Container Deployment (IaaS / Bare Metal)
 
 Turnkey container deployment configured in `config/deploy.yml`:
 
-- Leverages the multi-stage Docker build (`Dockerfile`) to create a minimal, hardened production image.
+- Leverages the multi-stage Docker build (`Dockerfile`, Ruby 4.0) to create a minimal, hardened production image.
 - Supports rolling zero-downtime updates, asset volume management, and direct integration with managed PostgreSQL and Resend transactional email.
+
+### 8.2 Local Infrastructure & Error Monitoring (`docker-compose.yml`)
+
+For local development, `docker-compose.yml` provisions supporting infrastructure with a single unified PostgreSQL instance:
+
+- **`db` (`postgres:17-alpine`)**: Primary PostgreSQL 17 server on port `5432`. Its healthcheck idempotently provisions both `time_echo_development` (for Rails) and `glitchtip` (for error monitoring) on the same container while keeping their schemas strictly separated.
+- **`mailpit` (`axllent/mailpit:edge`)**: Local SMTP server (`1025`) and web UI (`8025`) for inspecting magic links, confirmation emails, and GlitchTip alerts.
+- **`glitchtip-redis`, `glitchtip-web`, `glitchtip-worker`**: Self-hosted GlitchTip error tracking stack (`http://localhost:8000`) connected to `postgres://postgres:postgres@db:5432/glitchtip` and integrated with the Rails backend via `sentry-ruby` / `sentry-rails` (`rake error_tracking:test`).
 
 ---
 
@@ -533,7 +538,7 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 | `GET` | `/api/v1/letters` | `Api::V1::LettersController#index` | `200 OK` | Paginated scope via `UserTimelineQuery` (with status filters & pagination) |
 | `POST` | `/api/v1/letters` | `Api::V1::LettersController#create` | `201 Created` | `Letters::CreateService.call(...)` (supports `stamp_slug` / `stamp_id`) |
 | `GET` | `/api/v1/letters/:id` | `Api::V1::LettersController#show` | `200 OK` | `Letters::AccessService.call(...)` |
-| `DELETE` | `/api/v1/letters/:id` | `Api::V1::LettersController#destroy` | `204 No Content` | Direct deletion of unqueued letters |
+| `DELETE` | `/api/v1/letters/:id` | `Api::V1::LettersController#destroy` | `204 No Content` | `Letters::DestroyService.call(...)` (deletes archived letters) |
 | `POST` | `/api/v1/letters/:letter_id/predictions` | `Api::V1::LetterPredictionsController#update` | `200 OK` | Updates predictions and emotional deltas for delivered capsules |
 | `POST` | `/api/v1/letters/:id/archive` | `Api::V1::Letters::ArchivesController#create` | `200 OK` | Archives capsule from active timeline |
 | `POST` | `/api/v1/letters/:id/restore` | `Api::V1::Letters::RestoresController#create` | `200 OK` | Restores archived capsule to active timeline |

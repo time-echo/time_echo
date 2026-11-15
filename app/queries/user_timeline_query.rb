@@ -1,14 +1,21 @@
+# frozen_string_literal: true
+
 class UserTimelineQuery
-  def self.call(email, relation = Letter.all)
-    new(email, relation).call
+  def self.call(email, relation = Letter.all, status: nil)
+    new(email, relation, status: status).call
   end
 
-  def initialize(email, relation = Letter.all)
+  def initialize(email, relation = Letter.all, status: nil)
     @email = email
     @relation = relation
+    @status = status
   end
 
   def call
-    @relation.active.for_email(@email).order(deliver_at: :asc)
+    if @status.to_s == "archived"
+      @relation.archived.for_email(@email)
+    else
+      @relation.active.for_email(@email).order(deliver_at: :asc)
+    end
   end
 end

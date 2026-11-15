@@ -17,7 +17,7 @@ module Letters
       return Result.new(success: false, error: :not_found) if letter.nil?
 
       policy = LetterPolicy.new(@current_user_email, letter)
-      return Result.new(success: false, error: :unauthorized) unless policy.archive?
+      return Result.new(success: false, error: :not_found) unless policy.archive?
 
       return Result.new(success: false, error: :cannot_archive_delivered) unless letter.can_archive?
 

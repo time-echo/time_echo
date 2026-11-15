@@ -1,4 +1,4 @@
-require "ostruct"
+# frozen_string_literal: true
 
 module Settings
   class DestroyAccountService
@@ -12,8 +12,7 @@ module Settings
 
     def call
       ActiveRecord::Base.transaction do
-        letters = Letter.where(email: @email)
-        letter_ids = letters.pluck(:id)
+        letters = Letter.where(email: @email).to_a
 
         letters.each do |letter|
           AuditLog.record!(
@@ -26,21 +25,24 @@ module Settings
               status_at_deletion: letter.status
             }
           )
+          letter.destroy!
         end
 
-        if letter_ids.any?
-          conn = ActiveRecord::Base.connection
-          %w[goals predictions emotional_snapshots].each do |table|
-            conn.execute(conn.sanitize_sql_array([ "DELETE FROM #{table} WHERE letter_id IN (?)", letter_ids ])) rescue nil
-          end
-        end
-
-        letters.destroy_all
-        SessionToken.where(email: @email).destroy_all
-        AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
+        SessionToken.where(email: @email).delete_all
+        AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all
       end
 
-      OpenStruct.new(success?: true)
+      Result.new(success: true)
+    end
+
+    class Result
+      def initialize(success:)
+        @success = success
+      end
+
+      def success?
+        @success
+      end
     end
   end
 end

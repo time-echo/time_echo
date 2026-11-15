@@ -179,7 +179,14 @@ class LetterForm
   end
 
   def any_predictions?
-    [ prediction_city, prediction_salary, prediction_relationship, prediction_career, prediction_achievement ].any?(&:present?)
+    [
+      prediction_city,
+      prediction_salary,
+      prediction_relationship,
+      prediction_career,
+      prediction_achievement,
+      prediction_happiness
+    ].any?(&:present?)
   end
 
   def scheduled_at_must_be_in_future

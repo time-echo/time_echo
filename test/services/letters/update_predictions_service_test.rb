@@ -44,7 +44,7 @@ class Letters::UpdatePredictionsServiceTest < ActiveSupport::TestCase
     assert_equal :not_found, pending_result.error
   end
 
-  test "returns unauthorized when policy denies" do
+  test "returns not_found when policy denies" do
     original_show = LetterPolicy.instance_method(:show?)
     LetterPolicy.class_eval do
       alias_method :original_show?, :show?
@@ -57,7 +57,7 @@ class Letters::UpdatePredictionsServiceTest < ActiveSupport::TestCase
       @letter.email
     )
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
   ensure
     LetterPolicy.class_eval do
       alias_method :show?, :original_show?

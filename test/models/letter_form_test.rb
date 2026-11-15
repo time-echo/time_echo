@@ -293,4 +293,19 @@ class LetterFormTest < ActiveSupport::TestCase
     )
     assert other_form.valid?
   end
+
+  test "saving letter with only prediction_happiness tracks predictions_completed event" do
+    form = LetterForm.new(
+      title: "Happiness prediction only",
+      email: "happy_pred@example.com",
+      content: "Reflecting on my future happiness level and hoping for a peaceful and fulfilling life ahead.",
+      deliver_at: 1.year.from_now,
+      prediction_happiness: "Feeling deeply at peace"
+    )
+
+    assert_difference -> { AnalyticsEvent.where(event_type: "predictions_completed").count } => 1,
+                      -> { Prediction.where(category: "happiness").count } => 1 do
+      assert form.save
+    end
+  end
 end
