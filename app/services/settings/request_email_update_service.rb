@@ -14,12 +14,12 @@ module Settings
     def call
       unless valid_email?
         msg = I18n.t("settings.invalid_email")
-        return Result.new(success: false, code: :invalid, error: msg, message: msg)
+        return ServiceResult.failure(msg, code: :invalid, message: msg)
       end
 
       if @new_email == @old_email
         msg = I18n.t("settings.same_email")
-        return Result.new(success: false, code: :same_email, error: msg, message: msg)
+        return ServiceResult.failure(msg, code: :same_email, message: msg)
       end
 
       token = Rails.application.message_verifier(:email_update).generate(
@@ -30,9 +30,8 @@ module Settings
       VerificationMailer.confirm_email(@old_email, @new_email, token).deliver_later
       Analytics::TrackEventService.call("email_update_requested", { old_email: @old_email, new_email: @new_email })
 
-      Result.new(
-        success: true,
-        value: {
+      ServiceResult.success(
+        {
           email: @new_email,
           message: I18n.t("settings.email_update_requested_message", email: @new_email)
         }
@@ -45,20 +44,6 @@ module Settings
       @new_email.present? && @new_email.match?(URI::MailTo::EMAIL_REGEXP)
     end
 
-    class Result
-      attr_reader :value, :code, :error, :message
-
-      def initialize(success:, value: nil, code: nil, error: nil, message: nil)
-        @success = success
-        @value = value
-        @code = code
-        @error = error
-        @message = message
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
 end

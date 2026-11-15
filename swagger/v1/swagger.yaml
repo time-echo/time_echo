@@ -400,8 +400,76 @@ paths:
                 $ref: '#/components/schemas/ErrorEnvelope'
 
   /letters/{letter_id}/predictions:
+    patch:
+      summary: Update predictions and reality reflection
+      description: Updates milestone predictions, reality outcomes, and emotional reflections for a delivered letter.
+      tags:
+        - Letter Predictions
+      security:
+        - bearerAuth: []
+        - sessionTokenHeader: []
+      parameters:
+        - name: letter_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reveal_happiness:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                reveal_anxiety:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                reveal_motivation:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                opened_at:
+                  type: string
+                  format: date-time
+                predictions:
+                  type: array
+                  items:
+                    type: object
+                    required: [id, reality, matched]
+                    properties:
+                      id:
+                        type: integer
+                      reality:
+                        type: string
+                      matched:
+                        type: boolean
+      responses:
+        '200':
+          description: Letter updated with predictions and reflection.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LetterSingleResponse'
+        '401':
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        '404':
+          description: Letter not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
     post:
-      summary: Add prediction to letter
+      summary: Update or add predictions to letter
       description: Attaches a new milestone or outcome prediction to an existing letter.
       tags:
         - Letter Predictions

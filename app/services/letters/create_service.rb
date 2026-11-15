@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Letters
   class CreateService
     def self.call(params:, current_user_email: nil)
@@ -24,30 +26,17 @@ module Letters
             scheduled_at: form.letter.scheduled_at&.iso8601,
             language: form.letter.language,
             timezone: form.letter.timezone,
-            predictions_count: form.letter.predictions.count
+            predictions_count: form.letter.predictions.size
           }
         )
 
         LetterMailer.stamped_confirmation(form.letter).deliver_later
-        Result.new(success: true, letter: form.letter, form: form)
+        ServiceResult.success(letter: form.letter, form: form)
       else
-        Result.new(success: false, errors: form.errors, form: form)
+        ServiceResult.failure(:invalid, errors: form.errors, form: form)
       end
     end
 
-    class Result
-      attr_reader :letter, :errors, :form
-
-      def initialize(success:, letter: nil, errors: nil, form: nil)
-        @success = success
-        @letter = letter
-        @errors = errors
-        @form = form
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
 end

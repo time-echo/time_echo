@@ -19,17 +19,9 @@ module Auth
 
       Analytics::TrackEventService.call("user_logged_out", { email: @email }) if @email.present?
 
-      Result.new(success: true)
+      ServiceResult.success
     end
 
-    class Result
-      def initialize(success:)
-        @success = success
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
 end

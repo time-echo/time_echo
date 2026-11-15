@@ -104,7 +104,8 @@ graph TD
    - **`MagicLinkForm`**: Validates the email address submitted during passwordless sign-in.
 
 4. **Service Objects Layer (`app/services/`)**:
-   - Encapsulate single-responsibility business operations across domain namespaces:
+   - Encapsulate single-responsibility business operations across domain namespaces returning a standardized `ServiceResult` (`success?`, `failure?`, `value`, `error`, `message`, `details`):
+   - **`ServiceResult`**: Universal result contract unifying return payloads and error propagation across the application.
    - **`Letters::CreateService`**: Validates parameters via `LetterForm` and persists the future capsule.
    - **`Letters::DeliverService`**: Transitions capsule status (`pending` -> `queued` -> `delivered`/`failed`), sends the email via `LetterMailer`, tracks analytics, and logs audit events.
    - **`Letters::DispatchPendingService`**: Finds due pending capsules and enqueues deliver jobs into GoodJob.
@@ -566,6 +567,18 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 - **Swagger Documentation Engine (`/api-docs`)**:
   - Serves Swagger UI powered by `rswag-ui` and `rswag-api`.
   - Comprehensive OpenAPI 3.0.3 specification maintained at `swagger/v1/swagger.yaml`.
+
+---
+
+## 📑 10. Architecture Decision Records (ADRs)
+
+Key architectural decisions are documented under `docs/adr/` following the Architecture Designer standard:
+
+- [ADR-001: Passwordless Magic Link Authentication](adr/0001-passwordless-magic-link-authentication.md)
+- [ADR-002: Active Record Encryption for Letters and Predictions](adr/0002-active-record-encryption-for-capsules.md)
+- [ADR-003: GoodJob and SKIP LOCKED for High-Concurrency Capsule Dispatch](adr/0003-goodjob-skip-locked-for-capsule-delivery.md)
+- [ADR-004: Unified ServiceResult and API Error Contract](adr/0004-service-result-and-contract-unification.md)
+
 
 
 

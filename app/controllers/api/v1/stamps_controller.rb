@@ -38,7 +38,7 @@ module Api
         @stamp = Stamp.includes(:stamp_category).find_by(slug: params[:slug])
         raise Api::NotFoundError, "Stamp not found" if @stamp.nil?
 
-        nil unless stale?(etag: [ @stamp.updated_at, @stamp.stamp_category.updated_at, @locale ], public: true)
+        nil unless stale?(etag: [ @stamp.updated_at, @stamp.stamp_category&.updated_at, @locale ], public: true)
       end
     end
   end

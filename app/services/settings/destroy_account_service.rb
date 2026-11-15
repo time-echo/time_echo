@@ -32,17 +32,9 @@ module Settings
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all
       end
 
-      Result.new(success: true)
+      ServiceResult.success
     end
 
-    class Result
-      def initialize(success:)
-        @success = success
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
 end

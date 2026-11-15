@@ -22,7 +22,7 @@ Rails.application.routes.draw do
       resources :stamp_categories, only: [ :index ]
 
       resources :letters, only: [ :index, :show, :create, :destroy ] do
-        post "predictions", to: "letter_predictions#update"
+        match "predictions", to: "letter_predictions#update", via: [ :post, :patch, :put ]
         scope module: :letters do
           resource :archive, only: [ :create ]
           resource :restore, only: [ :create ]

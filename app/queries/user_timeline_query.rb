@@ -8,14 +8,25 @@ class UserTimelineQuery
   def initialize(email, relation = Letter.all, status: nil)
     @email = email
     @relation = relation
-    @status = status
+    @status = status.to_s.downcase.presence
   end
 
   def call
-    if @status.to_s == "archived"
-      @relation.archived.for_email(@email)
+    base = @relation.for_email(@email)
+
+    case @status
+    when "archived"
+      base.archived
+    when "delivered"
+      base.delivered
+    when "scheduled"
+      base.scheduled.order(scheduled_at: :asc)
+    when "pending"
+      base.where(status: "pending").order(scheduled_at: :asc)
+    when "draft"
+      base.where(status: "draft").order(updated_at: :desc)
     else
-      @relation.active.for_email(@email).order(deliver_at: :asc)
+      base.active.order(scheduled_at: :asc)
     end
   end
 end

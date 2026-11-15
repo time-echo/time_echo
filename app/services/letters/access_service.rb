@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Letters
   class AccessService
     def self.call(id_or_signed_id, current_user_email, include_archived: false)
@@ -14,17 +16,17 @@ module Letters
       letter = find_letter
 
       if letter.nil? || (!@include_archived && letter.archived?)
-        return Result.new(success: false, error: :not_found)
+        return ServiceResult.failure(:not_found)
       end
 
       policy = LetterPolicy.new(@current_user_email, letter)
       unless policy.show?
-        return Result.new(success: false, error: :not_found)
+        return ServiceResult.failure(:not_found)
       end
 
       countdown = letter.pending?
 
-      Result.new(success: true, letter: letter, countdown: countdown)
+      ServiceResult.success(letter: letter, countdown: countdown)
     end
 
     private
@@ -33,22 +35,6 @@ module Letters
       Letter.find_signed(@id_or_signed_id.to_s) || Letter.find_by(id: @id_or_signed_id)
     end
 
-    class Result
-      attr_reader :letter, :error, :countdown
-      def initialize(success:, letter: nil, error: nil, countdown: false)
-        @success = success
-        @letter = letter
-        @error = error
-        @countdown = countdown
-      end
-
-      def success?
-        @success
-      end
-
-      def countdown?
-        @countdown
-      end
-    end
+    Result = ServiceResult
   end
 end
