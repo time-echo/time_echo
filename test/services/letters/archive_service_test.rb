@@ -49,7 +49,7 @@ class Letters::ArchiveServiceTest < ActiveSupport::TestCase
     assert_equal "archived", letter.reload.status
   end
 
-  test "returns unauthorized when user does not own the letter" do
+  test "returns not_found when user does not own the letter" do
     letter = Letter.new(
       title: "Other's Letter",
       email: "other@example.com",
@@ -62,7 +62,7 @@ class Letters::ArchiveServiceTest < ActiveSupport::TestCase
     result = Letters::ArchiveService.call(letter.id, @user)
 
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
     assert_equal "pending", letter.reload.status
   end
 

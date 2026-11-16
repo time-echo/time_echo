@@ -6,12 +6,8 @@ module Api
       before_action :authenticate_user!, only: [ :index, :show, :destroy ]
 
       def index
-        scope = if params[:status] == "archived" || params[:archived] == "true"
-          Letter.archived.for_email(current_user_email)
-        else
-          ::UserTimelineQuery.call(current_user_email)
-        end
-
+        requested_status = params[:archived] == "true" ? "archived" : params[:status]
+        scope = ::UserTimelineQuery.call(current_user_email, status: requested_status)
         scope = scope.includes(:emotional_snapshot, :predictions, stamp: :stamp_category)
         @letters = paginate(scope)
 
@@ -35,7 +31,6 @@ module Api
       end
 
       def destroy
-        find_owned_letter!(params[:id])
         unwrap!(::Letters::DestroyService.call(params[:id], current_user_email))
         render_no_content
       end

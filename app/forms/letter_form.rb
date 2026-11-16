@@ -106,7 +106,11 @@ class LetterForm
     if val.is_a?(Date)
       tz.local(val.year, val.month, val.day).utc
     elsif val.is_a?(String)
-      parsed = tz.parse(val) rescue nil
+      parsed = begin
+        tz.parse(val)
+      rescue ArgumentError, TypeError
+        nil
+      end
       parsed&.utc
     else
       nil
@@ -119,8 +123,6 @@ class LetterForm
     utc_time = parsed_utc_scheduled_at
 
     Letter.transaction do
-      resolved_stamp = Stamp.find_by(slug: stamp_slug.to_s.strip) if stamp_slug.present?
-
       @letter = Letter.new(
         title: title,
         email: email,
@@ -165,11 +167,19 @@ class LetterForm
   def validate_stamp_availability
     return if stamp_slug.blank?
 
-    resolved = Stamp.find_by(slug: stamp_slug.to_s.strip)
+    resolved = resolved_stamp
     if resolved.nil?
       errors.add(:stamp_slug, :invalid)
-    elsif !resolved.active? || !resolved.stamp_category.active?
+    elsif !resolved.active? || !resolved.stamp_category&.active?
       errors.add(:stamp_slug, :unavailable)
+    end
+  end
+
+  def resolved_stamp
+    return @resolved_stamp if defined?(@resolved_stamp)
+
+    @resolved_stamp = if stamp_slug.present?
+      Stamp.find_by(slug: stamp_slug.to_s.strip)
     end
   end
 
@@ -179,7 +189,14 @@ class LetterForm
   end
 
   def any_predictions?
-    [ prediction_city, prediction_salary, prediction_relationship, prediction_career, prediction_achievement ].any?(&:present?)
+    [
+      prediction_city,
+      prediction_salary,
+      prediction_relationship,
+      prediction_career,
+      prediction_achievement,
+      prediction_happiness
+    ].any?(&:present?)
   end
 
   def scheduled_at_must_be_in_future

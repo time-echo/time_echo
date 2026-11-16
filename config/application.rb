@@ -27,7 +27,11 @@ module TimeEcho
 
     # Re-enable cookies and session store for session-based auth and GoodJob dashboard
     config.middleware.use ActionDispatch::Cookies
-    config.middleware.use ActionDispatch::Session::CookieStore, key: "_time_echo_session"
+    config.middleware.use ActionDispatch::Session::CookieStore,
+      key: "_time_echo_session",
+      httponly: true,
+      same_site: :lax,
+      secure: Rails.env.production?
     config.middleware.use ActionDispatch::Flash
 
     config.active_job.queue_adapter = :good_job

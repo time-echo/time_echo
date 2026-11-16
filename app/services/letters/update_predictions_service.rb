@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Letters
   class UpdatePredictionsService
     def self.call(letter_id_or_signed_id, params, current_user_email)
@@ -14,12 +16,12 @@ module Letters
       letter = find_letter
 
       if letter.nil? || letter.pending?
-        return Result.new(success: false, error: :not_found)
+        return ServiceResult.failure(:not_found)
       end
 
       policy = LetterPolicy.new(@current_user_email, letter)
       unless policy.show?
-        return Result.new(success: false, error: :unauthorized)
+        return ServiceResult.failure(:not_found)
       end
 
       Letter.transaction do
@@ -36,38 +38,16 @@ module Letters
 
         letter.update!(update_attrs.compact)
 
-        if @params[:predictions].present?
-          if @params[:predictions].is_a?(Array)
-            @params[:predictions].each do |pred_params|
-              prediction = letter.predictions.find_by(id: pred_params[:id])
-              if prediction
-                prediction.update!(
-                  reality: pred_params[:reality],
-                  matched: ActiveModel::Type::Boolean.new.cast(pred_params[:matched])
-                )
-              end
-            end
-          else
-            @params[:predictions].each do |pred_id, pred_params|
-              prediction = letter.predictions.find_by(id: pred_id)
-              if prediction
-                prediction.update!(
-                  reality: pred_params[:reality],
-                  matched: ActiveModel::Type::Boolean.new.cast(pred_params[:matched])
-                )
-              end
-            end
-          end
-        end
+        update_predictions!(letter)
 
         Analytics::TrackEventService.call("letter_opened", { letter_id: letter.id, email: letter.email }) if was_unopened && letter.opened_at.present?
         Analytics::TrackEventService.call("prediction_completion", { letter_id: letter.id, email: letter.email })
         Analytics::TrackEventService.call("emotional_snapshot_completion", { letter_id: letter.id, email: letter.email })
       end
 
-      Result.new(success: true, letter: letter)
+      ServiceResult.success(letter: letter)
     rescue ActiveRecord::RecordInvalid => e
-      Result.new(success: false, error: :invalid, message: e.message)
+      ServiceResult.failure(:invalid, message: e.message)
     end
 
     private
@@ -76,18 +56,35 @@ module Letters
       Letter.find_signed(@letter_id_or_signed_id.to_s) || Letter.find_by(id: @letter_id_or_signed_id)
     end
 
-    class Result
-      attr_reader :letter, :error, :message
-      def initialize(success:, letter: nil, error: nil, message: nil)
-        @success = success
-        @letter = letter
-        @error = error
-        @message = message
-      end
+    def update_predictions!(letter)
+      return if @params[:predictions].blank?
 
-      def success?
-        @success
+      predictions_by_id = letter.predictions.index_by { |p| p.id.to_s }
+      boolean_type = ActiveModel::Type::Boolean.new
+
+      if @params[:predictions].is_a?(Array)
+        @params[:predictions].each do |pred_params|
+          prediction = predictions_by_id[pred_params[:id].to_s]
+          next unless prediction
+
+          prediction.update!(
+            reality: pred_params[:reality],
+            matched: boolean_type.cast(pred_params[:matched])
+          )
+        end
+      else
+        @params[:predictions].each do |pred_id, pred_params|
+          prediction = predictions_by_id[pred_id.to_s]
+          next unless prediction
+
+          prediction.update!(
+            reality: pred_params[:reality],
+            matched: boolean_type.cast(pred_params[:matched])
+          )
+        end
       end
     end
+
+    Result = ServiceResult
   end
 end

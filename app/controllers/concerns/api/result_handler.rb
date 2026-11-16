@@ -60,7 +60,7 @@ module Api
     private
 
     def extract_result_value(result)
-      if result.respond_to?(:letter)
+      if result.respond_to?(:letter) && result.letter.present?
         result.letter
       elsif result.respond_to?(:value)
         result.value

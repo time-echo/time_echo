@@ -117,8 +117,12 @@ Views must remain lightweight and declarative.
 
 TimeEcho maintains specialized agent skills in the `.agents/skills/` directory to guide domain-specific workflows and enforce best practices across architecture and backend development. AI assistants must proactively reference these skill guides before undertaking relevant work:
 
-- **`.agents/skills/rails-expert/` (`SKILL.md`)**: Modern Rails conventions, Hotwire (Turbo Frames & Streams), Active Record query optimization (eager loading, batch queries), background jobs with GoodJob, and robust test suite creation. Consult for complex Rails architecture or query design.
-- **`.agents/skills/find-skills/` (`SKILL.md`)**: Discovery and installation of new agent skills when extended workflows are requested.
+- **`.agents/skills/rails-expert/` (`SKILL.md`)**: Rails 7.1+ & 8 architectural patterns and implementation standards — covering the directory contract, skinny controllers, service objects with Result structs, form objects, query objects, Hotwire (Turbo Frames & Streams), Active Record query optimization (N+1 prevention), background jobs with GoodJob/Solid Queue, and test suite creation.
+- **`.agents/skills/api-designer/` (`SKILL.md`)**: REST API design, resource modeling, versioning strategies, pagination standards, and error contract specifications.
+- **`.agents/skills/architecture-designer/` (`SKILL.md`)**: High-level system architecture, ADR authoring, trade-off evaluations, service boundaries, and scalability planning.
+- **`.agents/skills/database-optimizer/` (`SKILL.md`)**: Query optimization, index strategies, execution plan (EXPLAIN) interpretation, and lock contention mitigation.
+- **`.agents/skills/secure-code-guardian/` (`SKILL.md`)**: Authentication/authorization hardening, input sanitization, OWASP Top 10 mitigation, secure headers, and secrets safety.
+- **`.agents/skills/test-master/` (`SKILL.md`)**: Test planning, test suite generation, mocking strategies, edge-case coverage, and flaky test remediation.
 
 ### Operational Rules for Skills:
 - **Directory Location**: All skills reside in `.agents/skills/<skill_name>/SKILL.md`.
@@ -159,45 +163,5 @@ TimeEcho exposes a standardized RESTful API under `app/controllers/api/v1/` foll
 - **Collection Envelope**: `{ "data": [ ... ], "meta": { "page": 1, "perPage": 20, "total": 134, "totalPages": 7 } }` via `paginate(scope)` from `Api::ApiResponse`.
 - **Error Envelope**: `{ "error": { "code": "...", "message": "...", "details": { ... }?, "requestId": "..." } }`.
 - **Unhandled Exceptions**: Caught by `config.exceptions_app` (`Api::V1::ExceptionsController#show`) and `Rack::Attack` throttler to preserve the JSON contract.
-
----
-
-## ✅ Progress Summary
-
-The following tasks have been completed:
-
-- Created comprehensive UI/UX Design System and Architectural Specification in **[`docs/ui-ux.md`](docs/ui-ux.md)**.
-- Implemented Postal & Archival Design System across all core views (`letters/index`, `letters/new`, `letters/show`, `pages/landing`, `sessions/new`).
-- Established tripartite typography system: Fraunces (`font-serif-editorial`), Courier Prime (`font-letter`), and IBM Plex Sans (`font-ui`).
-- Unified color palette to authentic postal tones (Wax Seal Carmine `#8E2818`, Postmark Indigo `#2C485E`, Manila `#EFECE3`, Parchment `#FAF9F5`), eliminating all purple/violet hues.
-- Designed and generated high-contrast circular wax seal favicon and app icons with true 32-bit RGBA alpha transparency (`(0,0,0,0)`).
-- Cleaned up marketing copy by removing testimonial quote sections and obsolete locale keys.
-- Added missing `letters.*` locale keys to both `en.yml` and `es.yml` (total ~60+ keys)
-- Replaced all hardcoded Spanish text in `letters/index.html.erb` with `t()` calls
-- Replaced all hardcoded Spanish text in `letters/new.html.erb` with `t()` calls (including JS locale references)
-- Replaced all hardcoded Spanish text in `letters/show.html.erb` with `t()` calls
-- Replaced all hardcoded Spanish and English fallbacks in `layouts/application.html.erb`
-- Converted HTML comments in `layouts/application.html.erb` from Spanish to English
-- Implemented interactive language switch button in the navigation header with session persistence via `LocalesController` (`POST /locales`, `DELETE /locales/:id`).
-- Implemented timezone-aware letter scheduling (`scheduled_at` in UTC + `timezone` IANA column) with automatic browser timezone detection.
-- Separated `TimeCapsuleMailer` into `AuthMailer` and `LetterMailer`.
-- Added `Letters::DeliverLetterJob` worker with polynomial backoff retries (`retry_on`) for transient connection errors and status transition tracking (`pending` ➔ `queued` ➔ `delivered`/`failed`).
-- Configured production deployment pipeline (single-mode Puma with `WEB_CONCURRENCY=0`, GoodJob async mode).
-- Consolidated schema attributes into `db/migrate/20260520000001_create_letters.rb`.
-- Migrated all agent skills to `.agents/skills/` folder, updated `skills-lock.json` and documented skills standard in `AGENTS.md`.
-- Completed Impeccable technical audit & quality certification (`19.7/20` score, zero anti-patterns detected).
-- Hardened form accessibility (WCAG AA) with explicit label associations, ARIA attributes on range sliders and progress bars, and elevated placeholder contrast.
-- Adapted layouts for mobile devices (`viewport-fit=cover`, safe-area insets, $\ge 44 \times 44\text{ px}$ touch targets, responsive text-wrap).
-- Optimized font loading performance by removing render-blocking CSS `@import` and utilizing parallel preconnect links with `display=swap`.
-- Optimized landing page and marketing copy across bilingual locale files (`en.yml`, `es.yml`), eliminating inaccurate feature claims (photo/audio uploads) and introducing action-oriented benefit CTAs.
-- Comprehensive documentation update across `docs/architecture.md`, `docs/ui-ux.md`, `README.md`, `GEMINI.md`, and `AGENTS.md`.
-- **Standardized API v1 Responses & Error Handling**:
-  - Implemented `Api::ApiResponse`, `Api::ResultHandler`, and `Api::ErrorHandler` concerns with full single-responsibility boundaries.
-  - Established unified JSON response contracts (`{ data, meta }` and `{ error }`) with camelCase keys across all levels.
-  - Implemented Pagy pagination (`paginate(scope)`) with bounds clamping (1..100) and eager loading protection against N+1 queries.
-  - Created domain exception hierarchy (`ApiError`, `NotFoundError`, `UnauthorizedError`, `ForbiddenError`, `BusinessRuleError`, `RateLimitedError`, `ServiceUnavailableError`).
-  - Corrected permission denial mapping from 401 to 403 Forbidden.
-  - Configured `config.exceptions_app` via `Api::V1::ExceptionsController` and updated `Rack::Attack` throttler to preserve the JSON error contract for out-of-controller exceptions.
-  - Built comprehensive Minitest suite covering all status codes (400 through 503) and Result unwrapping.
 
 

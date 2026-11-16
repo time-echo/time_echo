@@ -1,17 +1,41 @@
 {
   "version": 1,
   "skills": {
-    "find-skills": {
-      "source": "vercel-labs/skills",
+    "api-designer": {
+      "source": "jeffallan/claude-skills",
       "sourceType": "github",
-      "skillPath": ".agents/skills/find-skills/SKILL.md",
-      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+      "skillPath": "skills/api-designer/SKILL.md",
+      "computedHash": "c7e454fd9b0e2ee4e2fce2e5a4718928d0112d9c26ac530257505369b67af13d"
+    },
+    "architecture-designer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-designer/SKILL.md",
+      "computedHash": "823a70de029953659315b8ab2033e59983a8b49915e9054fec3b75fc5848306b"
+    },
+    "database-optimizer": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/database-optimizer/SKILL.md",
+      "computedHash": "9c159ea0db53a75edb7402eb885734d59b44b4d6bdc3948340dcf9aa25b69064"
     },
     "rails-expert": {
       "source": "jeffallan/claude-skills",
       "sourceType": "github",
       "skillPath": ".agents/skills/rails-expert/SKILL.md",
       "computedHash": "e67a8886ff2a11da8133188a0bc0b48b9df213c6fc4bac4cbdd1ddacabb628c1"
+    },
+    "secure-code-guardian": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/secure-code-guardian/SKILL.md",
+      "computedHash": "c6cc420f7dede6f5845e68a053844cb4cca7f33be08b4fd256f5259a5c2725a4"
+    },
+    "test-master": {
+      "source": "jeffallan/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/test-master/SKILL.md",
+      "computedHash": "1cdb7ad7559606d4b322eb4365a67f2db0ed704bf8c79b3e7fc90f7da7572bac"
     }
   }
 }

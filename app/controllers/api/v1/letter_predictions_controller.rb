@@ -6,7 +6,6 @@ module Api
       before_action :authenticate_user!
 
       def update
-        find_owned_letter!(params[:letter_id])
         @letter = unwrap!(
           ::Letters::UpdatePredictionsService.call(
             params[:letter_id],

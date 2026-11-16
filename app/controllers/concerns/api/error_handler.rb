@@ -147,7 +147,7 @@ module Api
       @error_details = details
       @request_id = request&.request_id
 
-      render "api/v1/shared/error", status: status
+      render "api/v1/shared/error", formats: [ :json ], status: status, content_type: "application/json"
     end
 
     def log_exception(exception)

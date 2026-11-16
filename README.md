@@ -1,21 +1,20 @@
-# ⏳ TimeEcho — Rails 8 API Backend
+# ⏳ TimeEcho — API Backend
 
-TimeEcho is a secure, digital time-capsule platform designed to capture personal evolution, emotional shifts, and life predictions across time.
-
-This repository (`time_echo`) is the **API-only Ruby on Rails 8 backend** (`config.api_only = true`), built for transactional integrity, passwordless security, and asynchronous scalability. The user-facing application is served by the Next.js frontend (`frontend/`), while UI components are maintained in Storybook (`mockups/`).
+TimeEcho is a secure, digital time-capsule platform designed to capture personal evolution, emotional shifts, and life predictions across time. This repository (`time_echo`) is the **API-only Ruby on Rails 8 backend**.
 
 ---
 
 ## ✨ Core Backend Features
 
 - **Future Letters (Digital Capsules)**: Schedule encrypted letters for future delivery dates with timezone-aware release logic.
-- **Active Record Encryption**: Protects sensitive letter titles and content at rest using Rails Active Record Encryption (`encrypts :title`, `encrypts :content`).
+- **Active Record Encryption**: Protects sensitive letter titles, letter content, and life predictions/realities at rest using Rails Active Record Encryption (`encrypts :title`, `encrypts :content`, `encrypts :prediction`, `encrypts :reality`).
 - **Digital Postage Stamps Catalog**: Manage and serve dynamic postage stamps organized by category (`small-things`, `places-i-inhabit`, `stored-thoughts`, `passage-of-time`), with vector SVG content, search by name/denomination, and status filtering.
 - **Personal Evolution Tracking**:
   - **Emotional Snapshots**: Record Happiness, Anxiety, and Motivation (1–10) when writing. Compute baseline shifts and emotional evolution upon delivery.
-  - **Predictions vs. Reality**: Track future predictions across life categories. Compare past forecasts with present outcomes upon unlock.
+  - **Predictions vs. Reality**: Track future predictions across life categories (`city`, `salary`, `relationship`, `career`, `achievement`, `happiness`). Compare past forecasts with present outcomes upon unlock.
 - **Passwordless Magic Link Authentication**: Cryptographically signed single-use access tokens delivered via Resend transactional email.
 - **Background Job Scheduling (GoodJob)**: Database-backed Active Job queuing and cron execution for daily automated delivery dispatch (`0 0 * * *`) and hourly token cleanup (`0 * * * *`).
+- **Error Tracking & Audit Logging**: Integrated with GlitchTip / Sentry (`sentry-rails`) and immutable `AuditLog` tracking across critical lifecycle mutations.
 - **Interactive OpenAPI Documentation**: Swagger UI served directly at `/api-docs` via Rswag.
 
 ---
@@ -37,8 +36,8 @@ TimeEcho adopts a layered, highly decoupled API architecture:
    - Encapsulate single-responsibility business workflows (`Letters::*`, `Auth::*`, `Analytics::*`, `Settings::*`).
    - Return clean `Result` objects unwrapped by `ResultHandler#unwrap!`.
 4. **Query Objects (`app/queries/`)**:
-   - `UserTimelineQuery`: Loads letters for an authenticated user with eager loading (`includes(:predictions, :emotional_snapshot, :stamp)`) to eliminate $N+1$ queries.
-   - `PendingLettersQuery`: Selects letters due for delivery using high-concurrency row locking (`FOR UPDATE SKIP LOCKED`).
+   - `UserTimelineQuery`: Scopes active or archived letters for an authenticated user, paired with eager loading (`includes(:emotional_snapshot, :predictions, stamp: :stamp_category)`) in `LettersController#index` to eliminate $N+1$ queries.
+   - `PendingLettersQuery`: Selects letters due for delivery using high-concurrency row locking (`FOR UPDATE SKIP LOCKED`) inside a transaction.
 5. **Jbuilder JSON Serialization (`app/views/api/v1/`)**:
    - Formats API responses into standardized JSON envelopes (`data`, `meta`, and `error`) with `camelCase` keys.
 6. **Policy Layer (`app/policies/`)**:
@@ -55,39 +54,40 @@ For detailed sequence diagrams, database schemas, and transactional boundary det
 
 ## 📡 REST API Endpoints (`/api/v1`)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/livez` | Lightweight process liveness probe |
-| `GET` | `/readyz` | Readiness healthcheck (verifies DB, migrations, GoodJob) |
-| `GET` | `/api/v1/ping` | Timestamp and status diagnostic |
-| `GET` | `/api-docs` | Interactive Swagger UI API documentation |
-| `GET` | `/api-docs/v1/swagger.yaml` | OpenAPI 3.0.3 specification document |
-| `GET` | `/api/v1/letters` | Paginated user capsule timeline (filters: `status`, `page`, `per_page`) |
-| `POST` | `/api/v1/letters` | Create a new capsule (supports `stamp_slug`, predictions, emotions) |
-| `GET` | `/api/v1/letters/:id` | Fetch a single letter's details |
-| `DELETE` | `/api/v1/letters/:id` | Delete an unqueued capsule |
-| `POST` | `/api/v1/letters/:letter_id/predictions` | Update reality comparisons and reveal emotions |
-| `POST` | `/api/v1/letters/:id/archive` | Move capsule to archive |
-| `POST` | `/api/v1/letters/:id/restore` | Restore capsule from archive |
-| `GET` | `/api/v1/stamps` | List stamp catalog (search `q`, `category`, `status`, pagination) |
-| `GET` | `/api/v1/stamps/:slug` | Fetch a single stamp with raw vector SVG |
-| `GET` | `/api/v1/stamp_categories` | List active stamp categories ordered by position |
-| `POST` | `/api/v1/sessions` | Request a passwordless magic login link |
-| `GET` | `/api/v1/sessions/:token` | Authenticate magic link token and start session |
-| `GET` | `/api/v1/sessions/me` | Fetch currently authenticated user session |
-| `DELETE` | `/api/v1/sessions` | Destroy active session and invalidate cookie |
-| `PATCH` | `/api/v1/account` | Request email change confirmation |
-| `DELETE` | `/api/v1/account` | Purge entire user account and related records |
-| `GET` | `/api/v1/account/confirm_email` | Confirm email change token |
+| Method   | Endpoint                                 | Description                                                             |
+| -------- | ---------------------------------------- | ----------------------------------------------------------------------- |
+| `GET`    | `/livez`                                 | Lightweight process liveness probe                                      |
+| `GET`    | `/readyz`                                | Readiness healthcheck (verifies DB, migrations, GoodJob)                |
+| `GET`    | `/api/v1/ping`                           | Timestamp and status diagnostic                                         |
+| `GET`    | `/api-docs`                              | Interactive Swagger UI API documentation                                |
+| `GET`    | `/api-docs/v1/swagger.yaml`              | OpenAPI 3.0.3 specification document                                    |
+| `GET`    | `/api/v1/letters`                        | Paginated user capsule timeline (filters: `status`, `page`, `per_page`) |
+| `POST`   | `/api/v1/letters`                        | Create a new capsule (supports `stamp_slug`, predictions, emotions)     |
+| `GET`    | `/api/v1/letters/:id`                    | Fetch a single letter's details                                         |
+| `DELETE` | `/api/v1/letters/:id`                    | Permanently delete an archived capsule                                  |
+| `POST`   | `/api/v1/letters/:letter_id/predictions` | Update reality comparisons and reveal emotions                          |
+| `POST`   | `/api/v1/letters/:id/archive`            | Move capsule to archive                                                 |
+| `POST`   | `/api/v1/letters/:id/restore`            | Restore capsule from archive                                            |
+| `GET`    | `/api/v1/stamps`                         | List stamp catalog (search `q`, `category`, `status`, pagination)       |
+| `GET`    | `/api/v1/stamps/:slug`                   | Fetch a single stamp with raw vector SVG                                |
+| `GET`    | `/api/v1/stamp_categories`               | List active stamp categories ordered by position                        |
+| `POST`   | `/api/v1/sessions`                       | Request a passwordless magic login link                                 |
+| `GET`    | `/api/v1/sessions/:token`                | Authenticate magic link token and start session                         |
+| `GET`    | `/api/v1/sessions/me`                    | Fetch currently authenticated user session                              |
+| `DELETE` | `/api/v1/sessions`                       | Destroy active session and invalidate cookie                            |
+| `PATCH`  | `/api/v1/account`                        | Request email change confirmation                                       |
+| `DELETE` | `/api/v1/account`                        | Purge entire user account and related records                           |
+| `GET`    | `/api/v1/account/confirm_email`          | Confirm email change token                                              |
 
 ---
 
 ## 🛠️ Prerequisites & Stack
 
-- **Ruby**: `~> 3.2` or `3.3` (with Rails `8.1.x`)
-- **Database**: PostgreSQL (v14+)
+- **Ruby**: `4.0.1` (with Rails `8.1.x`)
+- **Database**: PostgreSQL (`17-alpine`)
 - **Queue Adapter**: GoodJob (database-backed Active Job)
-- **Mailer**: Resend (`resend` gem)
+- **Mailer**: Resend (`resend` gem) / Mailpit (local development)
+- **Error Monitoring**: GlitchTip / Sentry (`sentry-ruby`, `sentry-rails`)
 - **API Spec**: Rswag (OpenAPI 3.0.3)
 
 ---
@@ -135,25 +135,24 @@ The API will be accessible at `http://localhost:3000`. Explore endpoints at `htt
 
 ---
 
-## 🐳 Running with Docker
+## 🐳 Running Supporting Services with Docker
 
-TimeEcho includes a multi-stage `Dockerfile` and `docker-compose.yml`.
+TimeEcho includes a `docker-compose.yml` for local infrastructure and a `Dockerfile` for containerized deployments.
 
-### Start the Stack
+### Start Local Infrastructure
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
 Services started:
-- `db`: PostgreSQL 14 (port `5432`)
-- `web`: Rails 8 API server (port `3000`)
-- `queue`: GoodJob background worker
-- `mailpit`: Local SMTP catcher (web UI at `http://localhost:8025`)
+
+- `db`: PostgreSQL 17 (port `5432`) — hosts `time_echo_development`
+- `mailpit`: Local SMTP server (port `1025`) and web UI (`http://localhost:8025`)
 
 ---
 
-## 🧪 Testing the Suite
+## 🧪 Testing & Code Quality
 
 TimeEcho has a comprehensive Minitest test suite covering controllers, models, services, forms, queries, policies, jobs, and mailers:
 
@@ -165,6 +164,14 @@ Generate test coverage with SimpleCov:
 
 ```bash
 COVERAGE=true bundle exec rails test
+```
+
+Run linting and static security analysis:
+
+```bash
+bundle exec rubocop -a
+bundle exec brakeman --no-pager -q
+bundle exec bundler-audit check
 ```
 
 ---

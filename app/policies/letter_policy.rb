@@ -29,6 +29,13 @@ class LetterPolicy
   private
 
   def owner?
-    user_email.present? && letter.email == user_email
+    return false if user_email.blank? || letter&.email.blank?
+
+    normalized_user = user_email.to_s.strip.downcase
+    normalized_owner = letter.email.to_s.strip.downcase
+
+    return false unless normalized_user.bytesize == normalized_owner.bytesize
+
+    Rack::Utils.secure_compare(normalized_owner, normalized_user)
   end
 end

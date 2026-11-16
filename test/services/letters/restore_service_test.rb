@@ -66,7 +66,7 @@ class Letters::RestoreServiceTest < ActiveSupport::TestCase
     assert_equal "pending", letter.reload.status
   end
 
-  test "returns unauthorized when non-owner attempts to restore" do
+  test "returns not_found when non-owner attempts to restore" do
     letter = Letter.new(
       title: "Someone Else's Letter",
       email: "stranger@example.com",
@@ -79,7 +79,7 @@ class Letters::RestoreServiceTest < ActiveSupport::TestCase
     result = Letters::RestoreService.call(letter.id, @user)
 
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
     assert_equal "archived", letter.reload.status
   end
 

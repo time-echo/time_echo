@@ -13,9 +13,8 @@ module Auth
     def call
       token_record = SessionToken.active.find_by(token: @token)
       if token_record.nil?
-        return Result.new(
-          success: false,
-          error: :invalid_token,
+        return ServiceResult.failure(
+          :invalid_token,
           message: I18n.t("flash.invalid_link")
         )
       end
@@ -31,28 +30,14 @@ module Auth
 
       Analytics::TrackEventService.call("user_logged_in", { email: email })
 
-      Result.new(
-        success: true,
-        value: {
+      ServiceResult.success(
+        {
           email: email,
           token: api_session_token.token
         }
       )
     end
 
-    class Result
-      attr_reader :value, :error, :message
-
-      def initialize(success:, value: nil, error: nil, message: nil)
-        @success = success
-        @value = value
-        @error = error
-        @message = message
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
 end

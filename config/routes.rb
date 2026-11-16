@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   get "livez", to: "api/v1/health#liveness", defaults: { format: :json }
   get "readyz", to: "api/v1/health#show", defaults: { format: :json }
 
+  root to: "api/v1/health#index", defaults: { format: :json }
+
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       get "ping", to: proc {
@@ -22,7 +24,7 @@ Rails.application.routes.draw do
       resources :stamp_categories, only: [ :index ]
 
       resources :letters, only: [ :index, :show, :create, :destroy ] do
-        post "predictions", to: "letter_predictions#update"
+        match "predictions", to: "letter_predictions#update", via: [ :post, :patch, :put ]
         scope module: :letters do
           resource :archive, only: [ :create ]
           resource :restore, only: [ :create ]
