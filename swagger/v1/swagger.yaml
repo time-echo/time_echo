@@ -50,6 +50,8 @@ tags:
     description: Life predictions and future outcome verifications linked to letters.
   - name: Account
     description: Account email updates, email confirmations, and permanent vault deletion.
+  - name: Stamps
+    description: Catalog of digital postage stamps, philatelic categories, and vector SVG assets.
 
 paths:
   /health/liveness:
@@ -205,6 +207,186 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+
+  /stamps:
+    get:
+      summary: List postage stamps catalog
+      description: |
+        Returns active stamps belonging to active categories, ordered by category position and stamp position.
+        Supports filtering by name/query across English and Spanish translations, category slug or ID, activation status, pagination, and HTTP caching via ETag.
+      tags:
+        - Stamps
+      parameters:
+        - name: locale
+          in: query
+          description: Two-letter language code (`en`, `es`). Also configurable via `Accept-Language` or `X-Locale` headers.
+          required: false
+          schema:
+            type: string
+            enum: [en, es]
+            default: en
+        - name: q
+          in: query
+          description: Search term matching stamp slug or localized name in English/Spanish (alias `name`).
+          required: false
+          schema:
+            type: string
+            example: coffee
+        - name: name
+          in: query
+          description: Search term alias for `q`.
+          required: false
+          schema:
+            type: string
+            example: coffee
+        - name: category
+          in: query
+          description: Filter stamps by category slug (e.g. `small-things`) or numeric category ID.
+          required: false
+          schema:
+            type: string
+            example: small-things
+        - name: active
+          in: query
+          description: Filter by activation status (`true`, `false`, or `all` to include inactive stamps). Alias `status`.
+          required: false
+          schema:
+            type: string
+            enum: [true, false, all]
+            default: true
+        - name: status
+          in: query
+          description: Status filter alias for `active`.
+          required: false
+          schema:
+            type: string
+            enum: [true, false, all]
+        - name: page
+          in: query
+          description: Page number for pagination.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          description: Number of stamps returned per page.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+        - name: If-None-Match
+          in: header
+          description: ETag value from a previous response for conditional cache validation.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of stamps matching query filters.
+          headers:
+            ETag:
+              description: HTTP entity tag for cache validation.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampCollectionResponse'
+        '304':
+          description: Content not modified since previous request (ETag matched).
+
+  /stamps/{slug}:
+    get:
+      summary: Get stamp details
+      description: |
+        Retrieves detailed metadata and sanitized SVG vector content for a specific stamp by slug.
+        Historical inactive stamps remain accessible so previously stamped letters render correctly.
+      tags:
+        - Stamps
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Unique alphanumeric slug identifier of the stamp.
+          schema:
+            type: string
+            example: morning-coffee
+        - name: locale
+          in: query
+          description: Two-letter language code (`en`, `es`).
+          required: false
+          schema:
+            type: string
+            enum: [en, es]
+            default: en
+        - name: If-None-Match
+          in: header
+          description: ETag value from a previous response for conditional cache validation.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Stamp details with vector SVG content.
+          headers:
+            ETag:
+              description: HTTP entity tag for cache validation.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampSingleResponse'
+        '304':
+          description: Content not modified since previous request (ETag matched).
+        '404':
+          description: Stamp with the specified slug does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+
+  /stamp_categories:
+    get:
+      summary: List stamp categories
+      description: |
+        Returns active stamp categories that contain at least one active stamp, ordered by position.
+        Supports localization via the `locale` parameter or headers, and HTTP caching via ETag.
+      tags:
+        - Stamps
+      parameters:
+        - name: locale
+          in: query
+          description: Two-letter language code (`en`, `es`).
+          required: false
+          schema:
+            type: string
+            enum: [en, es]
+            default: en
+        - name: If-None-Match
+          in: header
+          description: ETag value from a previous response for conditional cache validation.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of active stamp categories.
+          headers:
+            ETag:
+              description: HTTP entity tag for cache validation.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampCategoryCollectionResponse'
+        '304':
+          description: Content not modified since previous request (ETag matched).
 
   /letters:
     get:
@@ -867,6 +1049,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Prediction'
+        stamp:
+          type: object
+          nullable: true
+          properties:
+            slug:
+              type: string
+              example: morning-coffee
+            name:
+              type: string
+              example: Morning Coffee
+            category_slug:
+              type: string
+              example: small-things
+            categorySlug:
+              type: string
+              example: small-things
 
     EmotionalSnapshot:
       type: object
@@ -955,6 +1153,10 @@ components:
           type: string
           format: date-time
           example: "2030-01-01T00:00:00Z"
+        stamp_slug:
+          type: string
+          description: Slug of active postage stamp to affix to the letter envelope.
+          example: morning-coffee
         emotionalSnapshot:
           type: object
           properties:
@@ -987,3 +1189,146 @@ components:
         category:
           type: string
           example: travel
+
+    StampItem:
+      type: object
+      required:
+        - slug
+        - name
+        - category_slug
+        - position
+        - active
+        - svg_content
+      properties:
+        slug:
+          type: string
+          example: morning-coffee
+        name:
+          type: string
+          example: Morning Coffee
+        category_slug:
+          type: string
+          example: small-things
+        categorySlug:
+          type: string
+          example: small-things
+        position:
+          type: integer
+          example: 1
+        active:
+          type: boolean
+          example: true
+        svg_content:
+          type: string
+          example: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/></svg>'
+        svgContent:
+          type: string
+          example: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/></svg>'
+
+    StampDetail:
+      type: object
+      required:
+        - slug
+        - name
+        - category_slug
+        - category_name
+        - active
+        - svg_content
+      properties:
+        slug:
+          type: string
+          example: morning-coffee
+        name:
+          type: string
+          example: Morning Coffee
+        category_slug:
+          type: string
+          example: small-things
+        categorySlug:
+          type: string
+          example: small-things
+        category_name:
+          type: string
+          example: Small Things
+        categoryName:
+          type: string
+          example: Small Things
+        active:
+          type: boolean
+          example: true
+        svg_content:
+          type: string
+          example: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/></svg>'
+        svgContent:
+          type: string
+          example: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="10"/></svg>'
+
+    StampCategory:
+      type: object
+      required:
+        - slug
+        - name
+        - position
+      properties:
+        slug:
+          type: string
+          example: small-things
+        name:
+          type: string
+          example: Small Things
+        position:
+          type: integer
+          example: 1
+
+    StampCollectionResponse:
+      type: object
+      required:
+        - stamps
+        - data
+      properties:
+        stamps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StampItem'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StampItem'
+        meta:
+          type: object
+          properties:
+            page:
+              type: integer
+              example: 1
+            per_page:
+              type: integer
+              example: 25
+            total:
+              type: integer
+              example: 18
+            total_pages:
+              type: integer
+              example: 1
+
+    StampSingleResponse:
+      type: object
+      required:
+        - stamp
+      properties:
+        stamp:
+          $ref: '#/components/schemas/StampDetail'
+
+    StampCategoryCollectionResponse:
+      type: object
+      required:
+        - stamp_categories
+        - stampCategories
+      properties:
+        stamp_categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/StampCategory'
+        stampCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/StampCategory'

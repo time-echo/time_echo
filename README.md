@@ -8,7 +8,7 @@ TimeEcho is a secure, digital time-capsule platform designed to capture personal
 
 - **Future Letters (Digital Capsules)**: Schedule encrypted letters for future delivery dates with timezone-aware release logic.
 - **Active Record Encryption**: Protects sensitive letter titles, letter content, and life predictions/realities at rest using Rails Active Record Encryption (`encrypts :title`, `encrypts :content`, `encrypts :prediction`, `encrypts :reality`).
-- **Digital Postage Stamps Catalog**: Manage and serve dynamic postage stamps organized by category (`small-things`, `places-i-inhabit`, `stored-thoughts`, `passage-of-time`), with vector SVG content, search by name/denomination, and status filtering.
+- **Digital Postage Stamps Catalog**: Manage and serve dynamic postage stamps organized by category (`small-things`, `places-i-inhabit`, `stored-thoughts`, `passage-of-time`), with vector SVG content, search by name/slug/category, and status filtering.
 - **Personal Evolution Tracking**:
   - **Emotional Snapshots**: Record Happiness, Anxiety, and Motivation (1–10) when writing. Compute baseline shifts and emotional evolution upon delivery.
   - **Predictions vs. Reality**: Track future predictions across life categories (`city`, `salary`, `relationship`, `career`, `achievement`, `happiness`). Compare past forecasts with present outcomes upon unlock.

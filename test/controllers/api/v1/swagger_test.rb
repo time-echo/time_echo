@@ -23,6 +23,8 @@ module Api
         assert_includes response.body, "/sessions"
         assert_includes response.body, "/letters"
         assert_includes response.body, "/account"
+        assert_includes response.body, "/stamps"
+        assert_includes response.body, "/stamp_categories"
       end
     end
   end
