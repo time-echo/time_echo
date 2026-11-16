@@ -29,4 +29,26 @@ class AuthMailerTest < ActionMailer::TestCase
       ENV["APP_HOST"] = original_host
     end
   end
+
+  test "magic_link renders in Spanish when locale: :es is provided" do
+    mail = AuthMailer.magic_link("user@example.com", "token123", :es)
+    assert_equal "Tu enlace de acceso a TimeEcho", mail.subject
+    assert_includes mail.html_part.body.decoded, "Inicia sesión en TimeEcho"
+    assert_includes mail.html_part.body.decoded, "Hola,"
+    assert_includes mail.html_part.body.decoded, "Iniciar sesión"
+    assert_includes mail.text_part.body.decoded, "Inicia sesión en TimeEcho"
+    assert_includes mail.text_part.body.decoded, "Este enlace vence en 15 minutos."
+    assert_includes mail.html_part.body.decoded, 'lang="es"'
+  end
+
+  test "magic_link renders in English when locale: :en is provided" do
+    mail = AuthMailer.magic_link("user@example.com", "token123", :en)
+    assert_equal "Your TimeEcho sign-in link", mail.subject
+    assert_includes mail.html_part.body.decoded, "Sign in to TimeEcho"
+    assert_includes mail.html_part.body.decoded, "Hello,"
+    assert_includes mail.html_part.body.decoded, "Sign in"
+    assert_includes mail.text_part.body.decoded, "Sign in to TimeEcho"
+    assert_includes mail.text_part.body.decoded, "This link expires in 15 minutes."
+    assert_includes mail.html_part.body.decoded, 'lang="en"'
+  end
 end

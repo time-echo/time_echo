@@ -22,6 +22,63 @@ class Api::V1::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_not token_record.used?
   end
 
+  test "POST /api/v1/sessions with X-Locale: es sends magic link in Spanish" do
+    assert_emails 1 do
+      post "/api/v1/sessions",
+        params: { email: @user_email },
+        headers: { "X-Locale" => "es" },
+        as: :json
+    end
+
+    json = assert_resource_response(expected_status: :created)
+    assert_equal @user_email, json["data"]["email"]
+    assert_equal "Te enviamos un enlace de acceso.", json["data"]["message"]
+
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal "Tu enlace de acceso a TimeEcho", mail.subject
+    assert_includes mail.html_part.body.decoded, "Inicia sesión en TimeEcho"
+    assert_includes mail.text_part.body.decoded, "Inicia sesión en TimeEcho"
+  end
+
+  test "POST /api/v1/sessions with locale in JSON body sends magic link in Spanish" do
+    assert_emails 1 do
+      post "/api/v1/sessions",
+        params: { email: @user_email, locale: "es" },
+        as: :json
+    end
+
+    json = assert_resource_response(expected_status: :created)
+    assert_equal @user_email, json["data"]["email"]
+    assert_equal "Te enviamos un enlace de acceso.", json["data"]["message"]
+
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal "Tu enlace de acceso a TimeEcho", mail.subject
+    assert_includes mail.html_part.body.decoded, "Inicia sesión en TimeEcho"
+  end
+
+  test "POST /api/v1/sessions falls back to existing user letter language if header is omitted" do
+    Letter.create!(
+      email: @user_email,
+      title: "Carta pasada",
+      content: "Contenido",
+      scheduled_at: 1.year.from_now,
+      language: "es"
+    )
+
+    assert_emails 1 do
+      post "/api/v1/sessions",
+        params: { email: @user_email },
+        as: :json
+    end
+
+    json = assert_resource_response(expected_status: :created)
+    assert_equal "Te enviamos un enlace de acceso.", json["data"]["message"]
+
+    mail = ActionMailer::Base.deliveries.last
+    assert_equal "Tu enlace de acceso a TimeEcho", mail.subject
+    assert_includes mail.html_part.body.decoded, "Inicia sesión en TimeEcho"
+  end
+
   test "POST /api/v1/sessions revokes previous active session tokens and issues fresh magic link token" do
     old_active_token = SessionToken.create!(email: @user_email)
     other_user_token = SessionToken.create!(email: "other_user@example.com")

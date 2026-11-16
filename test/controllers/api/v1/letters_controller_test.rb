@@ -96,6 +96,16 @@ class Api::V1::LettersControllerTest < ActionDispatch::IntegrationTest
     assert_includes json["error"]["message"], "El título no puede estar en blanco"
   end
 
+  test "POST /api/v1/letters returns 422 when scheduled_at is in the past" do
+    payload = @create_payload.deep_dup
+    payload[:letter][:scheduled_at] = 1.day.ago.iso8601
+
+    post "/api/v1/letters", params: payload, headers: @auth_headers.merge("X-Locale" => "es")
+    json = assert_error_response(expected_status: :unprocessable_content, expected_code: "validation_failed")
+    assert json["error"]["details"].present?
+    assert_includes json["error"]["message"], "futuro"
+  end
+
   test "GET /api/v1/letters/:id returns single letter in resource envelope" do
     post "/api/v1/letters", params: @create_payload, headers: @auth_headers
     created = assert_resource_response(expected_status: :created)

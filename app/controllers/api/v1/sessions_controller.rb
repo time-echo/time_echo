@@ -6,7 +6,10 @@ module Api
       before_action :authenticate_user!, only: [ :me, :destroy ]
 
       def create
-        @session_data = unwrap!(::Auth::RequestMagicLinkService.call(email: email_param))
+        @session_data = unwrap!(::Auth::RequestMagicLinkService.call(
+          email: email_param,
+          locale: locale_param
+        ))
         render :create, status: :created
       end
 
@@ -39,6 +42,12 @@ module Api
         else
           params.require(:email)
         end
+      end
+
+      def locale_param
+        extract_valid_locale(params[:locale]) ||
+          extract_valid_locale(params.dig(:session, :locale)) ||
+          extract_valid_locale(request.headers["X-Locale"])
       end
     end
   end

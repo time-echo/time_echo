@@ -57,7 +57,7 @@ module Api
 
       def set_locale
         locale = extract_valid_locale(request.headers["X-Locale"]) ||
-                 extract_valid_locale(params[:locale] || params.dig(:letter, :language)) ||
+                 extract_valid_locale(params[:locale] || params.dig(:letter, :language) || params.dig(:session, :locale)) ||
                  extract_valid_locale(session[:locale]) ||
                  extract_valid_locale(request.env["HTTP_ACCEPT_LANGUAGE"])
 
