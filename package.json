@@ -2,20 +2,13 @@
   "name": "time_echo",
   "private": true,
   "license": "MIT",
-  "dependencies": {
-    "daisyui": "^5.0.0-beta.0"
-  },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
-    "@tailwindcss/cli": "^4.0.0",
     "husky": "^9.1.7",
-    "lint-staged": "^17.5.0",
-    "tailwindcss": "^4.0.0"
+    "lint-staged": "^17.5.0"
   },
   "scripts": {
-    "build:css": "tailwindcss -i app/assets/stylesheets/application.tailwind.css -o app/assets/builds/tailwind.css --minify",
-    "watch:css": "tailwindcss -i app/assets/stylesheets/application.tailwind.css -o app/assets/builds/tailwind.css --watch=always",
     "commitlint": "commitlint",
     "prepare": "husky"
   }

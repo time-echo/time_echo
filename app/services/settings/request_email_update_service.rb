@@ -1,4 +1,4 @@
-require "ostruct"
+# frozen_string_literal: true
 
 module Settings
   class RequestEmailUpdateService
@@ -12,8 +12,15 @@ module Settings
     end
 
     def call
-      return OpenStruct.new(success?: false, error: I18n.t("settings.invalid_email", default: "Por favor introduce un correo electrónico válido.")) unless valid_email?
-      return OpenStruct.new(success?: false, error: I18n.t("settings.same_email", default: "El nuevo correo no puede ser igual al actual.")) if @new_email == @old_email
+      unless valid_email?
+        msg = I18n.t("settings.invalid_email")
+        return ServiceResult.failure(msg, code: :invalid, message: msg)
+      end
+
+      if @new_email == @old_email
+        msg = I18n.t("settings.same_email")
+        return ServiceResult.failure(msg, code: :same_email, message: msg)
+      end
 
       token = Rails.application.message_verifier(:email_update).generate(
         { old_email: @old_email, new_email: @new_email },
@@ -21,9 +28,14 @@ module Settings
       )
 
       VerificationMailer.confirm_email(@old_email, @new_email, token).deliver_later
-      Analytics::TrackEventService.call("email_update_requested", { old_email: @old_email, new_email: @new_email }) rescue nil
+      Analytics::TrackEventService.call("email_update_requested", { old_email: @old_email, new_email: @new_email })
 
-      OpenStruct.new(success?: true)
+      ServiceResult.success(
+        {
+          email: @new_email,
+          message: I18n.t("settings.email_update_requested_message", email: @new_email)
+        }
+      )
     end
 
     private
@@ -31,5 +43,7 @@ module Settings
     def valid_email?
       @new_email.present? && @new_email.match?(URI::MailTo::EMAIL_REGEXP)
     end
+
+    Result = ServiceResult
   end
 end

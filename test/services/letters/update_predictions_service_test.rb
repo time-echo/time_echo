@@ -25,13 +25,26 @@ class Letters::UpdatePredictionsServiceTest < ActiveSupport::TestCase
     assert @prediction.matched?
   end
 
-  test "returns not_found for nil letter" do
+  test "returns not_found for nil or pending letter" do
     result = Letters::UpdatePredictionsService.call(999, {}, @letter.email)
     assert_not result.success?
     assert_equal :not_found, result.error
+
+    pending_letter = Letter.new(
+      title: "Pending",
+      email: "user@example.com",
+      content: "Hello",
+      deliver_at: 1.day.from_now,
+      status: "pending"
+    )
+    pending_letter.save!(validate: false)
+
+    pending_result = Letters::UpdatePredictionsService.call(pending_letter.id, {}, pending_letter.email)
+    assert_not pending_result.success?
+    assert_equal :not_found, pending_result.error
   end
 
-  test "returns unauthorized when policy denies" do
+  test "returns not_found when policy denies" do
     original_show = LetterPolicy.instance_method(:show?)
     LetterPolicy.class_eval do
       alias_method :original_show?, :show?
@@ -44,7 +57,7 @@ class Letters::UpdatePredictionsServiceTest < ActiveSupport::TestCase
       @letter.email
     )
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
   ensure
     LetterPolicy.class_eval do
       alias_method :show?, :original_show?

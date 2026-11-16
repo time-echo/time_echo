@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Letters
   class DeliverService
     def self.call(letter)
@@ -15,7 +17,7 @@ module Letters
         LetterMailer.future_letter(@letter).deliver_now
       end
 
-      @letter.update!(status: "delivered", delivered_at: Time.current)
+      @letter.deliver!
 
       AuditLog.record!(
         action: "letter.delivered",
@@ -31,6 +33,10 @@ module Letters
         letter_id: @letter.id,
         email: @letter.email
       })
+
+      ServiceResult.success(letter: @letter)
     end
+
+    Result = ServiceResult
   end
 end

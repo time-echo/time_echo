@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Settings
   class DestroyAccountService
     def self.call(email)
@@ -10,8 +12,7 @@ module Settings
 
     def call
       ActiveRecord::Base.transaction do
-        letters = Letter.where(email: @email)
-        letter_ids = letters.pluck(:id)
+        letters = Letter.where(email: @email).to_a
 
         letters.each do |letter|
           AuditLog.record!(
@@ -24,19 +25,16 @@ module Settings
               status_at_deletion: letter.status
             }
           )
+          letter.destroy!
         end
 
-        if letter_ids.any?
-          conn = ActiveRecord::Base.connection
-          %w[goals predictions emotional_snapshots].each do |table|
-            conn.execute(conn.sanitize_sql_array([ "DELETE FROM #{table} WHERE letter_id IN (?)", letter_ids ])) rescue nil
-          end
-        end
-
-        letters.destroy_all
-        AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all rescue nil
+        SessionToken.where(email: @email).delete_all
+        AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all
       end
-      true
+
+      ServiceResult.success
     end
+
+    Result = ServiceResult
   end
 end

@@ -1,4 +1,4 @@
-require "ostruct"
+# frozen_string_literal: true
 
 module Settings
   class ConfirmEmailUpdateService
@@ -11,23 +11,38 @@ module Settings
     end
 
     def call
-      return OpenStruct.new(success?: false) if @token.blank?
+      invalid_msg = I18n.t("settings.confirmation_link_invalid")
+      return ServiceResult.failure(:invalid_token, message: invalid_msg) if @token.blank?
 
       payload = Rails.application.message_verifier(:email_update).verified(@token)
-      return OpenStruct.new(success?: false) unless payload.is_a?(Hash)
+      return ServiceResult.failure(:invalid_token, message: invalid_msg) unless payload.is_a?(Hash)
 
       old_email = payload[:old_email] || payload["old_email"]
       new_email = payload[:new_email] || payload["new_email"]
 
-      return OpenStruct.new(success?: false) if old_email.blank? || new_email.blank?
+      return ServiceResult.failure(:invalid_token, message: invalid_msg) if old_email.blank? || new_email.blank?
 
       ActiveRecord::Base.transaction do
         Letter.where(email: old_email).update_all(email: new_email)
+        SessionToken.where(email: old_email).update_all(email: new_email)
+        AuditLog.record!(
+          action: "account.email_updated",
+          actor_email: new_email,
+          metadata: { old_email: old_email, new_email: new_email }
+        )
       end
 
-      Analytics::TrackEventService.call("email_update_confirmed", { old_email: old_email, new_email: new_email }) rescue nil
+      Analytics::TrackEventService.call("email_update_confirmed", { old_email: old_email, new_email: new_email })
 
-      OpenStruct.new(success?: true, new_email: new_email)
+      ServiceResult.success(
+        {
+          email: new_email,
+          message: I18n.t("settings.email_confirmed")
+        },
+        new_email: new_email
+      )
     end
+
+    Result = ServiceResult
   end
 end

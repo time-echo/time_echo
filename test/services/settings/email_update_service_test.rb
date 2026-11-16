@@ -53,4 +53,27 @@ class Settings::EmailUpdateServiceTest < ActiveSupport::TestCase
     empty_hash_token = Rails.application.message_verifier(:email_update).generate({ old_email: "" })
     assert_not Settings::ConfirmEmailUpdateService.call(empty_hash_token).success?
   end
+
+  test "destroy account deletes letters, dependent records, session tokens, analytics events and records audit log" do
+    email = "destroy_me@example.com"
+    letter = Letter.create!(
+      email: email,
+      title: "Letter to purge",
+      content: "Deep emotional retrospection that is going to be deleted.",
+      deliver_at: 1.year.from_now
+    )
+    letter.predictions.create!(category: "city", prediction: "Madrid")
+    letter.create_emotional_snapshot!(happiness_level: 7, anxiety_level: 3, motivation_level: 8)
+    SessionToken.create!(email: email)
+    AnalyticsEvent.create!(event_type: "letter_created", metadata: { email: email })
+
+    assert_difference -> { Letter.where(email: email).count } => -1,
+                      -> { Prediction.where(letter_id: letter.id).count } => -1,
+                      -> { EmotionalSnapshot.where(letter_id: letter.id).count } => -1,
+                      -> { SessionToken.where(email: email).count } => -1,
+                      -> { AuditLog.for_action("letter.deleted").where(actor_email: email).count } => 1 do
+      result = Settings::DestroyAccountService.call(email)
+      assert result.success?
+    end
+  end
 end

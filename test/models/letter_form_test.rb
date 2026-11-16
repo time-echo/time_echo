@@ -111,7 +111,7 @@ class LetterFormTest < ActiveSupport::TestCase
       deliver_at: "not-a-valid-date-string"
     )
     assert_not form.valid?
-    assert_includes form.errors[:scheduled_at], "is invalid"
+    assert_includes form.errors[:scheduled_at], I18n.t("errors.messages.invalid")
 
     # 7. Blank timezone returns early in valid_iana_timezone
     form = LetterForm.new(
@@ -171,6 +171,33 @@ class LetterFormTest < ActiveSupport::TestCase
     assert form.valid?
     assert_difference -> { Letter.count } => 1, -> { Prediction.count } => 0 do
       assert form.save
+    end
+  end
+
+  test "accepts empty predictions_attributes array and empty emotional_snapshot_attributes hash without unknown attribute error" do
+    form = LetterForm.new(
+      title: "Empty predictions array",
+      email: "empty_preds@example.com",
+      content: "Just a plain note to my future self to reflect upon after all these years of growth and work.",
+      deliver_at: 1.year.from_now,
+      emotional_snapshot_attributes: {},
+      predictions_attributes: []
+    )
+
+    assert form.valid?
+    assert_difference -> { Letter.count } => 1, -> { Prediction.count } => 0 do
+      assert form.save
+    end
+  end
+
+  test "produces Spanish validation error messages when locale is es" do
+    I18n.with_locale(:es) do
+      form = LetterForm.new(title: "", email: "invalid", content: "Corto", deliver_at: 1.day.ago)
+      assert_not form.valid?
+      sentence = form.errors.full_messages.to_sentence
+      assert_includes sentence, "El título no puede estar en blanco"
+      assert_includes sentence, "El contenido es demasiado corto"
+      refute_match(/can't be blank|is too short|must be in the future/i, sentence)
     end
   end
 
@@ -265,5 +292,20 @@ class LetterFormTest < ActiveSupport::TestCase
       deliver_at: 1.year.from_now
     )
     assert other_form.valid?
+  end
+
+  test "saving letter with only prediction_happiness tracks predictions_completed event" do
+    form = LetterForm.new(
+      title: "Happiness prediction only",
+      email: "happy_pred@example.com",
+      content: "Reflecting on my future happiness level and hoping for a peaceful and fulfilling life ahead.",
+      deliver_at: 1.year.from_now,
+      prediction_happiness: "Feeling deeply at peace"
+    )
+
+    assert_difference -> { AnalyticsEvent.where(event_type: "predictions_completed").count } => 1,
+                      -> { Prediction.where(category: "happiness").count } => 1 do
+      assert form.save
+    end
   end
 end

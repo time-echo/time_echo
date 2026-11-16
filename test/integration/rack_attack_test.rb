@@ -21,21 +21,22 @@ class RackAttackTest < ActionDispatch::IntegrationTest
   end
 
   test "throttles excessive login requests per IP after 5 attempts" do
-    5.times do
-      post login_path, params: { magic_link_form: { email: "attacker@example.com" } }
-      assert_response :redirect
+    5.times do |i|
+      post "/api/v1/sessions", params: { email: "attacker#{i}@example.com" }, as: :json
+      assert_response :created
     end
 
-    post login_path, params: { magic_link_form: { email: "attacker@example.com" } }
+    post "/api/v1/sessions", params: { email: "attacker_final@example.com" }, as: :json
     assert_response :too_many_requests
-    assert_equal "text/plain; charset=utf-8", response.headers["Content-Type"]
+    assert_equal "application/json; charset=utf-8", response.headers["Content-Type"]
     assert response.headers["Retry-After"].present?
-    assert_includes response.body, "Too Many Requests"
+    json = JSON.parse(response.body)
+    assert_equal "rate_limited", json["error"]["code"]
   end
 
   test "throttles excessive letter submissions per IP after 10 attempts" do
     params = {
-      letter_form: {
+      letter: {
         title: "Flood Letter",
         email: "flood@example.com",
         content: "Reflections from the past designed to test volumetric submission limits on letter form.",
@@ -44,28 +45,24 @@ class RackAttackTest < ActionDispatch::IntegrationTest
       }
     }
 
-    10.times do
-      post letters_path, params: params
+    10.times do |i|
+      payload = params.deep_dup
+      payload[:letter][:email] = "flood#{i}@example.com"
+      post "/api/v1/letters", params: payload, as: :json
     end
 
-    post letters_path, params: params
+    post "/api/v1/letters", params: params, as: :json
     assert_response :too_many_requests
-    assert_equal "text/plain; charset=utf-8", response.headers["Content-Type"]
+    assert_equal "application/json; charset=utf-8", response.headers["Content-Type"]
     assert response.headers["Retry-After"].present?
   end
 
   test "throttles sensitive account deletion attempts after 3 tries" do
     3.times do
-      delete settings_path
+      delete "/api/v1/account", as: :json
     end
 
-    delete settings_path
+    delete "/api/v1/account", as: :json
     assert_response :too_many_requests
-  end
-
-  test "allows requests to static assets without triggering rate limits" do
-    get "/assets/application.css"
-    # Even if 404/not found or success, should not be 429
-    assert_not_equal 429, response.status
   end
 end

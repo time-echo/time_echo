@@ -65,10 +65,6 @@ class Letters::DestroyServiceTest < ActiveSupport::TestCase
     assert_not Letter.exists?(letter.id)
   end
 
-  test "Letters::DeleteService is an alias to DestroyService" do
-    assert_equal Letters::DestroyService, Letters::DeleteService
-  end
-
   test "returns cannot_delete when letter is pending" do
     letter = Letter.new(
       title: "Pending Letter",
@@ -138,7 +134,7 @@ class Letters::DestroyServiceTest < ActiveSupport::TestCase
     assert Letter.exists?(letter.id)
   end
 
-  test "returns unauthorized when user does not own the letter" do
+  test "returns not_found when user does not own the letter" do
     letter = Letter.new(
       title: "Someone Else's Letter",
       email: "stranger@example.com",
@@ -151,7 +147,7 @@ class Letters::DestroyServiceTest < ActiveSupport::TestCase
     result = Letters::DestroyService.call(letter.id, @user)
 
     assert_not result.success?
-    assert_equal :unauthorized, result.error
+    assert_equal :not_found, result.error
     assert Letter.exists?(letter.id)
   end
 

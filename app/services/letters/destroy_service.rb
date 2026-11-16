@@ -14,12 +14,12 @@ module Letters
     def call
       letter = find_letter
 
-      return Result.new(success: false, error: :not_found) if letter.nil?
+      return ServiceResult.failure(:not_found) if letter.nil?
 
       policy = LetterPolicy.new(@current_user_email, letter)
-      return Result.new(success: false, error: :unauthorized) unless policy.destroy?
+      return ServiceResult.failure(:not_found) unless policy.destroy?
 
-      return Result.new(success: false, error: :cannot_delete) unless letter.can_delete?
+      return ServiceResult.failure(:cannot_delete) unless letter.can_delete?
 
       letter_id = letter.id
       email = letter.email
@@ -41,7 +41,7 @@ module Letters
 
       Analytics::TrackEventService.call("letter_deleted", { letter_id: letter_id, email: email })
 
-      Result.new(success: true, letter: letter)
+      ServiceResult.success(letter: letter)
     end
 
     private
@@ -50,20 +50,6 @@ module Letters
       Letter.find_signed(@id_or_signed_id.to_s) || Letter.find_by(id: @id_or_signed_id)
     end
 
-    class Result
-      attr_reader :letter, :error
-
-      def initialize(success:, letter: nil, error: nil)
-        @success = success
-        @letter = letter
-        @error = error
-      end
-
-      def success?
-        @success
-      end
-    end
+    Result = ServiceResult
   end
-
-  DeleteService = DestroyService
 end

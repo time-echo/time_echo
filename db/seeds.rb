@@ -3,8 +3,12 @@ Prediction.delete_all
 EmotionalSnapshot.delete_all
 AnalyticsEvent.delete_all
 Letter.delete_all
+Stamp.delete_all
+StampCategory.delete_all
 
 puts "Seeding TimeEcho digital vaults..."
+
+load Rails.root.join("db/seeds/stamps.rb")
 
 # 1. Pre-delivered letter with completed predictions and emotional evolution
 delivered_letter = Letter.new(
@@ -16,7 +20,8 @@ delivered_letter = Letter.new(
   delivered_at: 1.year.ago,
   reveal_happiness: 8,
   reveal_anxiety: 3,
-  reveal_motivation: 9
+  reveal_motivation: 9,
+  stamp: Stamp.find_by(slug: "morning-coffee")
 )
 delivered_letter.save!(validate: false)
 
@@ -56,6 +61,7 @@ pending_reflection_letter = Letter.new(
   status: "delivered",
   deliver_at: 1.day.ago,
   delivered_at: 1.day.ago,
+  stamp: Stamp.find_by(slug: "one-more-year")
 )
 pending_reflection_letter.save!(validate: false)
 
@@ -81,7 +87,7 @@ AnalyticsEvent.create!([
 ])
 
 
-# 3. Sealed pending letter (awaiting future delivery)
+# 3. Sealed pending letter (awaiting future delivery) - created without a stamp (fallback test)
 sealed_letter = Letter.new(
   title: "Letter to 5 years in the future",
   content: "Hello future me,\n\nWriting this from the year 2026. I hope you have traveled to Japan, found deep peace of mind, and are still coding Rails with joy. Remember to call mom once a week and drink water.\n\nPeace,\nMe",

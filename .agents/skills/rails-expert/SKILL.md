@@ -33,6 +33,7 @@ Load detailed guidance based on context:
 
 | Topic | Reference | Load When |
 |-------|-----------|-----------|
+| Architectural Patterns | `references/architectural-patterns.md` | Service objects, form objects, query objects, directory contract, concern hygiene |
 | Hotwire/Turbo | `references/hotwire-turbo.md` | Turbo Frames, Streams, morphing, Stimulus controllers |
 | Active Record | `references/active-record.md` | Models, associations, `normalizes`, queries, performance |
 | Background Jobs | `references/background-jobs.md` | Active Job (`retry_on`/`discard_on`), Sidekiq 7 (`Sidekiq::Job`), queues |
