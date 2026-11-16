@@ -3,6 +3,11 @@
 module Api
   module V1
     class HealthController < BaseController
+      def index
+        @health = unwrap!(::Health::CheckService.call)
+        render :index, status: :ok
+      end
+
       def show
         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         @health = unwrap!(::Health::CheckService.call)

@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   get "livez", to: "api/v1/health#liveness", defaults: { format: :json }
   get "readyz", to: "api/v1/health#show", defaults: { format: :json }
 
+  root to: "api/v1/health#index", defaults: { format: :json }
+
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       get "ping", to: proc {

@@ -45,6 +45,18 @@ module Api
         assert_equal "healthy", body.dig("data", "status")
       end
 
+      test "GET / (root index) returns 200 and healthy status without meta key" do
+        get "/"
+
+        assert_response :ok
+        assert_equal "application/json", response.media_type
+        body = JSON.parse(response.body)
+        assert_equal "healthy", body.dig("data", "status")
+        assert_equal "1.0.0", body.dig("data", "version")
+        assert body.dig("data", "services").present?
+        assert_not body.key?("meta")
+      end
+
       test "GET /api/v1/health returns 503 when database is unreachable" do
         failed_result = Health::CheckService::Result.new(
           success: false,

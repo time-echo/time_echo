@@ -43,12 +43,12 @@ class ServiceResult
   end
 
   def [](key)
-    if respond_to?(key)
-      public_send(key)
-    elsif @value.is_a?(Hash)
-      @value[key] || @value[key.to_s]
-    else
+    if @value.is_a?(Hash) && (@value.key?(key) || @value.key?(key.to_s))
+      @value.key?(key) ? @value[key] : @value[key.to_s]
+    elsif @metadata.key?(key)
       @metadata[key]
+    elsif respond_to?(key)
+      public_send(key)
     end
   end
 

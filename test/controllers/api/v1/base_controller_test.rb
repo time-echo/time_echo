@@ -99,4 +99,27 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     assert_equal "ok", json["data"]["status"]
     assert json["data"]["timestamp"].present?
   end
+
+  test "GET / (index) returns health status data without meta key" do
+    get "/"
+
+    assert_response :ok
+    assert_equal "application/json", response.media_type
+    json = JSON.parse(response.body)
+    assert_equal "healthy", json["data"]["status"]
+    assert_equal "1.0.0", json["data"]["version"]
+    assert json["data"]["timestamp"].present?
+    assert json["data"]["services"].present?
+    assert_not json.key?("meta")
+  end
+
+  test "GET /icon.png returns 404 JSON error instead of missing template 500 error" do
+    get "/icon.png"
+
+    assert_response :not_found
+    assert_equal "application/json", response.media_type
+    json = JSON.parse(response.body)
+    assert_equal "not_found", json["error"]["code"]
+    assert_includes json["error"]["message"], "No route matches"
+  end
 end

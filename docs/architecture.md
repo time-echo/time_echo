@@ -533,6 +533,7 @@ All endpoints adhere to one of three JSON envelopes with keys camelized in `came
 |---|---|---|---|---|
 | `GET` | `/livez`, `/api/v1/health/liveness` | `Api::V1::HealthController#liveness` | `200 OK` | Lightweight process liveness probe |
 | `GET` | `/readyz`, `/api/v1/health` | `Api::V1::HealthController#show` | `200 OK` | `Health::CheckService.call` (DB, migrations, GoodJob queue) |
+| `GET` | `/` | `Api::V1::HealthController#index` | `200 OK` | `Health::CheckService.call` (root diagnostic without `meta`) |
 | `GET` | `/api/v1/ping` | Rack proc | `200 OK` | Timestamp & status diagnostic |
 | `GET` | `/api-docs` | `Rswag::Ui::Engine` | `200 OK` | Interactive Swagger UI API documentation |
 | `GET` | `/api-docs/v1/swagger.yaml` | `Rswag::Api::Engine` | `200 OK` | OpenAPI 3.0.3 specification document |

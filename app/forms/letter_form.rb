@@ -179,7 +179,7 @@ class LetterForm
     return @resolved_stamp if defined?(@resolved_stamp)
 
     @resolved_stamp = if stamp_slug.present?
-      Stamp.includes(:stamp_category).find_by(slug: stamp_slug.to_s.strip)
+      Stamp.find_by(slug: stamp_slug.to_s.strip)
     end
   end
 
