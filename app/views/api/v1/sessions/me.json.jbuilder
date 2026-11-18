@@ -2,6 +2,7 @@
 
 json.data do
   json.authenticated true
+  json.user_id ::Analytics::UserIdentifier.for(@email)
   json.email @email
   json.locale I18n.locale.to_s
 end

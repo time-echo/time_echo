@@ -29,6 +29,9 @@ gem "rack-attack"
 gem "sentry-ruby"
 gem "sentry-rails"
 
+# Product analytics with PostHog Ruby SDK
+gem "posthog-ruby"
+
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 

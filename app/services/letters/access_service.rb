@@ -26,6 +26,17 @@ module Letters
 
       countdown = letter.pending?
 
+      Analytics::PosthogService.track(
+        event: "letter_viewed",
+        email: @current_user_email.presence || letter.email,
+        properties: {
+          letter_id: letter.id.to_s,
+          status: letter.status,
+          is_locked: countdown,
+          is_opened: letter.opened_at.present?
+        }
+      )
+
       ServiceResult.success(letter: letter, countdown: countdown)
     end
 

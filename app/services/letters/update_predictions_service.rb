@@ -24,6 +24,8 @@ module Letters
         return ServiceResult.failure(:not_found)
       end
 
+      was_unopened = false
+
       Letter.transaction do
         was_unopened = letter.opened_at.blank?
 
@@ -44,6 +46,18 @@ module Letters
         Analytics::TrackEventService.call("prediction_completion", { letter_id: letter.id, email: letter.email })
         Analytics::TrackEventService.call("emotional_snapshot_completion", { letter_id: letter.id, email: letter.email })
       end
+
+      Analytics::PosthogService.track(
+        event: "letter_saved",
+        email: letter.email,
+        properties: {
+          letter_id: letter.id.to_s,
+          status: letter.status,
+          predictions_count: letter.predictions.size,
+          matched_predictions_count: letter.predictions.select(&:matched).size,
+          was_first_reveal: was_unopened && letter.opened_at.present?
+        }
+      )
 
       ServiceResult.success(letter: letter)
     rescue ActiveRecord::RecordInvalid => e
