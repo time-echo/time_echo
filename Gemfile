@@ -11,7 +11,7 @@ gem "puma", ">= 5.0"
 gem "jbuilder"
 
 # Pagination [https://github.com/ddnexus/pagy]
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.8"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
