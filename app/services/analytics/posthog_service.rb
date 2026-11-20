@@ -50,7 +50,8 @@ module Analytics
     EMAIL_PATTERN = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i
 
     class << self
-      attr_writer :client
+      # api_key= allows overriding the credential (e.g. in tests); nil restores it.
+      attr_writer :client, :api_key
 
       def enabled?
         return false if disabled_environment?
@@ -65,8 +66,13 @@ module Analytics
           Rails.env.to_s
       end
 
+      # PostHog project API key, stored in per-environment Rails credentials:
+      #   bin/rails credentials:edit --environment production
+      #   posthog:
+      #     api_key: phc_...
       def api_key
-        ENV["POSTHOG_API_KEY"].to_s.strip.presence
+        key = @api_key.nil? ? Rails.application.credentials.dig(:posthog, :api_key) : @api_key
+        key.to_s.strip.presence
       end
 
       def host

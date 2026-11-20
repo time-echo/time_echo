@@ -29,8 +29,12 @@ module Analytics
 
     private
 
+    # HMAC secret stored in per-environment Rails credentials:
+    #   bin/rails credentials:edit --environment production
+    #   analytics:
+    #     user_id_secret: <openssl rand -hex 32>
     def secret_key
-      ENV["ANALYTICS_USER_ID_SECRET"].presence ||
+      Rails.application.credentials.dig(:analytics, :user_id_secret).presence ||
         Rails.application.secret_key_base.presence ||
         "time_echo_analytics_default_key"
     end

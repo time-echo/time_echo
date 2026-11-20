@@ -32,7 +32,6 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
       "ANALYTICS_ENABLED" => ENV["ANALYTICS_ENABLED"],
       "ANALYTICS_ENVIRONMENT" => ENV["ANALYTICS_ENVIRONMENT"],
       "ANALYTICS_FORCE_ENABLED" => ENV["ANALYTICS_FORCE_ENABLED"],
-      "POSTHOG_API_KEY" => ENV["POSTHOG_API_KEY"],
       "POSTHOG_HOST" => ENV["POSTHOG_HOST"]
     }
     Analytics::PosthogService.reset_client!
@@ -46,6 +45,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
         ENV[key] = val
       end
     end
+    Analytics::PosthogService.api_key = nil
     Analytics::PosthogService.reset_client!
   end
 
@@ -62,7 +62,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
   end
 
   test "disabled by default in development and test environments" do
-    ENV["POSTHOG_API_KEY"] = "phc_test_key"
+    Analytics::PosthogService.api_key = "phc_test_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "development"
     ENV.delete("ANALYTICS_FORCE_ENABLED")
 
@@ -77,8 +77,8 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "enabled in staging and production when POSTHOG_API_KEY is configured" do
-    ENV["POSTHOG_API_KEY"] = "phc_staging_key"
+  test "enabled in staging and production when the PostHog API key credential is configured" do
+    Analytics::PosthogService.api_key = "phc_staging_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "staging"
     ENV["ANALYTICS_ENABLED"] = "true"
 
@@ -87,7 +87,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
     ENV["ANALYTICS_ENVIRONMENT"] = "production"
     assert Analytics::PosthogService.enabled?
 
-    ENV["POSTHOG_API_KEY"] = ""
+    Analytics::PosthogService.api_key = ""
     assert_not Analytics::PosthogService.enabled?
   end
 
@@ -122,7 +122,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
   end
 
   test "enqueues CaptureEventJob and sends sanitized event to PostHog client" do
-    ENV["POSTHOG_API_KEY"] = "phc_prod_key"
+    Analytics::PosthogService.api_key = "phc_prod_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "production"
     fake_client = FakePosthogClient.new
     Analytics::PosthogService.client = fake_client
@@ -153,7 +153,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
   end
 
   test "analytics failures never raise or break business operations" do
-    ENV["POSTHOG_API_KEY"] = "phc_prod_key"
+    Analytics::PosthogService.api_key = "phc_prod_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "production"
     Analytics::PosthogService.client = FakePosthogClient.new(raise_error: true)
 
@@ -182,7 +182,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
   end
 
   test "AuthenticateTokenService tracks user_signed_up on first login and user_logged_in on subsequent logins" do
-    ENV["POSTHOG_API_KEY"] = "phc_prod_key"
+    Analytics::PosthogService.api_key = "phc_prod_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "production"
     fake_client = FakePosthogClient.new
     Analytics::PosthogService.client = fake_client
@@ -216,7 +216,7 @@ class Analytics::PosthogServiceTest < ActiveSupport::TestCase
   end
 
   test "tracks letter_scheduled, letter_viewed, letter_saved, and letter_shared without sensitive data" do
-    ENV["POSTHOG_API_KEY"] = "phc_prod_key"
+    Analytics::PosthogService.api_key = "phc_prod_key"
     ENV["ANALYTICS_ENVIRONMENT"] = "production"
     fake_client = FakePosthogClient.new
     Analytics::PosthogService.client = fake_client
