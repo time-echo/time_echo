@@ -21,8 +21,11 @@ module Auth
 
       email = token_record.email
       api_session_token = nil
+      is_new_user = false
 
       SessionToken.transaction do
+        is_new_user = !SessionToken.where(email: email).where.not(used_at: nil).exists? &&
+                      !AuditLog.where(actor_email: email).exists?
         token_record.use!
         SessionToken.revoke_active_for(email)
         api_session_token = SessionToken.create!(email: email)
@@ -30,10 +33,30 @@ module Auth
 
       Analytics::TrackEventService.call("user_logged_in", { email: email })
 
+      user_id = Analytics::UserIdentifier.for(email)
+      auth_event = is_new_user ? "user_signed_up" : "user_logged_in"
+
+      Analytics::PosthogService.identify(
+        user_id: user_id,
+        properties: {
+          locale: I18n.locale.to_s
+        }
+      )
+      Analytics::PosthogService.track(
+        event: auth_event,
+        user_id: user_id,
+        properties: {
+          auth_method: "magic_link",
+          locale: I18n.locale.to_s
+        }
+      )
+
       ServiceResult.success(
         {
+          user_id: user_id,
           email: email,
-          token: api_session_token.token
+          token: api_session_token.token,
+          is_new_user: is_new_user
         }
       )
     end

@@ -31,6 +31,24 @@ module Letters
         )
 
         LetterMailer.stamped_confirmation(form.letter).deliver_later
+
+        letter = form.letter
+        horizon_days = letter.scheduled_at.present? ? ((letter.scheduled_at - Time.current) / 1.day).ceil : 0
+        Analytics::PosthogService.track(
+          event: "letter_scheduled",
+          email: letter.email,
+          properties: {
+            letter_id: letter.id.to_s,
+            status: letter.status,
+            language: letter.language,
+            timezone: letter.timezone,
+            has_stamp: letter.stamp_id.present?,
+            predictions_count: letter.predictions.size,
+            has_emotional_snapshot: letter.emotional_snapshot.present?,
+            delivery_horizon_days: [ horizon_days, 0 ].max
+          }
+        )
+
         ServiceResult.success(letter: form.letter, form: form)
       else
         ServiceResult.failure(:invalid, errors: form.errors, form: form)
