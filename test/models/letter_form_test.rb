@@ -52,7 +52,7 @@ class LetterFormTest < ActiveSupport::TestCase
   test "invalid letter form validations" do
     valid_content = "This is a sufficiently long archival reflection intended for my future self after many years."
 
-    # 1. Past deliver_at
+    # 1. Past deliver_at or fewer than 3 days from now
     form = LetterForm.new(
       title: "Title",
       email: "user@example.com",
@@ -61,6 +61,23 @@ class LetterFormTest < ActiveSupport::TestCase
     )
     assert_not form.valid?
     assert form.errors[:deliver_at].any?
+
+    form_two_days = LetterForm.new(
+      title: "Title",
+      email: "user@example.com",
+      content: valid_content,
+      deliver_at: 2.days.from_now.to_date.to_s
+    )
+    assert_not form_two_days.valid?
+    assert form_two_days.errors[:deliver_at].any?
+
+    form_three_days = LetterForm.new(
+      title: "Title",
+      email: "user@example.com",
+      content: valid_content,
+      deliver_at: 3.days.from_now.to_date.to_s
+    )
+    assert form_three_days.valid?
 
     # 2. Missing title
     form = LetterForm.new(

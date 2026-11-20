@@ -30,7 +30,7 @@ module Letters
         actor_email: @current_user_email,
         metadata: {
           from_status: from_status,
-          to_status: "pending"
+          to_status: letter.status
         }
       )
 

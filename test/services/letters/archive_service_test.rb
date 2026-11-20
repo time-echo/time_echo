@@ -66,7 +66,7 @@ class Letters::ArchiveServiceTest < ActiveSupport::TestCase
     assert_equal "pending", letter.reload.status
   end
 
-  test "returns cannot_archive_delivered when letter is delivered" do
+  test "archives delivered letter when authorized" do
     letter = Letter.new(
       title: "Delivered Letter",
       email: @user,
@@ -79,9 +79,25 @@ class Letters::ArchiveServiceTest < ActiveSupport::TestCase
 
     result = Letters::ArchiveService.call(letter.id, @user)
 
+    assert result.success?
+    assert_equal "archived", letter.reload.status
+  end
+
+  test "returns cannot_archive_delivered when letter is already archived" do
+    letter = Letter.new(
+      title: "Already Archived Letter",
+      email: @user,
+      content: "Archived content",
+      scheduled_at: 1.year.ago,
+      status: "archived"
+    )
+    letter.save!(validate: false)
+
+    result = Letters::ArchiveService.call(letter.id, @user)
+
     assert_not result.success?
     assert_equal :cannot_archive_delivered, result.error
-    assert_equal "delivered", letter.reload.status
+    assert_equal "archived", letter.reload.status
   end
 
   test "returns not_found when letter does not exist" do

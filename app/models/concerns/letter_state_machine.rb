@@ -7,8 +7,8 @@ module LetterStateMachine
     "pending" => %w[queued delivered archived],
     "queued" => %w[delivered failed archived pending],
     "failed" => %w[queued archived pending],
-    "archived" => %w[pending],
-    "delivered" => []
+    "archived" => %w[pending delivered],
+    "delivered" => %w[archived]
   }.freeze
 
   class InvalidTransitionError < StandardError; end
@@ -28,7 +28,7 @@ module LetterStateMachine
   end
 
   def can_restore?
-    can_transition_to?("pending") && archived?
+    archived? && (can_transition_to?("pending") || can_transition_to?("delivered"))
   end
 
   def can_deliver?
@@ -48,7 +48,8 @@ module LetterStateMachine
   end
 
   def restore!
-    transition_to!("pending")
+    target = delivered_at.present? || (scheduled_at.present? && scheduled_at <= Time.current) ? "delivered" : "pending"
+    transition_to!(target)
   end
 
   def deliver!(time = Time.current)

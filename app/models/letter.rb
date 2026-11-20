@@ -69,7 +69,11 @@ class Letter < ApplicationRecord
   private
 
   def scheduled_at_must_be_in_future
-    if scheduled_at.present? && scheduled_at <= Time.current
+    return if scheduled_at.blank?
+
+    tz = Time.find_zone(timezone) || Time.find_zone("UTC")
+    min_scheduled_at = tz.now.beginning_of_day + 3.days
+    if scheduled_at < min_scheduled_at
       errors.add(:scheduled_at, :must_be_in_future)
       errors.add(:deliver_at, :must_be_in_future) if errors[:deliver_at].empty?
     end

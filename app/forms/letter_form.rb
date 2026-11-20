@@ -203,7 +203,12 @@ class LetterForm
     utc_val = parsed_utc_scheduled_at
     if utc_val.blank?
       errors.add(:scheduled_at, :invalid)
-    elsif utc_val <= Time.current
+      return
+    end
+
+    tz = Time.find_zone(timezone) || Time.find_zone("UTC")
+    min_scheduled_at = tz.now.beginning_of_day + 3.days
+    if utc_val < min_scheduled_at.utc
       errors.add(:scheduled_at, :must_be_in_future)
       errors.add(:deliver_at, :must_be_in_future)
     end

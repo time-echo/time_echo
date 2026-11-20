@@ -32,6 +32,23 @@ class Letters::RestoreServiceTest < ActiveSupport::TestCase
     Analytics::TrackEventService.define_singleton_method(:call, original_track.to_proc)
   end
 
+  test "restores an archived delivered letter back to delivered" do
+    letter = Letter.new(
+      title: "Archived Delivered Letter",
+      email: @user,
+      content: "Content",
+      scheduled_at: 1.year.ago,
+      delivered_at: 1.year.ago,
+      status: "archived"
+    )
+    letter.save!(validate: false)
+
+    result = Letters::RestoreService.call(letter.id, @user)
+
+    assert result.success?
+    assert_equal "delivered", letter.reload.status
+  end
+
   test "returns cannot_restore when letter is not archived" do
     letter = Letter.new(
       title: "Delivered Letter",
