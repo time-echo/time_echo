@@ -1,5 +1,5 @@
 module.exports = {
-  "**/*.{rb,rake,ru}": "bundle exec rubocop --force-exclusion",
-  "{Gemfile,Rakefile}": "bundle exec rubocop --force-exclusion",
+  "**/*.{rb,rake,ru}": "bundle exec rubocop -a --force-exclusion",
+  "{Gemfile,Rakefile}": "bundle exec rubocop -a --force-exclusion",
   "Gemfile.lock": () => "bundle exec bundler-audit check"
 };
