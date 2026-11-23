@@ -152,53 +152,6 @@ Services started:
 
 ---
 
-## 🔧 Environment Variables
-
-| Variable | Description | Default | Required |
-| -------- | ----------- | ------- | -------- |
-| `DATABASE_HOST` | PostgreSQL host | `localhost` | No |
-| `DATABASE_PORT` | PostgreSQL port | `5432` | No |
-| `DATABASE_USERNAME` | PostgreSQL username | `postgres` | No |
-| `DATABASE_PASSWORD` | PostgreSQL password | `postgres` | No |
-| `DATABASE_URL` | Full PostgreSQL connection URL (production) | — | Yes (production) |
-| `DATABASE_PREPARED_STATEMENTS` | Enable prepared statements | `true` | No |
-| `RAILS_MAX_THREADS` | Active Record connection pool / Puma threads | `5` | No |
-| `WEB_CONCURRENCY` | Puma worker processes | `0` | No |
-| `PORT` | Puma listen port | `3000` | No |
-| `PIDFILE` | Puma PID file path | — | No |
-| `APP_HOST` | Frontend application host (used in email links) | `localhost:3001` | No |
-| `APP_PROTOCOL` | Frontend protocol for email links | `https` | No |
-| `SMTP_HOST` | Local SMTP/Mailpit host | `localhost` | No |
-| `RESEND_API_KEY` | Resend transactional email API key | — | No (dev uses Mailpit) |
-| `CORS_ORIGINS` | Comma-separated allowed CORS origins | — | No |
-| `SENTRY_DSN` | Sentry/GlitchTip DSN for error tracking | — | No |
-| `GLITCHTIP_DSN` | GlitchTip DSN (alternative to SENTRY_DSN) | — | No |
-| `ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY` | Active Record encryption primary key | — | Yes (production) |
-| `ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY` | Active Record encryption deterministic key | — | Yes (production) |
-| `ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT` | Active Record encryption key derivation salt | — | Yes (production) |
-| `ANALYTICS_ENABLED` | Enable PostHog analytics | `false` | No |
-| `ANALYTICS_ENVIRONMENT` | Analytics environment name | `development` | No |
-| `POSTHOG_HOST` | PostHog API host | `https://us.i.posthog.com` | No |
-| `RAILS_LOG_LEVEL` | Rails log level | `info` | No |
-| `GOOD_JOB_EXECUTION_MODE` | GoodJob execution mode (`async`/`sync`) | `async` | No |
-| `CI` | Set to any value in CI to enable eager loading in tests | — | No |
-| `RAILS_ENV` | Rails environment (`development`, `test`, `production`) | `development` | No |
-| `BUNDLE_GEMFILE` | Path to Gemfile (set by `config/boot.rb`) | — | No |
-
-Copy `.env.example` to `.env` and fill in values for your environment:
-
-```bash
-cp .env.example .env
-```
-
-Secrets such as encryption keys and API keys should be managed via Rails credentials in production:
-
-```bash
-bin/rails credentials:edit --environment production
-```
-
----
-
 ## 🧪 Testing & Code Quality
 
 TimeEcho has a comprehensive Minitest test suite covering controllers, models, services, forms, queries, policies, jobs, and mailers:
