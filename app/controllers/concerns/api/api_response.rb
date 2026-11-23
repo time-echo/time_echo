@@ -11,6 +11,10 @@ module Api
       records
     end
 
+    def render_resource(data, status: :ok, meta: {})
+      render json: { data: data, meta: meta }, status: status
+    end
+
     def render_no_content
       head :no_content
     end

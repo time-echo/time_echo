@@ -19,10 +19,67 @@ class Rack::Attack
   # 300 requests per minute per IP
   throttle("req/ip", limit: 300, period: 1.minute, &:ip)
 
-  # 2. Login / Magic Link submission limit per IP
+  def self.parsed_json_body(req)
+    return req.env["rack_attack.parsed_json_body"] if req.env.key?("rack_attack.parsed_json_body")
+
+    body = if req.media_type == "application/json" && req.body
+             raw = req.body.read
+             req.body.rewind
+             raw.present? ? JSON.parse(raw) : {}
+    else
+             {}
+    end
+    req.env["rack_attack.parsed_json_body"] = body.is_a?(Hash) ? body : {}
+  rescue JSON::ParserError
+    req.env["rack_attack.parsed_json_body"] = {}
+  end
+
+  def self.password_login_request?(req)
+    return false unless req.path == "/api/v1/sessions" && req.post?
+
+    body = parsed_json_body(req)
+    password = body["password"] || body.dig("session", "password") || req.params["password"] || req.params.dig("session", "password")
+    password.present?
+  end
+
+  def self.login_email_identifier(req)
+    body = parsed_json_body(req)
+    email = body["email"] || body.dig("session", "email") || req.params["email"] || req.params.dig("session", "email")
+    email.to_s.strip.downcase.presence
+  end
+
+  # 2. Magic Link submission limit per IP
   # 5 requests per minute per IP to prevent spamming transactional emails
   throttle("logins/ip", limit: 5, period: 1.minute) do |req|
-    req.ip if req.path == "/api/v1/sessions" && req.post?
+    req.ip if req.path == "/api/v1/sessions" && req.post? && !password_login_request?(req)
+  end
+
+  # 2b. Password login limits: 10/min/ip and 5/min per email identifier
+  throttle("password_logins/ip", limit: 10, period: 1.minute) do |req|
+    req.ip if password_login_request?(req)
+  end
+
+  throttle("password_logins/email", limit: 5, period: 1.minute) do |req|
+    login_email_identifier(req) if password_login_request?(req)
+  end
+
+  # 2c. Password reset requests per IP
+  throttle("password_resets/ip", limit: 3, period: 1.minute) do |req|
+    req.ip if req.path == "/api/v1/password_resets" && req.post?
+  end
+
+  # 2d. Account password update per IP
+  throttle("account_password/ip", limit: 5, period: 1.minute) do |req|
+    req.ip if req.path == "/api/v1/account/password" && (req.patch? || req.put?)
+  end
+
+  # 2e. OAuth endpoints per IP
+  throttle("oauth_authorizations/ip", limit: 20, period: 1.minute) do |req|
+    req.ip if req.path == "/api/v1/oauth_authorizations" && req.post?
+  end
+
+  throttle("oauth_callbacks/ip", limit: 10, period: 1.minute) do |req|
+    req.ip if req.path == "/api/v1/oauth_callbacks" && req.post?
   end
 
   # 3. Letter submission limit per IP

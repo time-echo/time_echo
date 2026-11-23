@@ -6,11 +6,20 @@ module Api
       before_action :authenticate_user!, only: [ :me, :destroy ]
 
       def create
-        @session_data = unwrap!(::Auth::RequestMagicLinkService.call(
-          email: email_param,
-          locale: locale_param
-        ))
-        render :create, status: :created
+        if password_param.present?
+          @session_data = unwrap!(::Auth::PasswordLoginService.call(
+            email: email_param,
+            password: password_param
+          ))
+          session[:current_user_email] = @session_data[:email]
+          render :show, status: :created
+        else
+          @session_data = unwrap!(::Auth::RequestMagicLinkService.call(
+            email: email_param,
+            locale: locale_param
+          ))
+          render :create, status: :created
+        end
       end
 
       def show
@@ -22,6 +31,8 @@ module Api
 
       def me
         @email = current_user_email
+        @user = User.find_by(email: @email)
+        @identities = @user ? @user.identities.order(:provider).to_a : []
         render :me, status: :ok
       end
 
@@ -41,6 +52,14 @@ module Api
           params.require(:session).require(:email)
         else
           params.require(:email)
+        end
+      end
+
+      def password_param
+        if params.key?(:password)
+          params[:password]
+        elsif params[:session].is_a?(ActionController::Parameters)
+          params[:session][:password]
         end
       end
 

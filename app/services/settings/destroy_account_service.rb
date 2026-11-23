@@ -29,6 +29,7 @@ module Settings
         end
 
         SessionToken.where(email: @email).delete_all
+        User.find_by(email: @email)&.destroy!
         AnalyticsEvent.where("metadata ->> 'email' = ?", @email).delete_all
       end
 

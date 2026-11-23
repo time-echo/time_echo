@@ -87,6 +87,10 @@ en:
         deliver_at: "Delivery date"
         timezone: "Timezone"
         language: "Language"
+      user:
+        email: "Email address"
+        password: "Password"
+        password_confirmation: "Password confirmation"
   errors:
     format: "%{attribute} %{message}"
     messages:
@@ -143,10 +147,21 @@ en:
     cannot_delete: "Only archived letters can be deleted."
     unauthorized_action: "You are not authorized to perform this action."
     service_unavailable: "Service temporarily unavailable. Please retry later."
+    invalid_credentials: "Invalid email or password."
+    registration_check_email: "Check your email for a sign-in link to access your account."
+    password_reset_sent: "If an account exists for that email, we sent a password reset link."
+    invalid_reset_token: "This password reset link is invalid or has expired."
+    password_reset_success: "Your password has been reset. You can now sign in."
+    oauth_invalid_provider: "Unsupported sign-in provider."
+    oauth_invalid_state: "Your sign-in session expired. Please try again."
+    oauth_failed: "Could not complete social sign-in. Please try again."
+    oauth_email_required: "Your social account must share a verified email address to sign in."
+    oauth_unverified_email: "Your social email is not verified. Please sign in with a magic link first."
   mailers:
     common:
       access_token_badge: "Sign-in link"
       email_update_badge: "Email change"
+      password_reset_badge: "Password reset"
       docket_prefix: Docket
     magic_link:
       subject: "Your TimeEcho sign-in link"
@@ -182,6 +197,15 @@ en:
       header: "Your letter is sealed"
       body: "Your letter \"%{title}\" is sealed and stored. It will arrive in your inbox on %{date}."
       footer_subtitle: "Letters to your future self."
+    password_reset:
+      subject: "Reset your TimeEcho password"
+      preheader: "Use this link to set a new password for your TimeEcho account."
+      header: "Reset your password"
+      greeting: Hello,
+      body: "We received a request to reset your TimeEcho password. Click the button below to choose a new password."
+      btn: "Reset password"
+      body_text: "Open the link below, or copy and paste it into your browser, to reset your password:"
+      expiry_help: "This link expires in 1 hour and can only be used once. If you didn't request this, you can ignore this email."
   settings:
     confirmation_link_invalid: "The confirmation link is invalid or has expired."
     email_confirmed: "Email address confirmed and updated."
@@ -191,5 +215,12 @@ en:
     updated_successfully: "Settings updated."
     account_deleted: "Your account and all your data were permanently deleted."
     could_not_save: "Couldn't save settings."
+    invalid_current_password: "Current password is incorrect."
+    password_updated: "Your password has been updated."
+    identity_already_linked: "This social account is already linked to another user."
+    provider_already_linked: "This provider is already linked to your account."
+    identity_not_found: "Connected account not found."
+    cannot_unlink_last_method: "You cannot unlink your last sign-in method. Set a password first."
+    identity_unlinked: "Connected account unlinked."
   letters:
     error_saving: "Couldn't save changes."

@@ -41,9 +41,16 @@ Rails.application.routes.draw do
       end
       delete "sessions", to: "sessions#destroy"
 
+      resources :registrations, only: [ :create ]
+      resources :password_resets, only: [ :create, :update ], param: :token
+      resources :oauth_authorizations, only: [ :create ]
+      resources :oauth_callbacks, only: [ :create ]
+
       resource :account, only: [ :update, :destroy ] do
         scope module: :accounts do
           resource :email_confirmation, only: [ :show ], path: "confirm_email", defaults: { format: :json }
+          resource :password, only: [ :update ]
+          resources :identities, only: [ :index, :create, :destroy ], param: :provider
         end
       end
     end
