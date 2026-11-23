@@ -83,7 +83,7 @@ For detailed sequence diagrams, database schemas, and transactional boundary det
 
 ## 🛠️ Prerequisites & Stack
 
-- **Ruby**: `4.0.1` (with Rails `8.1.x`)
+- **Ruby**: `4.0.10` (with Rails `8.1.x`)
 - **Database**: PostgreSQL (`17-alpine`)
 - **Queue Adapter**: GoodJob (database-backed Active Job)
 - **Mailer**: Resend (`resend` gem) / Mailpit (local development)
@@ -149,6 +149,12 @@ Services started:
 
 - `db`: PostgreSQL 17 (port `5432`) — hosts `time_echo_development`
 - `mailpit`: Local SMTP server (port `1025`) and web UI (`http://localhost:8025`)
+
+Copy `.env.example` to `.env` to configure environment variables:
+
+```bash
+cp .env.example .env
+```
 
 ---
 
