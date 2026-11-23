@@ -150,6 +150,12 @@ Services started:
 - `db`: PostgreSQL 17 (port `5432`) — hosts `time_echo_development`
 - `mailpit`: Local SMTP server (port `1025`) and web UI (`http://localhost:8025`)
 
+Copy `.env.example` to `.env` to configure environment variables:
+
+```bash
+cp .env.example .env
+```
+
 ---
 
 ## 🧪 Testing & Code Quality
