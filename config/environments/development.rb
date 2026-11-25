@@ -12,6 +12,14 @@ Rails.application.configure do
   # Show full error reports.
   config.consider_all_requests_local = true
 
+  # Allow ngrok tunnels for local development
+  config.hosts = [
+    "localhost",
+    "127.0.0.1",
+    "supercarpal-unwillingly-harriett.ngrok-free.dev",
+    "supercarpal-unwillingly-harriett.ngrok.io"
+  ]
+
   # Ensure API errors respond in API format instead of HTML error pages
   config.debug_exception_response_format = :api
 

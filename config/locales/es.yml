@@ -87,6 +87,10 @@ es:
         deliver_at: "La fecha de entrega"
         timezone: "La zona horaria"
         language: "El idioma"
+      user:
+        email: "El correo electrónico"
+        password: "La contraseña"
+        password_confirmation: "La confirmación de contraseña"
   errors:
     format: "%{attribute} %{message}"
     messages:
@@ -143,10 +147,21 @@ es:
     cannot_delete: "Solo se pueden eliminar las cartas archivadas."
     unauthorized_action: "No tienes autorización para realizar esta acción."
     service_unavailable: "Servicio no disponible temporalmente. Inténtalo más tarde."
+    invalid_credentials: "Correo electrónico o contraseña incorrectos."
+    registration_check_email: "Revisa tu correo electrónico para acceder a tu cuenta con un enlace de inicio de sesión."
+    password_reset_sent: "Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu contraseña."
+    invalid_reset_token: "Este enlace de restablecimiento no es válido o venció."
+    password_reset_success: "Tu contraseña ha sido restablecida. Ya puedes iniciar sesión."
+    oauth_invalid_provider: "Proveedor de inicio de sesión no compatible."
+    oauth_invalid_state: "Tu sesión de inicio venció. Inténtalo de nuevo."
+    oauth_failed: "No se pudo completar el inicio de sesión social. Inténtalo de nuevo."
+    oauth_email_required: "Tu cuenta social debe compartir un correo electrónico verificado para iniciar sesión."
+    oauth_unverified_email: "El correo de tu cuenta social no está verificado. Inicia sesión primero con un enlace mágico."
   mailers:
     common:
       access_token_badge: "Enlace de acceso"
       email_update_badge: "Cambio de correo"
+      password_reset_badge: "Restablecer contraseña"
       docket_prefix: Expediente
     magic_link:
       subject: "Tu enlace de acceso a TimeEcho"
@@ -182,6 +197,15 @@ es:
       header: "Tu carta está sellada"
       body: "Tu carta \"%{title}\" está sellada y guardada. Llegará a tu correo el %{date}."
       footer_subtitle: "Cartas a tu yo del futuro."
+    password_reset:
+      subject: "Restablece tu contraseña de TimeEcho"
+      preheader: "Usa este enlace para elegir una nueva contraseña para tu cuenta de TimeEcho."
+      header: "Restablece tu contraseña"
+      greeting: Hola,
+      body: "Recibimos una solicitud para restablecer tu contraseña de TimeEcho. Haz clic en el botón de abajo para elegir una nueva contraseña."
+      btn: "Restablecer contraseña"
+      body_text: "Abre el siguiente enlace, o cópialo y pégalo en tu navegador, para restablecer tu contraseña:"
+      expiry_help: "Este enlace vence en 1 hora y solo se puede usar una vez. Si no lo solicitaste, puedes ignorar este correo."
   settings:
     confirmation_link_invalid: "El enlace de confirmación no es válido o ha caducado."
     email_confirmed: "Correo electrónico confirmado y actualizado."
@@ -191,5 +215,12 @@ es:
     updated_successfully: "Ajustes actualizados."
     account_deleted: "Tu cuenta y todos tus datos se eliminaron de forma permanente."
     could_not_save: "No se pudieron guardar los ajustes."
+    invalid_current_password: "La contraseña actual es incorrecta."
+    password_updated: "Tu contraseña ha sido actualizada."
+    identity_already_linked: "Esta cuenta social ya está vinculada a otro usuario."
+    provider_already_linked: "Este proveedor ya está vinculado a tu cuenta."
+    identity_not_found: "Cuenta conectada no encontrada."
+    cannot_unlink_last_method: "No puedes desvincular tu último método de acceso. Configura una contraseña primero."
+    identity_unlinked: "Cuenta conectada desvinculada."
   letters:
     error_saving: "No se pudieron guardar los cambios."

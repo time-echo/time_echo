@@ -41,6 +41,48 @@ module Api
         exception_class: Api::UnauthorizedError,
         default_message: -> { I18n.t("flash.invalid_link", default: "Invalid or expired link") }
       },
+      invalid_credentials: {
+        exception_class: Api::UnauthorizedError,
+        default_message: -> { I18n.t("flash.invalid_credentials", default: "Invalid email or password") }
+      },
+      invalid_current_password: {
+        exception_class: Api::BusinessRuleError,
+        code: "invalid_current_password",
+        default_message: -> { I18n.t("settings.invalid_current_password", default: "Current password is incorrect") }
+      },
+      last_login_method: {
+        exception_class: Api::BusinessRuleError,
+        code: "last_login_method",
+        default_message: -> { I18n.t("settings.cannot_unlink_last_method", default: "You cannot unlink your last sign-in method") }
+      },
+      email_required: {
+        exception_class: Api::BusinessRuleError,
+        code: "email_required",
+        default_message: -> { I18n.t("flash.oauth_email_required", default: "Your social account must provide a verified email address") }
+      },
+      unverified_provider_email: {
+        exception_class: Api::BusinessRuleError,
+        code: "unverified_provider_email",
+        default_message: -> { I18n.t("flash.oauth_unverified_email", default: "Please sign in with a magic link first to link this account") }
+      },
+      identity_already_linked: {
+        exception_class: Api::BusinessRuleError,
+        code: "identity_already_linked",
+        default_message: -> { I18n.t("settings.identity_already_linked", default: "This social account is already linked") }
+      },
+      invalid_provider: {
+        exception_class: Api::BusinessRuleError,
+        code: "invalid_provider",
+        default_message: -> { I18n.t("flash.oauth_invalid_provider", default: "Unsupported sign-in provider") }
+      },
+      oauth_failed: {
+        exception_class: Api::UnauthorizedError,
+        default_message: -> { I18n.t("flash.oauth_failed", default: "Social sign-in failed") }
+      },
+      oauth_not_configured: {
+        exception_class: Api::ServiceUnavailableError,
+        default_message: -> { I18n.t("flash.service_unavailable", default: "Service temporarily unavailable. Please retry later.") }
+      },
       rate_limited: {
         exception_class: Api::RateLimitedError,
         default_message: -> { I18n.t("errors.messages.magic_link_rate_limit_exceeded", default: "Rate limit reached") }

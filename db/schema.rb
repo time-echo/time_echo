@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -150,6 +150,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000003) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
+  create_table "identities", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "provider", null: false
+    t.string "uid", null: false
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
+    t.index ["user_id", "provider"], name: "index_identities_on_user_id_and_provider", unique: true
+    t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
   create_table "letters", force: :cascade do |t|
     t.string "email", null: false
     t.string "title"
@@ -171,6 +183,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000003) do
     t.index ["scheduled_at"], name: "index_letters_on_scheduled_at"
     t.index ["stamp_id"], name: "index_letters_on_stamp_id"
     t.index ["status"], name: "index_letters_on_status"
+  end
+
+  create_table "oauth_states", force: :cascade do |t|
+    t.string "state_digest", null: false
+    t.string "provider", null: false
+    t.string "code_verifier", null: false
+    t.string "purpose", default: "login", null: false
+    t.bigint "user_id"
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_oauth_states_on_expires_at"
+    t.index ["state_digest"], name: "index_oauth_states_on_state_digest", unique: true
+    t.index ["user_id"], name: "index_oauth_states_on_user_id"
   end
 
   create_table "predictions", force: :cascade do |t|
@@ -221,8 +247,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000003) do
     t.index ["stamp_category_id"], name: "index_stamps_on_stamp_category_id"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "password_digest"
+    t.datetime "email_verified_at"
+    t.string "reset_token_digest"
+    t.datetime "reset_sent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_token_digest"], name: "index_users_on_reset_token_digest", unique: true
+  end
+
   add_foreign_key "emotional_snapshots", "letters"
+  add_foreign_key "identities", "users"
   add_foreign_key "letters", "stamps", on_delete: :restrict
+  add_foreign_key "oauth_states", "users"
   add_foreign_key "predictions", "letters"
   add_foreign_key "stamps", "stamp_categories"
 end

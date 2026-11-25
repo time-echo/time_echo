@@ -26,6 +26,8 @@ module Auth
       SessionToken.transaction do
         is_new_user = !SessionToken.where(email: email).where.not(used_at: nil).exists? &&
                       !AuditLog.where(actor_email: email).exists?
+        user = User.find_or_create_for_email!(email)
+        user.update!(email_verified_at: Time.current) if user.email_verified_at.nil?
         token_record.use!
         SessionToken.revoke_active_for(email)
         api_session_token = SessionToken.create!(email: email)

@@ -839,6 +839,208 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
 
+  /registrations:
+    post:
+      summary: Register a new account with email and password
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 10
+                password_confirmation:
+                  type: string
+                locale:
+                  type: string
+      responses:
+        '201':
+          description: Account created and session issued.
+        '202':
+          description: Magic link dispatched for existing passwordless account.
+        '422':
+          description: Validation error.
+
+  /password_resets:
+    post:
+      summary: Request a password reset email
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                locale:
+                  type: string
+      responses:
+        '200':
+          description: Generic success message (enumeration-safe).
+
+  /password_resets/{token}:
+    patch:
+      summary: Reset password using a single-use token
+      tags:
+        - Authentication
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+                  minLength: 10
+                password_confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Password updated and all active sessions revoked.
+        '401':
+          description: Invalid or expired reset token.
+
+  /account/password:
+    patch:
+      summary: Update or set account password
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                current_password:
+                  type: string
+                password:
+                  type: string
+                  minLength: 10
+                password_confirmation:
+                  type: string
+      responses:
+        '200':
+          description: Password updated and other sessions revoked.
+        '401':
+          description: Authentication required.
+        '422':
+          description: Invalid current password or validation error.
+
+  /oauth_authorizations:
+    post:
+      summary: Start an OAuth 2.0 PKCE authorization flow (Google or Facebook)
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider]
+              properties:
+                provider:
+                  type: string
+                  enum: [google, facebook]
+                purpose:
+                  type: string
+                  enum: [login, link]
+      responses:
+        '201':
+          description: Authorization URL generated.
+
+  /oauth_callbacks:
+    post:
+      summary: Complete an OAuth 2.0 callback and issue a session or link identity
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [provider, code, state]
+              properties:
+                provider:
+                  type: string
+                  enum: [google, facebook]
+                code:
+                  type: string
+                state:
+                  type: string
+      responses:
+        '200':
+          description: Authenticated session or linked identity result.
+        '401':
+          description: Invalid or expired state or OAuth failure.
+
+  /account/identities:
+    get:
+      summary: List connected social identities for the authenticated user
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Connected identities list.
+    post:
+      summary: Initiate linking a social provider to the authenticated account
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Authorization URL generated for linking.
+
+  /account/identities/{provider}:
+    delete:
+      summary: Unlink a connected social provider
+      tags:
+        - Account
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, facebook]
+      responses:
+        '200':
+          description: Identity unlinked.
+        '422':
+          description: Cannot unlink the last login method.
+
 components:
   securitySchemes:
     bearerAuth:

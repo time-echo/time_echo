@@ -25,6 +25,7 @@ module Settings
       ActiveRecord::Base.transaction do
         Letter.where(email: old_email).update_all(email: new_email)
         SessionToken.where(email: old_email).update_all(email: new_email)
+        User.where(email: old_email).update_all(email: new_email, email_verified_at: Time.current, updated_at: Time.current)
         AuditLog.record!(
           action: "account.email_updated",
           actor_email: new_email,

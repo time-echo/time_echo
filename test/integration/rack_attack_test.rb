@@ -65,4 +65,24 @@ class RackAttackTest < ActionDispatch::IntegrationTest
     delete "/api/v1/account", as: :json
     assert_response :too_many_requests
   end
+
+  test "throttles password login attempts per email after 5 tries" do
+    5.times do
+      post "/api/v1/sessions", params: { email: "victim@example.com", password: "wrong-password-123" }, as: :json
+      assert_response :unauthorized
+    end
+
+    post "/api/v1/sessions", params: { email: "victim@example.com", password: "wrong-password-123" }, as: :json
+    assert_response :too_many_requests
+  end
+
+  test "throttles password reset requests per IP after 3 tries" do
+    3.times do |i|
+      post "/api/v1/password_resets", params: { email: "reset#{i}@example.com" }, as: :json
+      assert_response :ok
+    end
+
+    post "/api/v1/password_resets", params: { email: "reset_extra@example.com" }, as: :json
+    assert_response :too_many_requests
+  end
 end
