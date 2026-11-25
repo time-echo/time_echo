@@ -19,9 +19,6 @@ module Oauth
       HTTP_TIMEOUT = 10
 
       def self.web_app_url
-        explicit = ENV["WEB_APP_URL"].presence
-        return explicit.strip.chomp("/") if explicit
-
         host = ENV.fetch("APP_HOST", "localhost:3001").strip.chomp("/")
         host.match?(%r{\Ahttps?://}i) ? host : "#{ENV.fetch('APP_PROTOCOL', 'http')}://#{host}"
       end
