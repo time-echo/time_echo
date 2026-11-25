@@ -3,8 +3,9 @@
 module Oauth
   class ProviderRegistry
     PROVIDERS = {
-      "google" => Providers::Google,
-      "facebook" => Providers::Facebook
+      "google" => Providers::Google
+      # Facebook login temporarily disabled:
+      # "facebook" => Providers::Facebook
     }.freeze
 
     def self.fetch(provider_name)
