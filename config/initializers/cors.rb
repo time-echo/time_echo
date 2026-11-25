@@ -4,8 +4,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       "http://localhost:3000",
       "http://127.0.0.1:3000",
       "http://localhost:3001",
-      "http://127.0.0.1:3001",
-      "https://supercarpal-unwillingly-harriett.ngrok-free.dev"
+      "http://127.0.0.1:3001"
     ]
 
     if ENV["CORS_ORIGINS"].present?
