@@ -23,6 +23,9 @@ Rails.application.routes.draw do
       resources :stamps, only: [ :index, :show ], param: :slug
       resources :stamp_categories, only: [ :index ]
 
+      resources :inspirations, only: [ :index, :show ], param: :slug
+      resources :inspiration_categories, only: [ :index ]
+
       resources :letters, only: [ :index, :show, :create, :destroy ] do
         match "predictions", to: "letter_predictions#update", via: [ :post, :patch, :put ]
         scope module: :letters do
