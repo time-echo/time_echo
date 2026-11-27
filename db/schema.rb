@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_23_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -160,6 +160,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_000002) do
     t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
     t.index ["user_id", "provider"], name: "index_identities_on_user_id_and_provider", unique: true
     t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
+  create_table "inspirations", force: :cascade do |t|
+    t.string "slug", null: false
+    t.jsonb "text", default: {}, null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["active", "position"], name: "index_inspirations_on_active_and_position"
+    t.index ["slug"], name: "index_inspirations_on_slug", unique: true
   end
 
   create_table "letters", force: :cascade do |t|

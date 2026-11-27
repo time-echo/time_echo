@@ -5,10 +5,12 @@ AnalyticsEvent.delete_all
 Letter.delete_all
 Stamp.delete_all
 StampCategory.delete_all
+Inspiration.delete_all
 
 puts "Seeding TimeEcho digital vaults..."
 
 load Rails.root.join("db/seeds/stamps.rb")
+load Rails.root.join("db/seeds/inspirations.rb")
 
 # 1. Pre-delivered letter with completed predictions and emotional evolution
 delivered_letter = Letter.new(
