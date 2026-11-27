@@ -6,7 +6,6 @@ Letter.delete_all
 Stamp.delete_all
 StampCategory.delete_all
 Inspiration.delete_all
-InspirationCategory.delete_all
 
 puts "Seeding TimeEcho digital vaults..."
 

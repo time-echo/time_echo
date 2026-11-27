@@ -6,8 +6,6 @@ inspirations_list = @inspirations.map do |inspiration|
   {
     slug: inspiration.slug,
     text: inspiration.localized_text(@locale),
-    category_slug: inspiration.inspiration_category.slug,
-    categorySlug: inspiration.inspiration_category.slug,
     position: inspiration.position,
     active: inspiration.active
   }

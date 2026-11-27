@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Inspiration < ApplicationRecord
-  belongs_to :inspiration_category
-
   validates :slug, presence: true,
                    uniqueness: { case_sensitive: false },
                    format: { with: /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/, message: :invalid }
@@ -12,19 +10,6 @@ class Inspiration < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(position: :asc, id: :asc) }
-  scope :in_active_categories, -> {
-    joins(:inspiration_category).where(inspiration_categories: { active: true })
-  }
-
-  scope :by_category, ->(category_param) {
-    return all if category_param.blank?
-
-    if category_param.to_s.match?(/\A\d+\z/)
-      where(inspiration_category_id: category_param)
-    else
-      joins(:inspiration_category).where(inspiration_categories: { slug: category_param.to_s.downcase })
-    end
-  }
 
   scope :search_by_text, ->(query) {
     return all if query.blank?

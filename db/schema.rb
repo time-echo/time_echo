@@ -162,20 +162,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_000002) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
-  create_table "inspiration_categories", force: :cascade do |t|
-    t.string "slug", null: false
-    t.jsonb "name", default: {}, null: false
-    t.jsonb "description", default: {}, null: false
-    t.integer "position", default: 0, null: false
-    t.boolean "active", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["position"], name: "index_inspiration_categories_on_position"
-    t.index ["slug"], name: "index_inspiration_categories_on_slug", unique: true
-  end
-
   create_table "inspirations", force: :cascade do |t|
-    t.bigint "inspiration_category_id", null: false
     t.string "slug", null: false
     t.jsonb "text", default: {}, null: false
     t.integer "position", default: 0, null: false
@@ -183,8 +170,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_000002) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["active", "position"], name: "index_inspirations_on_active_and_position"
-    t.index ["inspiration_category_id", "position"], name: "index_inspirations_on_inspiration_category_id_and_position"
-    t.index ["inspiration_category_id"], name: "index_inspirations_on_inspiration_category_id"
     t.index ["slug"], name: "index_inspirations_on_slug", unique: true
   end
 
@@ -287,7 +272,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_26_000002) do
 
   add_foreign_key "emotional_snapshots", "letters"
   add_foreign_key "identities", "users"
-  add_foreign_key "inspirations", "inspiration_categories"
   add_foreign_key "letters", "stamps", on_delete: :restrict
   add_foreign_key "oauth_states", "users"
   add_foreign_key "predictions", "letters"
